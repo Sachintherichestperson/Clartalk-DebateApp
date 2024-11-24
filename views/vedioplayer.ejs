@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/stylesheets/vedioplayer.css">
+</head>
+<body>
+        <section>
+            <div class="vediopage">
+                <nav>
+                    <img src="/images/nav.png" alt="" class="image">
+                    <input type="text" placeholder="Search" class="search">
+                </nav>
+                <div class="vedioplay">
+                    <video controls autoplay class="vedio">
+                        <source src="data:video/mp4;base64,<%= vedios.vedio.toString('base64') %>" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <p class="title"><%= vedios.title %></p>
+                    <div class="user">
+                        <% if(vedios.creator[0].image > 0){ %>
+                            <img src="data:image/jpeg;base64,<%= vedios.creator[0].image.toString('base64') %>" alt="Debate" class="display"> 
+                        <% }else{ %>
+                            <img src="/images/Default.png" alt="" class="display">
+                        <% } %>
+                        <a href="/creator/creator/<%= vedios.creator[0]._id %>"><p class="name"><%= vedios.creator[0].username %><span class="sub"><%= follower%> followers</span></p></a>
+                       
+                        <a href="/follow/<%= vedios.creator[0]._id %>" class="button-subscribe">
+                            <% if (isFollowing) { %>
+                                <p class="UnSubscribe-button">unfollow</p>
+                            <% } else { %>
+                                <p class="Subscribe-button">follow</p>
+                            <% } %>
+                        </a>
+                    </div>
+                    <div class="info">
+                        <p><span class="views"><%= vedios.Views %> Views</span> <span class="date"> <%= vedios.createdAt.toLocaleDateString('en-GB') %></span></p>
+                    <p class="Description"><%= vedios.description %></p>
+                    </div>
+                </div>
+            </div>
+            <div class="vedios">
+        <% suggestions.forEach(function(suggestion){ %>
+            <a href="/<%= currentRoute %>/<%= suggestion._id %>">
+                <div class="suggestions">
+                    <img src="data:image/jpeg;base64,<%= suggestion.Thumbnail.toString('base64') %>" alt="Debate" id="suggested-image">
+                    <div class="about-vedio">
+                        <p class="title-suggestion"><%= suggestion.title %></p>
+                        <p class="user-suggestion"><%= suggestion.creator[0].username %></p>
+                        <p class="about"><span class="view-suggestion"><%= suggestion.Views %> Views</span><span class="date-suggestions"><%= vedios.createdAt.toLocaleDateString('en-GB') %></span></p>
+                    </div>
+                </div>
+            </a>
+        <% }) %>
+                
+            </div>
+        </section>
+</body>
+</html>

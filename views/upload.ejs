@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creator page</title>
+    <link rel="stylesheet" href="/stylesheets/upload.css">
+</head>
+<body>
+    <section>
+        <h1>UPLOAD PODCAST VEDIO</h1>
+        <div class="form">
+            <form action="/creator/upload" method="post" enctype="multipart/form-data">
+                <h4 class="image-heading">Upload Thumbnail</h4>
+                <input type="file" name="Thumbnail" class="image">
+                <h4 class="vedio-heading">Upload vedio</h4>
+                <input type="file" name="vedio" class="vedio">
+                <input type="text" name="title" id="title" placeholder="Give Title">
+                <input type="text" name="description" id="description" placeholder="Give description">
+
+               
+    <p class="instruction">Select content type:</p>
+        <div class="choose">
+            <label for="debate">
+                <input type="radio" id="debate" name="contentType" value="debate" class="class" required>
+                <p class="label-debate">Debate</p>
+            </label>
+            <label for="podcast">
+                <input type="radio" id="podcast" name="contentType" value="podcast" class="class" required>
+                <p class="label-podcast">Podcast</p>
+            </label>
+        </div>
+                <input type="submit" value="Submit" id="button">
+            </form>
+        </div>
+    </section>
+</body>
+</html>

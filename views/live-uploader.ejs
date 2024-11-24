@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creator page</title>
+    <link rel="stylesheet" href="/stylesheets/live.css">
+    <script src="/javascript/main.js"></script>
+</head>
+<body>
+    <section>
+        <h1>Stream Live</h1>
+        <div class="form">
+            <form action="/creator/stream/live" method="post" enctype="multipart/form-data">
+                <h4 class="image-heading">Upload Thumbnail</h4>
+                <input type="file" name="Thumbnail" class="image">
+                <h2 class="time-heading">Streaming Time</h2>
+                <input type="datetime-local" name="Time" class="time">
+                <input type="text" name="title" id="title" placeholder="Give Title">
+                <input type="text" name="description" id="description" placeholder="Give description">
+                <div class="opponent">
+                    <p>Opponent Debater</p>
+                    <input type="text" placeholder="username" id="username-input" name="opponent">
+                </div>
+                <input type="submit" value="Send Request" id="button">
+            </form>
+        </div>
+    </section>
+</body>
+</html>

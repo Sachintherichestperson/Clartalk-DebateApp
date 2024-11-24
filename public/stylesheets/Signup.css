@@ -1,0 +1,75 @@
+body{
+    background-color: black;
+    width: 100%;
+    height: 100%;
+    color: white;
+    padding: 0px 181px 10px 400px;
+    overflow: hidden;
+}
+#Sign-up{
+    width: 400px;
+    padding: 20px 90px 50px 90px;
+    border: 2px solid white;
+}
+.username{
+    font-size: 40px;
+    display: block;
+    width: 400px;
+    font-weight: 900;
+}
+#username{
+    padding: 5px 50px 5px 50px;
+    width: 250px;
+    font-size: 30px;
+}
+.email{
+    font-size: 40px;
+    display: block;
+    width: 400px;
+    font-weight: 900;
+}
+#email{
+    padding: 5px 50px 5px 50px;
+    width: 250px;
+    font-size: 30px;
+}
+.password{
+    font-size: 40px;
+    display: block;
+    width: 400px;
+    font-weight: 900;
+}
+#password{
+    padding: 5px 50px 5px 50px;
+    width: 250px;
+    font-size: 30px;
+}
+button{
+    padding: 10px 105px 10px 105px;
+    font-size: 30px;
+    font-weight: 900;
+    background-color: black;
+    color: white;
+    border: 2px solid white;
+}
+h1{
+    font-size: 50px;
+}
+a{
+    font-size: 20px;
+    margin-left: 300px;
+    text-decoration: none;
+}
+.flash-message {
+    position: relative;
+    top: 10px;
+    background-color: red;
+    padding: 10px 20px 10px 20px; 
+    max-width: 500px;
+    min-width: 300px;
+    border-radius: 7px;
+    font-size: 23px; 
+    color: white; 
+    text-align: center; 
+    animation: fadeOut 3s forwards;
+}

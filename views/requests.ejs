@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .request-form{
+            width: 300px;
+            height: 100px;
+            position: relative;
+            top: 20px;
+        }
+        button{
+            padding: 10px 60px 10px 60px;
+            background-color: rgb(80, 80, 91);
+            color: white;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pending Requests</h1>
+    <% contents.forEach(function(content) {%>
+            <p><strong>Title:</strong> <%= content.title %></p>
+    <p><strong>Description:</strong> <%= content.description %></p>
+    
+        <form action="/creator/accept/<%= opponentId %>" method="post" class="request-form">
+            <input type="hidden" name="requestId" value="<%= opponentId %>">
+            <button type="submit" name="action" value="accept">Accept</button>
+        </form>
+        <form action="/creator/reject/<%=  opponentId %>" method="post" class="request-form">
+            <input type="hidden" name="requestId" value="<%= opponentId %>">
+            <button type="submit" name="action" value="reject">Reject</button>
+        </form>
+        <% })%>
+    
+</body>
+</html>

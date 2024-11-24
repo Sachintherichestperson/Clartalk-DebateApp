@@ -1,0 +1,251 @@
+body{
+    background-color: black;
+}
+section{
+    position: relative;
+    display: flex;
+}
+.ved{
+    width: 800px;
+    height: 500px;
+    position: relative;
+    top: 70px;
+    left: 70px;
+}
+.vediopage{
+    background-color: black;
+    height: 100%;
+}
+nav{
+    background-color: black;
+    width: 100%;
+    height: 120px;
+}
+nav .image{
+    width: 300px;
+    height: 120px;
+    object-fit: cover;
+}
+.search{
+    width: 320px;
+    height: 40px;
+    border-radius: 30px;
+    background-color: black;
+    position: relative;
+    top: -40px;
+    padding: 5px 10px 5px 10px;
+    font-size: 20px;
+    left: 650px;
+    border: 0.3px solid white;
+}
+.vedioplay{
+    width: 800px;
+    height: auto;
+    min-height: 1200px;
+    background-color: black;
+    position: relative;
+    left: 70px;
+    top: 30px;
+    border-radius: 2px;
+    border: 1px solid white;
+}
+.vedioplay .vedio{
+    width: 800px;
+    height: 500px;
+    object-fit: cover;
+    border: 1px solid white;
+}
+.title{
+    font-size: 30px;
+    color: white;
+    width: 750px;
+    position: relative;
+    left: 20px;
+}
+.Description{
+    font-size: 20px;
+    width: 710px;
+    position: relative;
+    color: rgb(175, 175, 175);
+    left: -10px;
+    height: auto;
+    top: -35px;
+    padding: 10px 20px 10px 20px;
+}
+.user{
+    border: 1px solid white;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: 70px;
+}
+.display{
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    position: relative;
+    left: 30px;
+    top: 5px;
+}
+.user .name{
+    width: 240px;
+    position: relative;
+    height: 40px;
+    font-size: 30px;
+    left: -60px;
+    top: -25px;
+    color: white;
+}
+.sub{
+    color: #8b8b8b;
+    width: 150px;
+    display: flex;
+    position: relative;
+    top: 5px;
+    font-size: 15px;
+}
+.Subscribe-button{
+    width: 150px;
+    height: 30px;
+    background-color: red;
+    border-radius: 60px;
+    color: white;
+    font-size: 25px;
+    padding: 5px 10px 5px 10px;
+    text-align: center;
+    position: relative;
+    bottom: 10px;
+    left: -210px;
+    cursor: pointer;
+    text-transform: uppercase;
+    border: 1px solid white;
+    outline: none;
+}
+.UnSubscribe-button{
+    width: 150px;
+    height: 30px;
+    background-color: rgb(69, 68, 68);
+    border-radius: 60px;
+    color: white;
+    font-size: 25px;
+    padding: 5px 10px 5px 10px;
+    text-align: center;
+    position: relative;
+    bottom: 10px;
+    left: -210px;
+    cursor: pointer;
+    text-transform: uppercase;
+    border: 1px solid white;
+    outline: none;
+}
+.info{
+    position: relative;
+    width: 710px;
+    color: rgb(98 98 98);
+    left: 25px;
+    height: auto;
+    font-size: 20px;
+    top: 20px;
+    background: #7979793b;
+    padding: 10px 20px 10px 20px;
+    border: 1px solid;
+    border-radius: 10px;
+}
+
+.date{
+    position: relative;
+    left: 5px;
+    color: rgb(255, 255, 255);
+    font-size: 23px;
+    font-weight: 900;
+    left: 20px;
+    top: -20px;
+}
+.views{
+    position: relative;
+    left: 10px;
+    color: rgb(255, 255, 255);
+    font-size: 23px;
+    font-weight: 900;
+    top: -20px;
+}
+.vedios{
+    width: 590px;
+    height: auto;
+    position: relative;
+    top: 150px;
+    left: 100px;
+    border: 1px solid white;
+    display: flex;
+    flex-direction: column;
+}
+#suggested-image{
+    width: 220px;
+    height: 130px;
+    object-fit: cover;
+    position: relative;
+    top: 10px;
+    left: 10px;
+    border-radius: 10px;
+}
+.suggestions{
+    width: 550px;
+    position: relative;
+    left: 20px;
+    /* top: 10px; */
+    height: 180px;
+    border: 0.5px solid rgb(87, 87, 87);
+    display: flex;
+}
+.title-suggestion{
+    width: 254.8px;
+    height: 45px;
+    color: rgb(253, 253, 253);
+    font-size: 20px;
+    position: relative;
+    left: 5px;
+    margin-bottom: 50px;
+    overflow: hidden;
+}
+.user-suggestion{
+    width: 200px;
+    color: #454444;
+    position: relative;
+    font-size: 23px;
+    top: -40px;
+    left: 5px;
+}
+.view-suggestion{
+    position: relative;
+    font-size: 15px;
+    height: 50px;
+    width: 100px;
+    left: 5px;
+    top: -60px;
+    color: #454444;
+    font-weight: 400;
+}
+.date-suggestions{
+    position: relative;
+    font-size: 15px;
+    height: 50px;
+    position: relative;
+    left: 15px;
+    width: 100px;
+    font-weight: 400;
+    color: #454444;
+    top: -60px;
+}
+.about-vedio{
+    width: 280px;
+    height: 180px;
+    position: relative;
+    left: 30px;
+}
+a{
+    text-decoration: none;
+}
+.error-solution{
+    color: white;
+}

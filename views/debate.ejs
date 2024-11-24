@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClarTalk</title>
+    <link rel="stylesheet" href="./stylesheets/home.css">
+</head>
+<body>
+    <section class="contanier">
+        <div class="home">
+            <nav>
+                <div class="image">
+                <img src="/images/nav.png" alt="clartalk">
+                <div class="search"><input type="text" name="" id="" placeholder="Search"></div>
+                </div>
+                <div class="nav">
+                <a href="/" class="Live">Live</a>
+                <a href="debate" class="Debates">Debates</a>
+                <a href="podcast" class="Podcasts">Podcasts</a>
+                <a href="/community" class="Community">Community</a>
+            </div>
+            </nav>
+            <div class="page">
+                <% vedios.forEach(function(vedio){ %>
+                    <a href="/debate/<%= vedio._id %>">
+                    <div class="vedios">
+                        <img src="data:image/jpeg;base64,<%= vedio.Thumbnail.toString('base64') %>" alt="debates">
+                        <p class="title"><%= vedio.title %></p>
+                        <p class="Time"><%= vedio.createdAt.toLocaleDateString('en-GB') %></p>
+                        <p class="Views"><%= vedio.Views %> Views</p>
+                    </div>
+                </a>
+                 <% }) %>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
