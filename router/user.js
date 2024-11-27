@@ -145,8 +145,8 @@ router.get("/follow/:id",isloggedin, async function(req, res){
 });
 
 
-router.get("/check", function(req, res){
-    res.render("live-player")
+router.get("/community-chat", function(req, res){
+    res.render("chat.ejs")
 })
 
 module.exports = router;

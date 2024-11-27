@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community-Chat</title>
+    <link rel="stylesheet" href="./stylesheets/chat.css">
+</head>
+<body>
+    <section>
+         <nav class="community-name">
+            <span class="DP"><img src="/images/nav.png" alt="community"></span>
+            <h2 class="Name">Community-Name</h2>
+            <div class="icon-container" tabindex="0">
+                <span class="icon">&#9776;</span>
+                <div class="icon-dropdown-menu">
+                    <ul>
+                        <li><a href="#">Option 1</a></li>
+                        <li><a href="#">Option 2</a></li>
+                        <li><a href="#">Option 3</a></li>
+                        <li><a href="#">Option 4</a></li>
+                        <li><a href="#">Option 5</a></li>
+                        <li><a href="#">Option 6</a></li>
+                    </ul>
+                </div>
+            </div>
+         </nav>
+         <div class="chat-panel">
+            <div class="chat">
+                <div class="msg"><span>Admin:</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+            </div>
+             <div class="chat">
+                <div class="msg"><span>Modi:</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+            </div>
+            <div class="chat">
+                <div class="msg"><span>Neeraj:</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+            </div>
+            <div class="chat">
+                <div class="msg"><span>Admin:</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+            </div>
+            <div class="Self">
+                <div class="msg"><span>Self</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+            </div>
+             <div class="chat">
+                <div class="msg"><span>Modi:</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+            </div>
+            <div class="Self">
+                <div class="msg"><span>Self</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+            </div>
+            <div class="chat">
+                <div class="msg"><span>Neeraj:</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+            </div>
+            <div class="Self">
+                <div class="msg"><span>Self</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+            </div>
+            <div class="chat">
+                <div class="msg"><span>Admin:</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+            </div>
+            <div class="chat">
+                <div class="msg"><span>Admin:</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+            </div>
+            <div class="Self">
+                <div class="msg"><span>Self</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+            </div>
+         </div>
+         <div class="input">
+            <div class="files">
+                <label for="dropdown-toggle">@</label>
+                <input type="checkbox" id="dropdown-toggle">
+                <div class="dropdown-menu">
+                  <ul>
+                    <li><a href="#"><img src="/images/camera.png" alt="" class="camera"><p>Camera</p></a></li>
+                    <li><a href="#"><img src="/images/gallery.png" alt="" class="camera"><p>Gallery</p></a></li>
+                    <li><a href="#"><img src="/images/document.png" alt="" class="camera"><p>Document</p></a></li>
+                    <li><a href="#"><img src="/images/icon.png" alt="" class="camera"><p>Poll</p></a></li>
+                  </ul>
+                </div>
+              </div>              
+            <input type="text" placeholder="Type your message" id="msg">
+            <input type="submit" id="btn" value="">
+         </div>
+    </section>
+</body>
+<script>
+    // When the document is clicked, close the dropdown if it's open
+document.addEventListener('click', function (e) {
+  const dropdown = document.querySelector('.dropdown-menu');
+  const checkbox = document.querySelector('#dropdown-toggle');
+  const files = document.querySelector('.files');
+
+  // Check if the click is outside the dropdown and files
+  if (!files.contains(e.target)) {
+    checkbox.checked = false;  // Uncheck the checkbox to close the dropdown
+  }
+});
+
+</script>
+</html>
