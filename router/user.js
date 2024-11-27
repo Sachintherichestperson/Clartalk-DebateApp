@@ -28,7 +28,6 @@ router.get("/",isloggedin,async function(req, res){
   try{
     const user = await User.findOne({email: req.user.email}).populate("requests").populate( "Sender" );
     const vedios = await liveMongo.find({ status: "accept"})
-    console.log(user.Sender)
     res.render("front-page", {vedios, user})
   }catch(err){
     res.status(404).send(err);
@@ -117,33 +116,28 @@ router.get("/community", function(req, res){
 router.get("/logout", logout)
 
 router.get("/follow/:id",isloggedin, async function(req, res){
-  const follow = await User.findById(req.params.id);  // The creator to be followed/unfollowed
-  const user = await User.findOne({ email: req.user.email });  // The currently logged-in user
+  const follow = await User.findById(req.params.id);  
+  const user = await User.findOne({ email: req.user.email }); 
 
-  // Check if the user is already following the creator
+
   if (!user.following.includes(follow._id)) {
-    // If not, follow the creator: add to the logged-in user's followers
+
     user.following.push(follow._id);
     await user.save();
     
-    // Also add the logged-in user to the creator's followers
     follow.followers.push(user._id);
     await follow.save();
   } else {
-    // If the user is already following, unfollow the creator
     user.following.pull(follow._id);
     await user.save();
 
-    // Also remove the logged-in user from the creator's followers
     follow.followers.pull(user._id);
     await follow.save();
   }
 
-  // Redirect the user back to the previous page or home page
   const redirectUrl = req.get("Referrer") || "/";
   res.redirect(redirectUrl);
 });
-
 
 router.get("/community-chat", function(req, res){
     res.render("chat.ejs")

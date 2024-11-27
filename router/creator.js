@@ -174,31 +174,36 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
 });
 
 
-router.get("/opponent-requests/:Id",isloggedin, async (req, res) => {
+router.get("/opponent-requests/:Id", isloggedin, async (req, res) => {
   try {
-
-    const user = await User.findOne({ email: req.user.email}).populate({
+    const user = await User.findOne({ email: req.user.email }).populate({
       path: "requests",
-      select: "OpponentName requestId title description"
+      select: "OpponentName requestId title description",
     });
 
-    const opponentId = user.requests[0].OpponentName;
-    console.log(opponentId)
+    if (!user || !user.requests || user.requests.length === 0) {
+      return res.status(404).send("No requests found for this user.");
+    }
 
-    
+    const opponentId = user.requests[0]?.OpponentName; // Use optional chaining
+    if (!opponentId) {
+      return res.status(404).send("OpponentName not found in the request.");
+    }
+
+    console.log(opponentId);
+
     const contents = await livemongo.find({ status: "pending" });
     const opponentUser = await User.findById(opponentId);
 
     const requests = user.requests;
 
-    
     res.render("requests", { requests, contents, opponentId, user });
-    
-  }catch (err) {
+  } catch (err) {
     console.log("Error fetching opponent requests: ", err);
     res.status(500).send("Server error");
   }
 });
+
 
 
 router.post("/accept/:id",isloggedin,async function (req, res) {
