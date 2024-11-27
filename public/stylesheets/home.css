@@ -127,3 +127,10 @@ a{
     font-size: 20px;
     left: 140px;
 }
+.requests{
+    height: 32px;
+    min-width: 130px;
+    padding: 15px 30px 15px 30px;
+    border: 1px solid white;
+    text-align: center;
+}

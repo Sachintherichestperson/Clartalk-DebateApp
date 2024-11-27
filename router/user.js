@@ -111,6 +111,9 @@ router.get("/podcast/:id",isloggedin, async function(req, res){
     }
 });
 
+router.get("/community", function(req, res){
+  res.render("community");
+})
 router.get("/logout", logout)
 
 router.get("/follow/:id",isloggedin, async function(req, res){
