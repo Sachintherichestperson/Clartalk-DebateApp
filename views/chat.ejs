@@ -8,7 +8,7 @@
 </head>
 <body>
     <section>
-         <nav class="community-name">
+        <nav class="community-name">
             <span class="DP"><img src="/images/nav.png" alt="community"></span>
             <h2 class="Name">Community-Name</h2>
             <div class="icon-container" tabindex="0">
@@ -24,99 +24,75 @@
                     </ul>
                 </div>
             </div>
-         </nav>
-         <div class="chat-panel">
+        </nav>
+
+        <!-- Add to Community Section -->
+        <div id="add-to-community" class="first-time-chat">
+            <p>Welcome to the community chat! Click the button below to join the community.</p>
+            <button id="add-user-btn">Add to Community</button>
+        </div>
+
+        <div class="chat-panel">
             <div class="chat">
                 <div class="msg"><span>Admin:</span>
                     <p>BJP should come but with this .........</p>
                 </div>
             </div>
-             <div class="chat">
-                <div class="msg"><span>Modi:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-            <div class="chat">
-                <div class="msg"><span>Neeraj:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-            <div class="chat">
-                <div class="msg"><span>Admin:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-            <div class="Self">
-                <div class="msg"><span>Self</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-             <div class="chat">
-                <div class="msg"><span>Modi:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-            <div class="Self">
-                <div class="msg"><span>Self</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-            <div class="chat">
-                <div class="msg"><span>Neeraj:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-            <div class="Self">
-                <div class="msg"><span>Self</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-            <div class="chat">
-                <div class="msg"><span>Admin:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-            <div class="chat">
-                <div class="msg"><span>Admin:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-            <div class="Self">
-                <div class="msg"><span>Self</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-         </div>
-         <div class="input">
+            <!-- More chat messages -->
+        </div>
+        <div class="input">
             <div class="files">
                 <label for="dropdown-toggle">@</label>
                 <input type="checkbox" id="dropdown-toggle">
                 <div class="dropdown-menu">
-                  <ul>
-                    <li><a href="#"><img src="/images/camera.png" alt="" class="camera"><p>Camera</p></a></li>
-                    <li><a href="#"><img src="/images/gallery.png" alt="" class="camera"><p>Gallery</p></a></li>
-                    <li><a href="#"><img src="/images/document.png" alt="" class="camera"><p>Document</p></a></li>
-                    <li><a href="#"><img src="/images/icon.png" alt="" class="camera"><p>Poll</p></a></li>
-                  </ul>
+                    <ul>
+                        <li><a href="#"><img src="/images/camera.png" alt="" class="camera"><p>Camera</p></a></li>
+                        <li><a href="#"><img src="/images/gallery.png" alt="" class="camera"><p>Gallery</p></a></li>
+                        <li><a href="#"><img src="/images/document.png" alt="" class="camera"><p>Document</p></a></li>
+                        <li><a href="#"><img src="/images/icon.png" alt="" class="camera"><p>Poll</p></a></li>
+                    </ul>
                 </div>
-              </div>              
+            </div>              
             <input type="text" placeholder="Type your message" id="msg">
             <input type="submit" id="btn" value="">
-         </div>
+        </div>
     </section>
 </body>
 <script>
     // When the document is clicked, close the dropdown if it's open
-document.addEventListener('click', function (e) {
-  const dropdown = document.querySelector('.dropdown-menu');
-  const checkbox = document.querySelector('#dropdown-toggle');
-  const files = document.querySelector('.files');
+    document.addEventListener('click', function (e) {
+        const dropdown = document.querySelector('.dropdown-menu');
+        const checkbox = document.querySelector('#dropdown-toggle');
+        const files = document.querySelector('.files');
 
-  // Check if the click is outside the dropdown and files
-  if (!files.contains(e.target)) {
-    checkbox.checked = false;  // Uncheck the checkbox to close the dropdown
-  }
-});
+        // Check if the click is outside the dropdown and files
+        if (!files.contains(e.target)) {
+            checkbox.checked = false;  // Uncheck the checkbox to close the dropdown
+        }
+    });
 
+    // First-time user join logic
+    const addToCommunitySection = document.getElementById('add-to-community');
+    const addUserButton = document.getElementById('add-user-btn');
+    const chatPanel = document.querySelector('.chat-panel');
+    const inputSection = document.querySelector('.input');
+
+    addUserButton.addEventListener('click', () => {
+        // Logic to handle adding user to the community
+        alert('You have been added to the community!');
+        addToCommunitySection.style.display = 'none'; // Hide the "add to community" section
+        chatPanel.style.display = 'block'; // Show the chat panel
+        inputSection.style.display = 'flex'; // Enable chat input
+    });
+
+    // Simulating first-time user detection (replace this with actual server-side logic)
+    const isFirstTimeUser = true; // This should be determined dynamically
+    if (isFirstTimeUser) {
+        addToCommunitySection.style.display = 'block';
+        chatPanel.style.display = 'none';
+        inputSection.style.display = 'none';
+    } else {
+        addToCommunitySection.style.display = 'none';
+    }
 </script>
 </html>

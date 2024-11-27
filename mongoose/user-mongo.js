@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
     username: String,
     email: String,
     password: String,
+    communities: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Community' }],
     vedio: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "vedio"
@@ -45,7 +46,7 @@ const userSchema = new mongoose.Schema({
             description: String,
             status: { type: String, default: 'pending' }
         }
-    ],
+    ]
 });
 
 module.exports = mongoose.model('User', userSchema);
