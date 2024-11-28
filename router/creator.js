@@ -8,6 +8,7 @@ const vediomongoose = require("../mongoose/vedio-mongo");
 const isloggedin = require("../middleware/isloggedin");
 const debatemongoose = require("../mongoose/debate-mongo");
 const livemongo = require("../mongoose/live-mongo");
+const communitymongo = require("../mongoose/community-mongo");
 const app = express();
 const { createServer } = require("http");
 const { Server } = require("socket.io");
@@ -284,37 +285,32 @@ router.post("/reject/:id",isloggedin,async function (req, res) {
   }
 })
 
+router.get("/chat", function(req, res){
+  res.render("community-builder")
+})
+
+router.post("/community/builder",upload.single("CommunityDP"), isloggedin, async function (req, res) {
+  try{
+       let{ CommunityName, CommunityisAbout, CommunityDP } = req.body;
+       const user = await User.findOne({email: req.user.email});
 
 
-router.get("/requests/:Id",isloggedin, async (req, res) => {
-  try {
+       const community = await communitymongo.create({
+         CommunityName,
+         CommunityisAbout,
+         CommunityDP: req.file.buffer,
+         creator: user._id
+       });
 
-    // const user = await User.findOne({ email: req.user.email}).populate({
-    //   path: "Sender",
-    //   select: "OpponentName requestId title description"
-    // });
-
-    // const opponentId = user.Sender[0].OpponentName;
-    // console.log(opponentId)
-
-    
-    // const content = await livemongo.find();
-    // const opponentUser = await User.findById(opponentId);
-
-    // const requests = user.requests;
-
-    
-    res.send("No requests");
-    
-  }catch (err) {
-    console.log("Error fetching opponent requests: ", err);
-    res.status(500).send("Server error");
+       user.communities.push(community._id);
+       await user.save();
+       res.redirect("/");
+       console.log(community);
+  }catch(err){
+    res.status(404).send(err)
+    console.log(err)
   }
-});
-
-
-
-
+})
 
 
 module.exports = router;

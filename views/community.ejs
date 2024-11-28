@@ -22,15 +22,17 @@
             </div>
             </nav>
             <div class="page">
+                <% communities.forEach(function(community){ %>
                 <section class="group">
                     <div class="chat">
-                        <strong>Demo 1</strong>
-                        <div class="msg"><span>Admin:</span>
-                            <p>BJP should come but with this .........</p>
+                        <strong><%= community.CommunityName %></strong>
+                        <div class="msg"><span>About</span>
+                            <p><%= community.CommunityisAbout %></p>
                         </div>
-                        <a href="/community-chat"><div class="button">chat</div></a>
+                        <a href="/community-chat/<%= community._id %>"><div class="button">chat</div></a>
                     </div>
                 </section>
+                <% }) %>
                 <div class="instruction">
                     No More Community
                 </div>

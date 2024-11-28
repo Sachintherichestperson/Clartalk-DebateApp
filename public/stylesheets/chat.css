@@ -150,7 +150,7 @@ section{
   /* Style for the @ symbol */
 .files label {
     cursor: pointer;
-    font-size: 30px;
+    font-size: 40px;
     color: white;
 }
   
@@ -162,7 +162,7 @@ section{
     color: white;
     border-radius: 5px;
     padding: 10px;
-    bottom: 50px;  /* Position above the @ symbol */
+    bottom: 50px;
     left: 0;
     width: 250px;
     z-index: 1;
@@ -178,15 +178,24 @@ section{
     display: flex;
     align-items: center;
     padding: 10px 0;
-    height: 50px;
+    height: 40px;
     color: white;
     text-decoration: none;
 }
+
+.dropdown-menu ul li:hover {
+    background-color: #555;
+}
+
 .dropdown-menu p{
     position: relative;
     left: 20px;
 }
-  /* Show the dropdown menu when checkbox is checked */
+
+#dropdown-toggle:hover + .dropdown-menu {
+    display: block;
+}
+
 #dropdown-toggle:checked + .dropdown-menu {
     display: block;
 }

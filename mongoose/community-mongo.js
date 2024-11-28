@@ -3,7 +3,8 @@ const Schema = mongoose.Schema;
 
 const communitySchema = new Schema({
   CommunityName: { type: String, required: true },      
-  CommunityisAbout: { type: String },                
+  CommunityisAbout: { type: String },
+  CommunityDP: Buffer,                
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });

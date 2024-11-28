@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build Your World</title>
+    <link rel="stylesheet" href="/stylesheets/community-builder.css">
+</head>
+<body>
+    <section class="page">
+        <nav>
+            Build Your World
+        </nav>
+        <form id="creator-community" method="post" enctype="multipart/form-data" action="/creator/community/builder">
+            <div class="input">
+            <label for="creator-community">Community-Name</label>
+            <input type="text" name="CommunityName" placeholder="Input Your Community-Name">
+        </div>
+        <div class="input">
+            <label for="creator-community">About-Community</label>
+            <input type="text" name="CommunityisAbout" placeholder="Input Your Community-Description">
+        </div>
+        <div class="input">
+            <label for="creator-community">Community-Thumbnail</label>
+            <input type="file" name="CommunityDP" placeholder="Input Your Community-DisplayImage" class="file">
+        </div>
+            <input type="submit" value="Submit" class="submit">
+        </form>
+    </section>
+</body>
+</html>

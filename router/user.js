@@ -8,6 +8,7 @@ const isloggedin = require("../middleware/isloggedin");
 const vediomongoose = require("../mongoose/vedio-mongo");
 const debatemongoose = require("../mongoose/debate-mongo");
 const liveMongo = require("../mongoose/live-mongo");
+const communityMongo = require("../mongoose/community-mongo");
 
 router.get("/register", (req, res) => {
     let err = req.flash("key")
@@ -110,8 +111,13 @@ router.get("/podcast/:id",isloggedin, async function(req, res){
     }
 });
 
-router.get("/community", function(req, res){
-  res.render("community");
+router.get("/community",async function(req, res){
+  const communities = await communityMongo.find().populate({
+    path: "createdBy",
+    select: "username"
+  });
+  console.log(communities)
+  res.render("community", { communities } );
 })
 router.get("/logout", logout)
 
@@ -139,8 +145,17 @@ router.get("/follow/:id",isloggedin, async function(req, res){
   res.redirect(redirectUrl);
 });
 
-router.get("/community-chat", function(req, res){
-    res.render("chat.ejs")
-})
+router.get("/community-chat/:id",async function(req, res){
+  try{
+    const community = await communityMongo.findById(req.params.id)
+    console.log(community)
+    res.render("chat", {community});
+  }catch(err){
+    res.send(err)
+    console.log(err.message)
+  }
+});
+
+
 
 module.exports = router;
