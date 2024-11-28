@@ -156,6 +156,17 @@ router.get("/community-chat/:id",async function(req, res){
   }
 });
 
+router.get("/profile", function(req, res){
+  res.render("profile")
+})
+
+router.get("/uploaded-content",async function (req, res) {
+  res.render("Uploaded-content-profile")
+});
+
+router.get("/My-World",function(req, res){
+  res.render("Myworld")
+});
 
 
 module.exports = router;

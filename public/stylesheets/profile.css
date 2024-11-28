@@ -1,0 +1,206 @@
+body{
+    background-color: black;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+}
+.contanier{
+    width: 100%;
+    height: 100%;
+}
+nav{
+    width: 100%;
+    height: 200px;
+    background-color: rgb(0, 0, 0);
+}
+.image{
+    height: 200px;
+    width: 300px;
+}
+.image img{
+    height: 200px;
+    width: 300px;
+    object-fit: cover;
+}
+.Points p{
+    top: 50px;
+    position: absolute;
+    right: 130px;
+    border: 1px solid white;
+    font-size: 30px;
+    padding: 10px 50px 10px 50px;
+    color: white;
+}
+.nav{
+    width: 100%;
+    height: 60px;
+    background-color: rgb(10 9 9);
+    border: 1px solid white;
+    position: relative;
+    justify-content: space-evenly;
+    font-size: 30px;
+    display: flex;
+}
+.nav a{
+    color: white;
+    text-decoration: none;
+    background: #22222287;
+}
+.Live{
+    height: 30px;
+    min-width: 130px;
+    padding: 15px 30px 15px 30px;
+    border: 1px solid white;
+    text-align: center;
+}
+.Debates{
+    height: 30px;
+    min-width: 130px;
+    padding: 15px 30px 15px 30px;
+    border: 1px solid white;
+    text-align: center;
+}
+.Podcasts{
+    height: 30px;
+    min-width: 130px;
+    padding: 15px 30px 15px 30px;
+    border: 1px solid white;
+    text-align: center;
+}
+.Community{
+    height: 30px;
+    min-width: 130px;
+    padding: 15px 30px 15px 30px;
+    border: 1px solid white;
+    text-align: center;
+}
+.page{
+    width: 100%;
+    position: relative;
+    top: 62px;
+    background-color: black;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 5px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+}
+.requests{
+    height: 30px;
+    min-width: 130px;
+    padding: 15px 30px 15px 30px;
+    border: 1px solid white;
+    text-align: center;
+}
+.profile{
+    min-width: 130px;
+    height: 30px;
+    padding: 15px 30px 15px 30px;
+    border: 1px solid white;
+    text-align: center;
+}
+.profile-page{
+    width: 100%;
+    height: 500px;
+    position: relative;
+    top: 65px;
+}
+.profile-img img{
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    position: relative;
+    top: 25px;
+    left: 50px;
+    border: 4px solid white;
+}
+#profile-page{
+    width: 95%;
+    height: 150px;
+    border: 1px solid white;
+    position: relative;
+    top: 30px;
+    left: 30px;
+    display: flex;
+}
+#About-user{
+    width: 500px;
+    height: 80px;
+    background-color: rgb(28 28 28 / 62%);
+    position: relative;
+    top: 28px;
+    left: 90px;
+    padding: 15px 0px 0px 20px;
+    border: 1px solid white;
+}
+.username{
+    font-size: 20px;
+    color: white;
+    text-transform: uppercase;
+}
+.videos{
+    font-size: 15px;
+    color: white;
+    margin-right: 10px;
+}
+.followers{
+    font-size: 15px;
+    color: white;
+}
+.input{
+    width: 100%;
+    gap: 20px;
+}
+.My-videos{
+    width: 95%;
+    height: 150px;
+    border: 1px solid white;
+    position: relative;
+    margin-bottom: 10px;
+    border-radius: 40px;
+    background: #292929;
+}
+.input-a{
+    text-decoration: none;
+    height: 150px;
+    width: 95%;
+    position: relative;
+    left: 30px;
+    top: 80px;
+}
+.My-videos p{
+    font-size: 50px;
+    color: white;
+    position: relative;
+    left: 50px;
+    text-transform: uppercase;
+}
+#extra{
+    width: 100%;
+    height: 200px;
+    position: relative;
+    top: 150px;
+    text-align: center;
+    border-top: 2px solid white;
+}
+.extra{
+    font-size: 50px;
+    color: white;
+    text-transform: capitalize;
+}
+#update-a{
+    width: 400px;
+    height: 80px;
+    position: relative;
+    border: 1px solid white;
+    top: 30px;
+    left: 350px;
+    text-decoration: none;
+    color: white;
+    font-size: 40px;
+    text-align: center;
+    align-content: center;
+    background-color: rgba(31, 31, 31, 0.501);
+}
