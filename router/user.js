@@ -160,9 +160,33 @@ router.get("/profile", function(req, res){
   res.render("profile")
 })
 
-router.get("/uploaded-content",async function (req, res) {
-  res.render("Uploaded-content-profile")
+router.get("/uploaded-content", isloggedin, async function (req, res) {
+  try {
+    const vediosData = await User.findOne({ email: req.user.email }).populate({
+      path: "vedio",
+      select: "title description Thumbnail createdAt Views"
+    });
+
+    const debatesData = await User.findOne({ email: req.user.email }).populate({
+      path: "debate",
+      select: "title description Thumbnail createdAt Views"
+    });
+
+    // Combine and sort by createdAt date
+    const allContent = [
+      ...(vediosData?.vedio || []).map(vedio => ({ ...vedio.toObject(), type: "vedio" })),
+      ...(debatesData?.debate || []).map(debate => ({ ...debate.toObject(), type: "debate" }))
+    ];
+
+    allContent.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    res.render("Uploaded-content-profile", { allContent });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while fetching data.");
+  }
 });
+
 
 router.get("/My-World",function(req, res){
   res.render("Myworld")
