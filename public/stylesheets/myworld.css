@@ -1,173 +1,93 @@
-body{
-    background-color: black;
-    overflow-y: auto;
+/* styles.css */
+
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #121212;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     overflow-x: hidden;
-    scrollbar-width: none;
-}
-.contanier{
-    width: 100%;
-    height: 100%;
-}
-nav{
-    width: 100%;
-    background-color: rgb(0, 0, 0);
-}
-.image{
-    height: 200px;
-    width: 300px;
-}
-.image img{
-    height: 200px;
-    width: 300px;
-    object-fit: cover;
-}
-.search input{
-    top: 100px;
-    position: absolute;
-    right: 130px;
-    background-color: rgb(39, 39, 39);
-    border: 1px solid white;
-    border-radius: 30px;
-    font-size: 30px;
-    padding: 10px 50px 10px 50px;
-}
-.nav{
-    width: 100%;
-    height: 60px;
-    background-color: rgb(10 9 9);
-    border: 1px solid white;
+  }
+  
+  .container {
+    text-align: center;
+  }
+  
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+  }
+  
+  .cards {
     position: relative;
-    justify-content: space-evenly;
-    font-size: 30px;
     display: flex;
-}
-.nav a{
-    color: white;
-    text-decoration: none;
-    background: #22222287;
-}
-.page{
-    width: 100%;
-    position: relative;
-    background-color: black;
-    display: flex;
+    gap: 20px;
+    justify-content: center;
     flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 45px;
-    overflow-y: auto;
-    height: auto;
-    min-height: 1000px;
-    overflow-x: hidden;
-    scrollbar-width: none;
-}
-.vedios{
-    width: 370px;
-    height: 330px;
-    position: relative;
-    background-color: transparent;
-    cursor: pointer;
-}
-.vedios img{
-    width: 325px;
-    height: 200px;
-    position: relative;
-    border: 1px solid white;
-    top: 20px;
-    left: 25px;
-}
-.title{
-    color: white;
-    position: relative;
-    left: 30px;
-    top: 10px;
-    font-size: 20px;
-    width: 300px;
-}
-.Time{
-    font-size: 20px;
-    color: #606060;    
-    position: relative;
-    left: 30px;
-}
-a{
-    text-decoration: none;
-}
-.Views{
-    color: #606060;
-    position: relative;
-    top: -43px;
-    font-size: 20px;
-    left: 140px;
-}
-.group{
-    width: 400px;
-    height: 450px;
-    background-color: rgb(79 79 79 / 17%);
-    color: white;
-    border-radius: 20%;
-    border: 1px solid white;
-    position: relative;
-    left: 70px;
-    top: 50px;
-}
-.chat strong{
-    font-size: 45px;
-    position: relative;
-    left: 20px;
-    top: 50px;
-    color: #828181;
-    text-decoration: underline;
-}
-.msg{
-    width: 370px;
-    height: 100px;
-    position: relative;
-    display: flex;
-    top: 60px;
-    gap: 5px;
-    left: 12px;
-}
-.msg p{
-    font-size: 30px;
-    color: #363636;
-}
-.msg span{
-    font-size: 40px;
-    color: #4b4b4b;
-    height: 50px;
-    position: relative;
-    top: 23px;
-    text-decoration: underline;
-}
-.button{
-    width: 380px;
-    height: 70px;
-    color: white;
-    background-color: green;
-    position: relative;
-    top: 120px;
-    text-align: center;
-    font-size: 45px;
-    text-transform: uppercase;
-    left: 10px;
+  }
+  
+  .card {
+    background: #1e1e1e;
+    padding: 20px;
     border-radius: 15px;
-    align-content: center;
-}
-.instruction{
-    font-size: 60px;
-    color: white;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    height: 400px;
+  }
+  
+  .card:hover {
+    transform: translateY(-10px);
+    background-color: #333333;
+  }
+  
+  .icon {
+    font-size: 4rem;
+    margin-bottom: 15px;
+  }
+  
+  h2 {
+    font-size: 2.5rem;
+    margin: 10px 0;
+  }
+  
+  p {
+    font-size: 1.2rem;
+    color: #cccccc;
+    text-transform: capitalize;
+  }
+  
+  #WorldName {
+    background-color: #22dd22;
+    color: #ffffff;
+    border: none;
+    padding: 10px 50px;
+    border-radius: 10px;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: relative;
+    top: 20px;
+    text-transform: uppercase;
+  }
+  
+  #WorldName:hover {
+    background-color: #19aa19;
+  }
+  .extra{
     width: 100%;
     height: 200px;
+    background-color: black;
     text-align: center;
     align-content: center;
-}
-.Heading{
-    width: 100%;
-    height: 100px;
-    border-bottom: 1px solid white;
-    text-align: center;
-}
-h1{
-    font-size: 60px;
+    border-top: 1px solid white;
+    position: relative;
+    top: 30px;
+  }
+  .extra h2{
+    font-size: 50px;
     color: white;
-}
+  }

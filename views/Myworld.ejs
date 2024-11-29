@@ -1,65 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClarTalk</title>
-    <link rel="stylesheet" href="./stylesheets/myworld.css">
-    <style>
-    
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My World</title>
+  <link rel="stylesheet" href="/stylesheets/Myworld.css">
 </head>
 <body>
-    <section class="contanier">
-        <div class="home">
-            <nav>
-                <div class="Heading">
-                    <h1>My World</h1>
-                </div>
-            </div>
-            </nav>
-            <div class="page">
-                <section class="group">
-                    <div class="chat">
-                        <strong>Sachin</strong>
-                        <div class="msg"><span>About</span>
-                            <p>Access To The Legend Sachin Bajaj</p>
-                        </div>
-                        <a href="#"><div class="button">chat</div></a>
-                    </div>
-                </section>
-                <section class="group">
-                    <div class="chat">
-                        <strong>Sachin</strong>
-                        <div class="msg"><span>About</span>
-                            <p>Access To The Legend Sachin Bajaj</p>
-                        </div>
-                        <a href="#"><div class="button">chat</div></a>
-                    </div>
-                </section>
-                <section class="group">
-                    <div class="chat">
-                        <strong>Sachin</strong>
-                        <div class="msg"><span>About</span>
-                            <p>Access To The Legend Sachin Bajaj</p>
-                        </div>
-                        <a href="#"><div class="button">chat</div></a>
-                    </div>
-                </section>
-                <section class="group">
-                    <div class="chat">
-                        <strong>Sachin</strong>
-                        <div class="msg"><span>About</span>
-                            <p>Access To The Legend Sachin Bajaj</p>
-                        </div>
-                        <a href="#"><div class="button">chat</div></a>
-                    </div>
-                </section>
-                <div class="instruction">
-                    No More Community
-                </div>
-            </div>
+  <div class="container">
+    <h1>My World</h1>
+    <div class="cards">
+        <% communities.communities.forEach(function(Community){ %>
+      <div class="card">
+        <div class="icon">
+          🌐
         </div>
-    </section>
+        <h2><%= Community.CommunityName %></h2>
+        <p><%= Community.CommunityisAbout %></p>
+        <p id="WorldName"><%= communities.username %></p>
+      </div>
+      <% }) %>
+      <div class="extra">
+        <h1>No More Communities</h1>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

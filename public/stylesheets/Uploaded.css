@@ -1,7 +1,8 @@
         body{
             scrollbar-width: none;
-            background-color: black;
+            background-color: #121212;
             overflow-x: hidden;
+            font-family: 'Arial', sans-serif;
         }
         .page{
             width: 100%;
@@ -40,7 +41,7 @@
     width: 370px;
     height: 350px;
     position: relative;
-    background-color: rgb(9, 9, 9);
+    background-color: rgb(16, 16, 16);
     cursor: pointer;
     left: 20px;
     top: 20px;
@@ -62,6 +63,8 @@
     top: 10px;
     font-size: 25px;
     width: 300px;
+    height: 55px;
+    overflow: hidden;
 }
 .Time{
     font-size: 20px;

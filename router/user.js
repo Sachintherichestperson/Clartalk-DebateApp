@@ -188,9 +188,22 @@ router.get("/uploaded-content", isloggedin, async function (req, res) {
 });
 
 
-router.get("/My-World",function(req, res){
-  res.render("Myworld")
+router.get("/My-World",isloggedin, async function(req, res){
+  const communities = await User.findOne({email: req.user.email}).populate("communities");
+  res.render("Myworld", { communities })
 });
 
+
+router.get("/SentRequests",isloggedin, async function (req, res) {
+  const contents = await User.findOne({ email: req.user.email }).populate({
+    path: "Sender",
+    select: "OpponentName",
+    populate: {
+      path: "OpponentName",
+      select: "username"
+    }
+  });
+  res.render("Sentrequests", { contents })
+});
 
 module.exports = router;
