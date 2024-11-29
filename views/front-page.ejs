@@ -25,11 +25,13 @@
             </nav>
             <div class="page">
                 <% vedios.forEach(function(vedio){ %>
+                    <a href="/live-content-applying-page/<%= vedio._id %>">
                 <div class="vedios">
                     <img src="data:image/jpeg;base64,<%= vedio.Thumbnail.toString('base64') %>" alt="debates">
                     <p class="title"><%= vedio.title%></p>
                     <p class="Time">Time Left <%= vedio.Time %></p>
                 </div>
+            </a>
                 <% }) %>
             </div>
         </div>

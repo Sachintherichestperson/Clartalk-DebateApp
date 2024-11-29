@@ -21,6 +21,10 @@ const vedioSchema = new mongoose.Schema({
     status: {
         type: String,
         default: "pending"
+    },
+    Booking: {
+        type: Number,
+        default: 0
     }
 });
 

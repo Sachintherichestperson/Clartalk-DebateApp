@@ -187,12 +187,10 @@ router.get("/uploaded-content", isloggedin, async function (req, res) {
   }
 });
 
-
 router.get("/My-World",isloggedin, async function(req, res){
   const communities = await User.findOne({email: req.user.email}).populate("communities");
   res.render("Myworld", { communities })
 });
-
 
 router.get("/SentRequests",isloggedin, async function (req, res) {
   const contents = await User.findOne({ email: req.user.email }).populate({
@@ -206,4 +204,17 @@ router.get("/SentRequests",isloggedin, async function (req, res) {
   res.render("Sentrequests", { contents })
 });
 
+router.get("/live-content-applying-page/:id",isloggedin, async function(req, res){
+  const Live = await liveMongo.findById(req.params.id).populate("creator");
+  
+  const followerscount = Live.creator[0].followers;
+  const follower = followerscount.length;
+
+  const suggestions = await liveMongo.find({ _id: { $ne: Live._id } }).limit(5).populate({
+    path: "creator",
+    select: "username"
+})
+
+  res.render("Livedebate-player", { Live, follower, suggestions, currentRoute: "live-content-applying-page" });
+})
 module.exports = router;

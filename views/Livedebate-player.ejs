@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/stylesheets/Livedebate-player.css">
+    <style>
+        .link{
+            width: 500px;
+            height: 100px;
+            background-color: #009c00;
+            color: white;
+            font-size: 30px;
+            text-align: center;
+            position: relative;
+            top: 10px;
+            left: -10px;
+        }
+    </style>
+</head>
+<body>
+        <section>
+            <div class="vediopage">
+                <nav>
+                    <img src="/images/nav.png" alt="" class="image">
+                    <input type="text" placeholder="Search" class="search">
+                </nav>
+                <div class="vedioplay"> 
+                    <img src="data:image/jpeg;base64,<%= Live.Thumbnail.toString('base64') %>" alt="" class="vedio">
+                    <p class="title"><%= Live.title %></p>
+                    <div class="Pay">
+                        <img src="/images/Default.png" alt="" class="display">
+                        <a href="/creator/creator/"><p class="name"><%= Live.creator[0].username  %> <span class="sub"><%= follower %> followers</span></p></a>
+                              <a href="#" class="link"><p class="amount">PAY: ₹19</p></a>
+                    </div>
+                    <div class="info">
+                        <p><span class="views"> 10M Booked</span> <span class="date"> 12/07/2025</span></p>
+                    <p class="Description"> <%= Live.description %> </p>
+                    </div>
+                </div>
+            </div>
+            <div class="vedios">
+                <% suggestions.forEach(function(suggestion){ %>
+                    <a href="/<%= currentRoute %>/<%= suggestion._id %>">
+                        <div class="suggestions">
+                            <img src="data:image/jpeg;base64,<%= suggestion.Thumbnail.toString('base64') %>" alt="Debate" id="suggested-image">
+                            <div class="about-vedio">
+                                <p class="title-suggestion"><%= suggestion.title %></p>
+                                <p class="user-suggestion"><%= suggestion.creator[0].username %></p>
+                                <p class="about"><span class="view-suggestion"><%= suggestion.Views %> Views</span><span class="date-suggestions"><%  %></span></p>
+                            </div>
+                        </div>
+                    </a>
+                <% }) %>
+            </div>
+        </section>
+</body>
+</html>
