@@ -4,26 +4,36 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My World</title>
-  <link rel="stylesheet" href="/stylesheets/Myworld.css">
+  <link rel="stylesheet" href="./stylesheets/myworld.css"> <!-- Link to your CSS file -->
 </head>
 <body>
+  <!-- Main Container -->
   <div class="container">
-    <h1>My World</h1>
-    <div class="cards">
-        <% communities.communities.forEach(function(Community){ %>
-      <div class="card">
-        <div class="icon">
-          🌐
+    
+    <!-- Header Section with Page Name -->
+    <header>
+      <h1>My World</h1>
+    </header>
+
+    <div class="page">
+      <% communities.communities.forEach(function(Community){ %>
+      <section class="group">
+        <div class="chat">
+          <div class="community-name"><%= Community.CommunityName %></div>
+          <div class="msg">
+            <p>
+              <span>About The Community:</span> <%= Community.CommunityisAbout %></p>
         </div>
-        <h2><%= Community.CommunityName %></h2>
-        <p><%= Community.CommunityisAbout %></p>
-        <p id="WorldName"><%= communities.username %></p>
-      </div>
+        <a href="">
+          <div class="button"><%= communities.username %></div>
+        </a>
+        </div>
+      </section>
       <% }) %>
-      <div class="extra">
-        <h1>No More Communities</h1>
-      </div>
-    </div>
+    
+  </div>
+  <div class="extra">
+    <h1>No More Communities</h1>
   </div>
 </body>
 </html>

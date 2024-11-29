@@ -3,40 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pending Requests - ClarTalk</title>
-    <link rel="stylesheet" href="/stylesheets/requests.css"> <!-- Link to the external CSS file -->
+    <title>Pending Requests</title>
+    <link rel="stylesheet" href="/stylesheets/requests.css">
 </head>
 <body>
 
+    <!-- Displaying Pending Requests -->
     <h1>Pending Requests</h1>
 
-    <div class="container">
-        <div class="content">
-            <% if (contents.length > 0) { %>
-                <% contents.forEach(function(content) { %>
-                    <div class="request-item">
-                        <p><strong>Title:</strong> <%= content.title %></p>
-                        <p><strong>Description:</strong> <%= content.description %></p>
-
-                        <div class="request-actions">
-                            <form action="/creator/accept/<%= content.opponentId %>" method="post" class="request-form">
-                                <input type="hidden" name="requestId" value="<%= content.opponentId %>">
-                                <button type="submit" name="action" value="accept">Accept</button>
-                            </form>
-                            <form action="/creator/reject/<%= content.opponentId %>" method="post" class="request-form">
-                                <input type="hidden" name="requestId" value="<%= content.opponentId %>">
-                                <button type="submit" name="action" value="reject">Reject</button>
-                            </form>
-                        </div>
-                    </div>
-                <% }) %>
-            <% } else { %>
-                <div class="no-requests">
-                    <p>No requests available.</p>
-                </div>
-            <% } %>
+    <% if (contents.length > 0) { %>
+        <% contents.forEach(function(content) { %>
+    <div class="request-card">
+        <p><strong>Title:</strong> <%= content.title %></p>
+        <p><strong>Description:</strong> <%= content.description %></p>
+        <!-- Action Buttons (Accept, Reject) -->
+        <div class="request-actions">
+            <form action="/creator/accept/<%= opponentId %>" method="post" class="request-form">
+                <input type="hidden" name="requestId" value="<%= opponentId %>">
+                <button type="submit" name="action" value="accept" class="action-btn">Accept</button>
+            </form> 
+            <form action="/creator/reject/<%= opponentId %>" method="post" class="request-form">
+                <input type="hidden" name="requestId" value="<%= opponentId %>">
+                <button type="submit" name="action" value="reject" class="action-btn">Reject</button>
+            </form>
         </div>
     </div>
+    <% }) %>
+    <% } else { %>
+        <div class="no-requests">
+            <p>No requests available.</p>
+        </div>
+    <% } %>
 
 </body>
 </html>

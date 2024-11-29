@@ -1,4 +1,4 @@
-       /* General Page Styles */
+        /* General Page Styles */
         body {
             background-color: #121212;
             font-family: Arial, sans-serif;
@@ -55,14 +55,14 @@
             border-radius: 5px;
         }
 
-        .status.accepted {
+        .status.accept {
             color: #4caf50;
             background-color: #1e1e1e;
             padding: 5px 10px;
             border-radius: 5px;
         }
 
-        .status.rejected {
+        .status.reject {
             color: #f44336;
             background-color: #1e1e1e;
             padding: 5px 10px;
@@ -70,9 +70,9 @@
         }
 
         /* Button Style */
-        .action-btn {
+        .delete-btn {
             padding: 10px 20px;
-            background-color: #ff5722;
+            background-color: #f44336;
             border: none;
             border-radius: 20px;
             color: white;
@@ -81,22 +81,18 @@
             transition: background-color 0.3s ease;
         }
 
-        .action-btn:hover {
-            background-color: #ff9800;
-        }
-
-        .request-actions {
-            margin-top: 20px;
-        }
-
-        /* Button Container */
-        .request-actions form {
-            display: inline-block;
-            margin: 5px;
+        .delete-btn:hover {
+            background-color: #ff5722;
         }
 
         /* No Requests Message */
         .no-requests {
             color: #ff9800;
             font-size: 18px;
+        }
+
+        /* Form container */
+        .delete-form {
+            display: inline-block;
+            margin-top: 15px;
         }
