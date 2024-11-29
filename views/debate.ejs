@@ -3,36 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClarTalk</title>
-    <link rel="stylesheet" href="./stylesheets/home.css">
+    <title>ClarTalk Debates</title>
+    <link rel="stylesheet" href="./stylesheets/debate.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-    <section class="contanier">
-        <div class="home">
-            <nav>
-                <div class="image">
-                <img src="/images/nav.png" alt="clartalk">
-                <div class="search"><input type="text" name="" id="" placeholder="Search"></div>
+    <section class="container">
+        <header>
+            <div class="branding">
+                <img src="/images/nav.png" alt="ClarTalk Logo">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search topics, debates...">
                 </div>
-                <div class="nav">
-                <a href="/" class="Live">Live</a>
-                <a href="debate" class="Debates">Debates</a>
-                <a href="podcast" class="Podcasts">Podcasts</a>
-                <a href="/community" class="Community">Community</a>
             </div>
+            <nav class="navigation">
+                <a href="/" class="nav-link">
+                    <i class="fas fa-tv"></i> Live
+                </a>
+                <a href="debate" class="nav-link active">
+                    <i class="fas fa-comments"></i> Debates
+                </a>
+                <a href="podcast" class="nav-link">
+                    <i class="fas fa-podcast"></i> Podcasts
+                </a>
+                <a href="/community" class="nav-link ">
+                    <i class="fas fa-users"></i> Community
+                </a>
+                <a href="/creator/opponent-requests/" class="nav-link">
+                    <i class="fas fa-envelope"></i> Requests
+                </a>
+                <a href="/profile" class="nav-link">
+                    <i class="fas fa-user"></i> Profile
+                </a>
             </nav>
+        </header>
             <div class="page">
                 <% vedios.forEach(function(vedio){ %>
+                <div class="videos">
                     <a href="/debate/<%= vedio._id %>">
-                    <div class="vedios">
-                        <img src="data:image/jpeg;base64,<%= vedio.Thumbnail.toString('base64') %>" alt="debates">
-                        <p class="title"><%= vedio.title %></p>
-                        <p class="Time"><%= vedio.createdAt.toLocaleDateString('en-GB') %></p>
-                        <p class="Views"><%= vedio.Views %> Views</p>
-                    </div>
-                </a>
-                 <% }) %>
+                        <img src="data:image/jpeg;base64,<%= vedio.Thumbnail.toString('base64') %>" alt="debate-thumbnail">
+                        <div class="video-details">
+                            <p class="video-title"><%= vedio.title %></p>
+                            <p class="video-time"><%= vedio.createdAt.toLocaleDateString('en-GB') %></p>
+                            <p class="Views"><%= vedio.Views %> Views</p>
+                        </div>
+                    </a>
+                </div>
+                <% }) %>
             </div>
+        </div>
+        <div class="instruction">
+            No More Videos
         </div>
     </section>
 </body>

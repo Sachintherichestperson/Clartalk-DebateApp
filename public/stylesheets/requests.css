@@ -1,0 +1,100 @@
+/* requests.css */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #101010;
+    margin: 0;
+    padding: 0;
+    color: white;
+}
+
+h1 {
+    text-align: center;
+    color: #fff;
+    font-size: 2.5rem;
+    margin-top: 30px;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+}
+
+.content {
+    width: 80%;
+    max-width: 1200px;
+    background-color: #2f2f2f;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+.request-item {
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #3a3a3a;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.request-item p {
+    margin: 10px 0;
+    color: #ccc;
+}
+
+.request-item strong {
+    color: #fff;
+}
+
+.request-actions {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.request-actions button {
+    padding: 12px 25px;
+    font-size: 1rem;
+    background-color: #565656;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+}
+
+.request-actions button:hover {
+    background: linear-gradient(135deg, #ff5722, #ff9800);
+    transform: scale(1.1);
+}
+
+.no-requests {
+    text-align: center;
+    font-size: 1.3rem;
+    color: #888;
+    margin-top: 20px;
+}
+
+.request-form {
+    width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+
+    .content {
+        width: 100%;
+    }
+
+    .request-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .request-actions button {
+        width: 100%;
+    }
+}

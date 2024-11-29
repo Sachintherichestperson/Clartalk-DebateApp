@@ -3,41 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClarTalk</title>
+    <title>ClarTalk Community</title>
     <link rel="stylesheet" href="./stylesheets/community.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-    <section class="contanier">
-        <div class="home">
-            <nav>
-                <div class="image">
-                <img src="/images/nav.png" alt="clartalk">
-                <div class="search"><input type="text" name="" id="" placeholder="Search"></div>
+    <section class="container">
+        <header>
+            <div class="branding">
+                <img src="/images/nav.png" alt="ClarTalk Logo">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search topics, debates...">
                 </div>
-                <div class="nav">
-                <a href="/" class="Live">Live</a>
-                <a href="/debate" class="Debates">Debates</a>
-                <a href="/podcast" class="Podcasts">Podcasts</a>
-                <a href="/community" class="Community">Community</a>
             </div>
+            <nav class="navigation">
+                <a href="/" class="nav-link">
+                    <i class="fas fa-tv"></i> Live
+                </a>
+                <a href="debate" class="nav-link">
+                    <i class="fas fa-comments"></i> Debates
+                </a>
+                <a href="podcast" class="nav-link">
+                    <i class="fas fa-podcast"></i> Podcasts
+                </a>
+                <a href="/community" class="nav-link active">
+                    <i class="fas fa-users"></i> Community
+                </a>
+                <a href="/creator/opponent-requests/" class="nav-link">
+                    <i class="fas fa-envelope"></i> Requests
+                </a>
+                <a href="/profile" class="nav-link">
+                    <i class="fas fa-user"></i> Profile
+                </a>
             </nav>
-            <div class="page">
-                <% communities.forEach(function(community){ %>
+        </header>
+        <div class="page">
+            <% communities.forEach(function(community) { %>
                 <section class="group">
                     <div class="chat">
-                        <strong><%= community.CommunityName %></strong>
-                        <div class="msg"><span>About</span>
-                            <p><%= community.CommunityisAbout %></p>
+                        <strong class="community-name"><%= community.CommunityName %></strong>
+                        <div class="msg">
+                            <p><span>About:</span> <%= community.CommunityisAbout %></p>
                         </div>
-                        <a href="/community-chat/<%= community._id %>"><div class="button">chat</div></a>
+                        <a href="/community-chat/<%= community._id %>">
+                            <div class="button">Join Chat</div>
+                        </a>
                     </div>
                 </section>
-                <% }) %>
-                <div class="instruction">
-                    No More Community
-                </div>
-            </div>
+            <% }) %>
         </div>
+        <div class="instruction">No More Communities</div>
     </section>
 </body>
 </html>

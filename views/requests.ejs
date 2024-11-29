@@ -3,42 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        .request-form{
-            width: 300px;
-            height: 100px;
-            position: relative;
-            top: 20px;
-        }
-        button{
-            padding: 10px 60px 10px 60px;
-            background-color: rgb(80, 80, 91);
-            color: white;
-            font-size: 20px;
-        }
-        .no-requests{
-            color: black;
-            font-size: 30px;
-        }
-    </style>
+    <title>Pending Requests - ClarTalk</title>
+    <link rel="stylesheet" href="/stylesheets/requests.css"> <!-- Link to the external CSS file -->
 </head>
 <body>
+
     <h1>Pending Requests</h1>
-    <% contents.forEach(function(content) {%>
-            <p><strong>Title:</strong> <%= content.title %></p>
-    <p><strong>Description:</strong> <%= content.description %></p>
-    
-        <form action="/creator/accept/<%= opponentId %>" method="post" class="request-form">
-            <input type="hidden" name="requestId" value="<%= opponentId %>">
-            <button type="submit" name="action" value="accept">Accept</button>
-        </form>
-        <form action="/creator/reject/<%=  opponentId %>" method="post" class="request-form">
-            <input type="hidden" name="requestId" value="<%= opponentId %>">
-            <button type="submit" name="action" value="reject">Reject</button>
-        </form>
-        <% })%>
-    <p class="no-requests">No requests</p>
-    
+
+    <div class="container">
+        <div class="content">
+            <% if (contents.length > 0) { %>
+                <% contents.forEach(function(content) { %>
+                    <div class="request-item">
+                        <p><strong>Title:</strong> <%= content.title %></p>
+                        <p><strong>Description:</strong> <%= content.description %></p>
+
+                        <div class="request-actions">
+                            <form action="/creator/accept/<%= content.opponentId %>" method="post" class="request-form">
+                                <input type="hidden" name="requestId" value="<%= content.opponentId %>">
+                                <button type="submit" name="action" value="accept">Accept</button>
+                            </form>
+                            <form action="/creator/reject/<%= content.opponentId %>" method="post" class="request-form">
+                                <input type="hidden" name="requestId" value="<%= content.opponentId %>">
+                                <button type="submit" name="action" value="reject">Reject</button>
+                            </form>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="no-requests">
+                    <p>No requests available.</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
 </body>
 </html>

@@ -3,32 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uploaded-Content</title>
-    <link rel="stylesheet" href="./stylesheets/Uploaded.css">
+    <title>Uploaded Content - ClarTalk</title>
+    <link rel="stylesheet" href="/stylesheets/uploaded.css"> <!-- Link to external CSS file -->
 </head>
 <body>
+
     <section class="page">
         <nav>
-            <h1>Uploaded-Content</h1>
+            <h1>Uploaded Content</h1>
             <div class="Count">
-                <p class="length">Total Content:<%= allContent.length %></p>
+                <p class="length">Total Content: <%= allContent.length %></p>
             </div>
         </nav>
+
         <section id="Content">
             <div class="videos">
                 <% allContent.forEach(function(content) { %>
-                <div class="vedio">
-                    <img src="data:image/jpeg;base64,<%= content.Thumbnail.toString('base64') %>" alt="<%= content.type %>">
-                    <p class="title"><%= content.title %></p>
-                    <p class="Time"><%= new Date(content.createdAt).toLocaleDateString() %></p>
-                    <p class="Views"><%= content.Views || 0 %> Views</p>
-                </div>
+                    <div class="video-details">
+                        <img src="data:image/jpeg;base64,<%= content.Thumbnail.toString('base64') %>" alt="<%= content.type %>">
+                        <p class="video-title"><%= content.title %></p>
+                        <div class="single-line">
+                        <p class="video-time"><%= new Date(content.createdAt).toLocaleDateString() %></p>
+                        <p class="Views"><%= content.Views || 0 %> Views</p>
+                        </div>
+                    </div>
                 <% }) %>
             </div>
-            <div class="extra">
-                <h2>No More Content</h2>
-            </div>
         </section>
+        <div class="extra">
+            <h2>No More Content</h2>
+        </div>
     </section>
+
 </body>
 </html>
