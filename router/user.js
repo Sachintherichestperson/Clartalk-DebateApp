@@ -147,11 +147,11 @@ router.get("/follow/:id",isloggedin, async function(req, res){
   res.redirect(redirectUrl);
 });
 
-router.get("/community-chat/:id",async function(req, res){
+router.get("/community-chat/:id",isloggedin ,async function(req, res){
   try{
-    const community = await communityMongo.findById(req.params.id)
-    console.log(community)
-    res.render("chat", {community});
+    const community = await communityMongo.findById(req.params.id);
+    const user = await User.findOne({email: req.user.email});
+    res.render("chat", {community, user});
   }catch(err){
     res.send(err)
     console.log(err.message)
@@ -263,5 +263,24 @@ router.get("/LeaderBoard",isloggedin,async function(req, res){
     console.log(err)
   }
 });
+
+router.post("/Join-community/:id",isloggedin,async (req, res) => {
+  try{
+      const community = await communityMongo.findById(req.params.id);
+
+      if(!community.members.includes(req.user._id)){
+        community.members.push(req.user._id);
+        await community.save();
+      }else{
+       console.log("Already a member")
+      }
+      
+      const redirectUrl = req.get("Referrer") || "/";
+      res.redirect(redirectUrl);
+
+  }catch(err){
+    console.log(err);
+  }
+} )
 
 module.exports = router;

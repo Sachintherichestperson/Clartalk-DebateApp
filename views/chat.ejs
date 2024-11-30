@@ -5,118 +5,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Community-Chat</title>
     <link rel="stylesheet" href="/stylesheets/chat.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        
+    </style>
+
 </head>
 <body>
-    <section>
-         <nav class="community-name">
-            <span class="DP"><img src="/images/nav.png" alt="community"></span>
-            <h2 class="Name">Community-Name</h2>
-            <div class="icon-container" tabindex="0">
-                <span class="icon">&#9776;</span>
-                <div class="icon-dropdown-menu">
-                    <ul>
-                        <li><a href="#">Option 1</a></li>
-                        <li><a href="#">Option 2</a></li>
-                        <li><a href="#">Option 3</a></li>
-                        <li><a href="#">Option 4</a></li>
-                        <li><a href="#">Option 5</a></li>
-                        <li><a href="#">Option 6</a></li>
-                    </ul>
+    <section class="community-chat-section">
+        <div class="chat-container">
+            <!-- Navigation on the left -->
+            <nav class="community-nav">
+                <span class="community-logo"><img src="data:image/jpeg;base64,<%= community.CommunityDP.toString('base64') %>" alt="Video Thumbnail"></span>
+                <h2 class="community-name"><%= community.CommunityName %></h2>
+                <div class="icon-container" tabindex="0">
+                    <span class="icon">&#9776;</span>
+                    <div class="icon-dropdown-menu">
+                        <ul>
+                            <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
+                            <li><a href="/Settings"><i class="fas fa-cogs"></i> Setting</a></li>
+                            <li><a href="/Members"><i class="fas fa-users"></i> Members</a></li>
+                            <li><a href="/Messages"><i class="fas fa-envelope"></i> Messages</a></li>
+                            <li><a href="/Notifications"><i class="fas fa-bell"></i> Notifications</a></li>
+                            <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Log-out</a></li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-         </nav>
-         <div class="chat-panel">
-            <div class="chat">
-                <div class="msg"><span>Admin:</span>
+            </nav>
+
+            <!-- Chat and input section on the right -->
+            <div class="chat-panel">
+                <div class="chat-msg"><span>Admin:</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+                <div class="self-msg"><span>Self:</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+                <div class="chat-msg"><span>Modi:</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+                <div class="self-msg"><span>Self:</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+                <div class="chat-msg"><span>Neeraj:</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+                <div class="self-msg"><span>Self:</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+                <div class="chat-msg"><span>Admin:</span>
+                    <p>BJP should come but with this .........</p>
+                </div>
+                <div class="self-msg"><span>Self:</span>
                     <p>BJP should come but with this .........</p>
                 </div>
             </div>
-             <div class="chat">
-                <div class="msg"><span>Modi:</span>
-                    <p>BJP should come but with this .........</p>
+
+            <!-- Input section -->
+            <div class="input-section">
+                <div class="file-options">
+                    <label for="dropdown-toggle">
+                        <i class="fas fa-paperclip"></i> <!-- Paperclip icon for attachment -->
+                    </label>
+                    <input type="checkbox" id="dropdown-toggle">
+                    <div class="dropdown-menu">
+                        <ul class="dropdown-list">
+                            <li><a href="#"><i class="fas fa-camera"></i><p>Camera</p></a></li> <!-- Camera icon -->
+                            <li><a href="#"><i class="fas fa-images"></i><p>Gallery</p></a></li> <!-- Gallery icon -->
+                            <li><a href="#"><i class="fas fa-file-alt"></i><p>Document</p></a></li> <!-- Document icon -->
+                            <li><a href="#"><i class="fas fa-poll"></i><p>Poll</p></a></li> <!-- Poll icon -->
+                        </ul>
+                    </div>
                 </div>
+                <% if (community.members.includes(user._id)){ %>
+                <input type="text" placeholder="Type your message" id="msg-input" class="message-input">
+                <input type="submit" id="send-btn" value="Send" class="send-btn">
+                <% }else{%>
+                    <form action="/Join-community/<%= community._id %>" method="post">
+                    <input type="submit" value="Join The Community" id="Add-input" class="Add-input" readonly>
+                </form>
+                <%}%>
             </div>
-            <div class="chat">
-                <div class="msg"><span>Neeraj:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-            <div class="chat">
-                <div class="msg"><span>Admin:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-            <div class="Self">
-                <div class="msg"><span>Self</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-             <div class="chat">
-                <div class="msg"><span>Modi:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-            <div class="Self">
-                <div class="msg"><span>Self</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-            <div class="chat">
-                <div class="msg"><span>Neeraj:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-            <div class="Self">
-                <div class="msg"><span>Self</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-            <div class="chat">
-                <div class="msg"><span>Admin:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-            <div class="chat">
-                <div class="msg"><span>Admin:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-            <div class="Self">
-                <div class="msg"><span>Self</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-            </div>
-         </div>
-         <div class="input">
-            <div class="files">
-                <label for="dropdown-toggle">@</label>
-                <input type="checkbox" id="dropdown-toggle">
-                <div class="dropdown-menu">
-                  <ul>
-                    <li><a href="#"><img src="/images/camera.png" alt="" class="camera"><p>Camera</p></a></li>
-                    <li><a href="#"><img src="/images/gallery.png" alt="" class="camera"><p>Gallery</p></a></li>
-                    <li><a href="#"><img src="/images/document.png" alt="" class="camera"><p>Document</p></a></li>
-                    <li><a href="#"><img src="/images/icon.png" alt="" class="camera"><p>Poll</p></a></li>
-                  </ul>
-                </div>
-              </div>              
-            <input type="text" placeholder="Type your message" id="msg">
-            <input type="submit" id="btn" value="">
-         </div>
+        </div>
     </section>
+    <script>
+        // Close dropdown when clicked outside
+        document.addEventListener('click', function (e) {
+            const dropdown = document.querySelector('.dropdown-menu');
+            const checkbox = document.querySelector('#dropdown-toggle');
+            const files = document.querySelector('.file-options');
+
+            if (!files.contains(e.target)) {
+                checkbox.checked = false;  // Uncheck to close the dropdown
+            }
+        });
+    </script>
 </body>
-<script>
-    // When the document is clicked, close the dropdown if it's open
-document.addEventListener('click', function (e) {
-  const dropdown = document.querySelector('.dropdown-menu');
-  const checkbox = document.querySelector('#dropdown-toggle');
-  const files = document.querySelector('.files');
-
-  // Check if the click is outside the dropdown and files
-  if (!files.contains(e.target)) {
-    checkbox.checked = false;  // Uncheck the checkbox to close the dropdown
-  }
-});
-
-</script>
 </html>

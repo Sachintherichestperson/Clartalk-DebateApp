@@ -3,59 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Video Page</title>
     <link rel="stylesheet" href="/stylesheets/vedioplayer.css">
 </head>
 <body>
-        <section>
-            <div class="vediopage">
-                <nav>
-                    <img src="/images/nav.png" alt="" class="image">
-                    <input type="text" placeholder="Search" class="search">
-                </nav>
-                <div class="vedioplay">
-                    <video controls autoplay class="vedio">
+    <section>
+        <div class="vediopage">
+            <nav>
+                <img src="/images/nav.png" alt="Logo" class="logo">
+                <input type="text" placeholder="Search for debates, podcasts, or live streams..." class="search-bar">
+            </nav>
+            <div class="video-and-suggestions">
+                <div class="video-section">
+                    <video controls autoplay class="video-player">
                         <source src="data:video/mp4;base64,<%= vedios.vedio.toString('base64') %>" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
-                    <p class="title"><%= vedios.title %></p>
-                    <div class="user">
-                        <% if(vedios.creator[0].image > 0){ %>
-                            <img src="data:image/jpeg;base64,<%= vedios.creator[0].image.toString('base64') %>" alt="Debate" class="display"> 
-                        <% }else{ %>
-                            <img src="/images/Default.png" alt="" class="display">
+                    <h1 class="video-title"><%= vedios.title %></h1>
+                    <div class="video-user-info">
+                        <% if (vedios.creator[0].image > 0) { %>
+                            <img src="data:image/jpeg;base64,<%= vedios.creator[0].image.toString('base64') %>" alt="Creator" class="user-avatar">
+                        <% } else { %>
+                            <img src="/images/Default.png" alt="Default Avatar" class="user-avatar">
                         <% } %>
-                        <a href="/creator/creator/<%= vedios.creator[0]._id %>"><p class="name"><%= vedios.creator[0].username %><span class="sub"><%= follower%> followers</span></p></a>
-                       
-                        <a href="/follow/<%= vedios.creator[0]._id %>" class="button-subscribe">
+                        <div class="creator-details">
+                            <a href="/creator/creator/<%= vedios.creator[0]._id %>" class="creator-name">
+                                <%= vedios.creator[0].username %>
+                            </a>
+                            <p class="followers-count"><%= follower %> Followers</p>
+                        </div>
+                        <a href="/follow/<%= vedios.creator[0]._id %>" class="follow-btn">
                             <% if (isFollowing) { %>
-                                <p class="UnSubscribe-button">unfollow</p>
+                                <span class="unfollow">Unfollow</span>
                             <% } else { %>
-                                <p class="Subscribe-button">follow</p>
+                                <span class="follow">Follow</span>
                             <% } %>
                         </a>
                     </div>
-                    <div class="info">
-                        <p><span class="views"><%= vedios.Views %> Views</span> <span class="date"> <%= vedios.createdAt.toLocaleDateString('en-GB') %></span></p>
-                    <p class="Description"><%= vedios.description %></p>
+                    <div class="video-info">
+                        <p>
+                            <span class="views-count"><%= vedios.Views %> Views</span>
+                            <span class="upload-date"> • <%= vedios.createdAt.toLocaleDateString('en-GB') %></span>
+                        </p>
+                        <div class="description-container">
+                            <p class="video-description"><%= vedios.description %></p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="vedios">
-        <% suggestions.forEach(function(suggestion){ %>
-            <a href="/<%= currentRoute %>/<%= suggestion._id %>">
-                <div class="suggestions">
-                    <img src="data:image/jpeg;base64,<%= suggestion.Thumbnail.toString('base64') %>" alt="Debate" id="suggested-image">
-                    <div class="about-vedio">
-                        <p class="title-suggestion"><%= suggestion.title %></p>
-                        <p class="user-suggestion"><%= suggestion.creator[0].username %></p>
-                        <p class="about"><span class="view-suggestion"><%= suggestion.Views %> Views</span><span class="date-suggestions"><%= vedios.createdAt.toLocaleDateString('en-GB') %></span></p>
-                    </div>
+                <div class="suggestions-section">
+                    <h2 class="suggestions-header">Up Next</h2>
+                    <% suggestions.forEach(function(suggestion) { %>
+                        <a href="/<%= currentRoute %>/<%= suggestion._id %>" class="suggestion-card">
+                            <img src="data:image/jpeg;base64,<%= suggestion.Thumbnail.toString('base64') %>" alt="Thumbnail" class="suggestion-thumbnail">
+                            <div class="suggestion-info">
+                                <p class="suggestion-title"><%= suggestion.title %></p>
+                                <p class="suggestion-creator"><%= suggestion.creator[0].username %></p>
+                                <p class="suggestion-meta">
+                                    <span class="views"><%= suggestion.Views %> Views</span>
+                                    <span class="upload-date"> • <%= suggestion.createdAt.toLocaleDateString('en-GB') %></span>
+                                </p>
+                            </div>
+                        </a>
+                    <% }) %>
                 </div>
-            </a>
-        <% }) %>
-                
             </div>
-        </section>
+        </div>
+    </section>
 </body>
 </html>
