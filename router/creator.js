@@ -177,33 +177,36 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
 
 router.get("/opponent-requests/:Id", isloggedin, async (req, res) => {
   try {
+    // Fetch the user by email and populate the requests
     const user = await User.findOne({ email: req.user.email }).populate({
       path: "requests",
       select: "OpponentName requestId title description",
     });
 
+    // Check if the user or their requests do not exist or are empty
     if (!user || !user.requests || user.requests.length === 0) {
-      return res.status(404).send("No requests found for this user.");
+      return res.render("requests", { requests: [], contents: [], opponentId: null, user });
     }
 
-    const opponentId = user.requests[0]?.OpponentName; // Use optional chaining
+    // Get the first request's opponentId
+    const opponentId = user.requests[0]?.OpponentName; // Using optional chaining
+
+    // If opponentId doesn't exist in the request, return empty data
     if (!opponentId) {
-      return res.status(404).send("OpponentName not found in the request.");
+      return res.render("requests", { requests: [], contents: [], opponentId: null, user });
     }
 
-    console.log(opponentId);
-
+    // Fetch the contents with status 'pending'
     const contents = await livemongo.find({ status: "pending" });
-    const opponentUser = await User.findById(opponentId);
 
-    const requests = user.requests;
-
-    res.render("requests", { requests, contents, opponentId, user });
+    // Render the page with requests and contents
+    res.render("requests", { requests: user.requests, contents, opponentId, user });
   } catch (err) {
     console.log("Error fetching opponent requests: ", err);
     res.status(500).send("Server error");
   }
 });
+
 
 
 
@@ -225,7 +228,7 @@ router.post("/accept/:id",isloggedin,async function (req, res) {
       { $set: {"Sender.$.status": "accept"}},
        { new: true }
     )
-    console.log(sender);
+    console.log(opponent);
     
     const request = opponent.requests[0].status;
     const update = await User.findOneAndUpdate(

@@ -121,6 +121,13 @@ nav a:hover {
     color: #bbb;
 }
 
+.follower .followers {
+    font-size: 16px;
+    color: #bbb;
+    position: relative;
+    left: 15px;
+}
+
 #update-a {
     margin-top: 20px;
 }

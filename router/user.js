@@ -38,9 +38,9 @@ router.get("/",isloggedin,async function(req, res){
 })
 
 router.get("/debate",isloggedin,async function(req, res){
-  const user = await User.findOne({email: req.user.email});
+  const user = await User.findOne({email: req.user.email}).populate("requests");
   let vedios = await debatemongoose.find({});
-  res.render("debate", { vedios })
+  res.render("debate", { vedios,user });
 })
 
 router.get("/debate/:id",isloggedin, async function(req, res){
@@ -75,9 +75,9 @@ router.get("/debate/:id",isloggedin, async function(req, res){
 })
 
 router.get("/podcast", isloggedin, async function(req, res){
-  const user = await User.findOne({email: req.user.email});
+  const user = await User.findOne({email: req.user.email}).populate("requests")
   let vedios = await vediomongoose.find({});
-  res.render("podcast", { vedios });
+  res.render("podcast", { vedios, user });
 });
 
 router.get("/podcast/:id",isloggedin, async function(req, res){
@@ -112,13 +112,14 @@ router.get("/podcast/:id",isloggedin, async function(req, res){
     }
 });
 
-router.get("/community",async function(req, res){
+router.get("/community",isloggedin,async function(req, res){
   const communities = await communityMongo.find().populate({
     path: "createdBy",
     select: "username"
   });
-  console.log(communities)
-  res.render("community", { communities } );
+
+  const user = await User.findOne({email: req.user.email}).populate("requests");
+  res.render("community", { communities, user } );
 })
 router.get("/logout", logout)
 
@@ -158,16 +159,17 @@ router.get("/community-chat/:id",async function(req, res){
 });
 
 router.get("/profile",isloggedin,async function(req, res){
-  const user = await User.findOne({email: req.user.email}).populate("followers").populate("vedio").populate("debate").populate("profile");
+  const user = await User.findOne({email: req.user.email}).populate("followers").populate("vedio").populate("debate").populate("profile").populate("requests");
 
   const videoCount = user.vedio ? user.vedio.length : 0;
   const debateCount = user.debate ? user.debate.length : 0;
   const totalContent = videoCount + debateCount;
 
-  const profile = user.profile ? user.profile : null;
+  const profile = user.profile;
+  
   const followerCount = user.followers ? user.followers.length : 0;
 
-  res.render("profile", { user, totalContent, followerCount })
+  res.render("profile", { user, totalContent, followerCount, profile });
 })
 
 router.get("/uploaded-content", isloggedin, async function (req, res) {
@@ -234,20 +236,31 @@ router.get("/update-route/:id",isloggedin, async function(req, res){
   res.render("update-profile", { profileupdate })
 });
 
-router.post("/update-profile",isloggedin,upload.single("profile"), async function(req, res){
-  try{
-    let{ profile, username} = req.body;
+router.post("/update-profile", isloggedin, upload.single("profile"), async function (req, res) {
+  try {
+    let { username } = req.body;
+    let profileImageBuffer = req.file ? req.file.buffer : null; // Get the file buffer or null if no file is uploaded
 
-    const user = await User.findOne({ email: req.user.email }).populate("profile")
-
-    console.log(user)
-    user.profile = profileImage._id;
+    const user = await User.findOne({ email: req.user.email });
+    if (profileImageBuffer) {
+      user.profile = profileImageBuffer;  // Save the buffer data
+    }
     user.username = username;
-    await user.save();
 
-    res.redirect("/profile")
+    await user.save();
+    res.redirect("/profile");
+  } catch (err) {
+    res.status(404).send(err);
+  }
+});
+
+router.get("/LeaderBoard",isloggedin,async function(req, res){
+  try{
+    const user = await User.findOne({email: req.user.email})
+    res.render("leaderBoard", {user})
   }catch(err){
-    res.status(404).send(err)
+    res.send(err)
+    console.log(err)
   }
 });
 

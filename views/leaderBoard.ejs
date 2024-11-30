@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="./stylesheets/leaderboard.css">
+</head>
+<body>
+    <section class="container">
+        <header>
+            <div class="branding">
+                <img src="/images/nav.png" alt="ClarTalk Logo">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search topics, debates...">
+                </div>
+            </div>
+            <nav class="navigation">
+                <a href="/" class="nav-link">
+                    <i class="fas fa-tv"></i> Live
+                </a>
+                <a href="debate" class="nav-link">
+                    <i class="fas fa-comments"></i> Debates
+                </a>
+                <a href="podcast" class="nav-link">
+                    <i class="fas fa-podcast"></i> Podcasts
+                </a>
+                <a href="/community" class="nav-link">
+                    <i class="fas fa-users"></i> Community
+                </a>
+                <a href="/creator/opponent-requests/<%= user._id %>" class="nav-link">
+                    <i class="fas fa-envelope"></i> Requests
+                </a>
+                <a href="/LeaderBoard" class="nav-link active">
+                    <i class="fas fa-trophy"></i> Leaderboard
+                </a>
+                <a href="/profile" class="nav-link">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+            </nav>
+        </header>
+    <div class="leaderboard-container">
+        <header>
+            <h1><i class="fas fa-trophy"></i> Top Debaters</h1>
+        </header>
+        <div class="leaderboard-list">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Username</th>
+                        <th>Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>JohnDoe</td>
+                        <td>1500</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>JaneSmith</td>
+                        <td>1300</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Mike123</td>
+                        <td>1200</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Alexandra</td>
+                        <td>1100</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Maximus</td>
+                        <td>1000</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>JohnDoe</td>
+                        <td>1500</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>JaneSmith</td>
+                        <td>1300</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>Mike123</td>
+                        <td>1200</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>Alexandra</td>
+                        <td>1100</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Maximus</td>
+                        <td>1000</td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>JohnDoe</td>
+                        <td>1500</td>
+                    </tr>
+                    <tr>
+                        <td>12</td>
+                        <td>JaneSmith</td>
+                        <td>1300</td>
+                    </tr>
+                    <tr>
+                        <td>13</td>
+                        <td>Mike123</td>
+                        <td>1200</td>
+                    </tr>
+                    <tr>
+                        <td>14</td>
+                        <td>Alexandra</td>
+                        <td>1100</td>
+                    </tr>
+                    <tr>
+                        <td>15</td>
+                        <td>Maximus</td>
+                        <td>1000</td>
+                    </tr>
+                    <tr>
+                        <td>16</td>
+                        <td>JohnDoe</td>
+                        <td>1500</td>
+                    </tr>
+                    <tr>
+                        <td>17</td>
+                        <td>JaneSmith</td>
+                        <td>1300</td>
+                    </tr>
+                    <tr>
+                        <td>18</td>
+                        <td>Mike123</td>
+                        <td>1200</td>
+                    </tr>
+                    <tr>
+                        <td>19</td>
+                        <td>Alexandra</td>
+                        <td>1100</td>
+                    </tr>
+                    <tr>
+                        <td>20</td>
+                        <td>Maximus</td>
+                        <td>1000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

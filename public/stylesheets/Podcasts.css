@@ -148,6 +148,14 @@ header {
     color: white;
     box-shadow: 0 4px 10px rgba(255, 87, 34, 0.5);
 }
+
+.instruction {
+    margin-top: 20px;
+    font-size: 18px;
+    color: #bbb;
+    text-align: center;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .branding {

@@ -21,6 +21,7 @@ header {
     align-items: center;
     gap: 15px;
 }
+
 .branding {
     display: flex;
     align-items: center;
@@ -37,12 +38,14 @@ header {
     width: 200px;
     object-fit: contain;
 }
+
 .search-bar {
     flex: 1;
     margin-left: 20px;
     display: flex;
     align-items: center;
 }
+
 .search-bar input {
     width: 100%;
     max-width: 500px;
@@ -64,6 +67,7 @@ header {
     background-color: #444;
     transform: scale(1.05);
 }
+
 /* Navigation Bar */
 .navigation {
     display: flex;
@@ -73,6 +77,7 @@ header {
     max-width: 1200px;
     margin-top: 10px;
 }
+
 .nav-link {
     color: #ffffff;
     text-decoration: none;
@@ -88,55 +93,84 @@ header {
     background: linear-gradient(135deg, #ff5722, #ff9800);
     transform: scale(1.1);
 }
-
-/* Page Content */
-.page {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-    justify-content: center;
-    padding: 40px 20px;
+/* Container for the leaderboard */
+.leaderboard-container {
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    width: 80%;
     max-width: 1200px;
-    margin: auto;
+    text-align: center;
+    position: relative;
+    left: 100px;
 }
 
-.video-card {
+header {
     background-color: #222;
-    border-radius: 12px;
-    overflow: hidden;
-    text-decoration: none;
-    width: 300px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
 }
 
-.video-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 20px rgba(255, 87, 34, 0.5);
+header h1 {
+    font-size: 40px;
+    color: #ffcc00;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
 
-.video-card img {
+header h1 i {
+    font-size: 45px;
+}
+
+table {
     width: 100%;
-    height: 180px;
-    object-fit: cover;
-}
-
-.video-details {
-    padding: 15px;
-}
-
-.video-title {
-    color: #ffffff;
-    font-size: 18px;
-    margin: 10px 0;
-    white-space: nowrap;
+    margin: 0 auto;
+    border-collapse: collapse;
+    background-color: #333;
+    border-radius: 10px;
     overflow: hidden;
-    text-overflow: ellipsis;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
 }
 
-.video-time {
-    font-size: 14px;
-    color: #aaaaaa;
+table th, table td {
+    padding: 15px;
+    text-align: center;
+    font-size: 18px;
+    color: #ccc;
+}
+
+tr{
+    border-bottom: 1px solid #ffcc00;
+}
+table th {
+    background-color: #444;
+    font-weight: bold;
+    color: #ffcc00;
+}
+
+table td {
+    background-color: #555;
+}
+
+table tr:nth-child(even) {
+    background-color: #444;
+}
+
+table tr:hover {
+    background-color: #666;
+}
+
+table tr:first-child {
+    border-top: 3px solid #ffcc00;
+}
+
+table tr:last-child {
+    border-bottom: 3px solid #ffcc00;
 }
 
 .navigation a:hover, .navigation a.active {
@@ -144,30 +178,10 @@ header {
     color: white;
     box-shadow: 0 4px 10px rgba(255, 87, 34, 0.5);
 }
-.instruction {
-    margin-top: 20px;
-    font-size: 18px;
-    color: #bbb;
-    text-align: center;
-}
-/* Responsive Design */
+
+/* Mobile responsiveness */
 @media (max-width: 768px) {
-    .branding {
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .search-bar input {
-        max-width: 100%;
-    }
-
-    .navigation {
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-
-    .page {
-        padding: 20px 10px;
-        gap: 20px;
+    table th, table td {
+        font-size: 16px;
     }
 }

@@ -5,7 +5,9 @@ const userSchema = new mongoose.Schema({
     username: String,
     email: String,
     password: String,
-    profile: Buffer,
+    profile: {
+        type: Buffer,
+    },
     communities: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Community' }],
     vedio: [{
         type: mongoose.Schema.Types.ObjectId,

@@ -30,6 +30,9 @@
                 <a href="/creator/opponent-requests/" class="nav-link">
                     <i class="fas fa-envelope"></i> Requests
                 </a>
+                <a href="/LeaderBoard" class="nav-link">
+                    <i class="fas fa-trophy"></i> Leaderboard
+                </a>
                 <a href="/profile" class="nav-link active">
                     <i class="fas fa-user"></i> Profile
                 </a>
@@ -41,7 +44,11 @@
             <div class="profile-page">
                  <div id="profile-page">
                     <span class="profile-img">
-                        <img src="<%= user.profile || '/images/Default.png' %>" alt="Profile Page">
+                        <% if(profile && profile.length > 0) { %>
+                            <img src="data:image/jpeg;base64,<%= profile.toString('base64') %>" alt="Profile Image">
+                        <% } else { %>
+                            <img src="/images/Default.png" alt="Default Profile Image">
+                        <% } %>
                     </span>
                     <div id="About-user">
                         <div class="username">
