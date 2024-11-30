@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
     username: String,
     email: String,
     password: String,
+    profile: Buffer,
     communities: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Community' }],
     vedio: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -14,7 +15,6 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "debate"
     }],
-    profile: Buffer,
     followers: [{ 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User' 

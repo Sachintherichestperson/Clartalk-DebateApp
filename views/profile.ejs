@@ -40,19 +40,21 @@
             </nav>
             <div class="profile-page">
                  <div id="profile-page">
-                    <span class="profile-img"><img src="/images/Default.png" alt="Upload Profile Page"></span>
+                    <span class="profile-img">
+                        <img src="<%= user.profile || '/images/Default.png' %>" alt="Profile Page">
+                    </span>
                     <div id="About-user">
                         <div class="username">
-                            <strong>Profile UserName</strong>
+                            <strong><%= user.username %></strong>
                         </div>
                         <div class="follower video">
                             <p>
-                                <span class="videos">28 videos</span>
-                                <span class="followers">78k followers</span>
+                                <span class="videos"><%= totalContent %> videos</span>
+                                <span class="followers"><%= followerCount %> followers</span>
                             </p>
                         </div>
                     </div>
-                    <a href="/#" id="update-a">
+                    <a href="/update-route/<%= user._id %>" id="update-a">
                         <div class="update-user-profile">Update The Profile</div>
                     </a>
                  </div>

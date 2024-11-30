@@ -9,6 +9,7 @@ const vediomongoose = require("../mongoose/vedio-mongo");
 const debatemongoose = require("../mongoose/debate-mongo");
 const liveMongo = require("../mongoose/live-mongo");
 const communityMongo = require("../mongoose/community-mongo");
+const upload = require("../config/multer");
 
 router.get("/register", (req, res) => {
     let err = req.flash("key")
@@ -156,8 +157,17 @@ router.get("/community-chat/:id",async function(req, res){
   }
 });
 
-router.get("/profile", function(req, res){
-  res.render("profile")
+router.get("/profile",isloggedin,async function(req, res){
+  const user = await User.findOne({email: req.user.email}).populate("followers").populate("vedio").populate("debate").populate("profile");
+
+  const videoCount = user.vedio ? user.vedio.length : 0;
+  const debateCount = user.debate ? user.debate.length : 0;
+  const totalContent = videoCount + debateCount;
+
+  const profile = user.profile ? user.profile : null;
+  const followerCount = user.followers ? user.followers.length : 0;
+
+  res.render("profile", { user, totalContent, followerCount })
 })
 
 router.get("/uploaded-content", isloggedin, async function (req, res) {
@@ -216,5 +226,29 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
 })
 
   res.render("Livedebate-player", { Live, follower, suggestions, currentRoute: "live-content-applying-page" });
-})
+});
+
+router.get("/update-route/:id",isloggedin, async function(req, res){
+  const profileupdate = await User.findOne({ email: req.user.email }).populate("profile");
+  console.log(profileupdate)
+  res.render("update-profile", { profileupdate })
+});
+
+router.post("/update-profile",isloggedin,upload.single("profile"), async function(req, res){
+  try{
+    let{ profile, username} = req.body;
+
+    const user = await User.findOne({ email: req.user.email }).populate("profile")
+
+    console.log(user)
+    user.profile = profileImage._id;
+    user.username = username;
+    await user.save();
+
+    res.redirect("/profile")
+  }catch(err){
+    res.status(404).send(err)
+  }
+});
+
 module.exports = router;
