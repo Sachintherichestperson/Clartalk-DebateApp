@@ -1,8 +1,3 @@
-/*!
- * Socket.IO v4.8.1
- * (c) 2014-2024 Guillermo Rauch
- * Released under the MIT License.
- */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :

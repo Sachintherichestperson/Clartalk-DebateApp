@@ -21,7 +21,6 @@ module.exports.userregister = async (req, res) => {
                     email,
                     password: hash,
                 });
-                console.log(user)
                 let token = jwt.sign({ email: email}, process.env.JWT_KEY);
                 res.cookie("user", token, {
                     httpOnly: true,

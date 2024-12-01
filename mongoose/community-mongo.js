@@ -6,6 +6,7 @@ const communitySchema = new Schema({
   CommunityisAbout: { type: String },
   CommunityDP: Buffer,                
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  Messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Messages' }],
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 

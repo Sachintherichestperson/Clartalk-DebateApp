@@ -35,30 +35,6 @@
 
             <!-- Chat and input section on the right -->
             <div class="chat-panel">
-                <div class="chat-msg"><span>Admin:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-                <div class="self-msg"><span>Self:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-                <div class="chat-msg"><span>Modi:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-                <div class="self-msg"><span>Self:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-                <div class="chat-msg"><span>Neeraj:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-                <div class="self-msg"><span>Self:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-                <div class="chat-msg"><span>Admin:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
-                <div class="self-msg"><span>Self:</span>
-                    <p>BJP should come but with this .........</p>
-                </div>
             </div>
 
             <!-- Input section -->
@@ -99,6 +75,71 @@
                 checkbox.checked = false;  // Uncheck to close the dropdown
             }
         });
+    </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const btn = document.querySelector(".send-btn"); 
+        const socket = io();
+
+        const user = "<%= user.username %>"
+        const communityId = "<%= community._id %>"
+        console.log(communityId);
+
+        socket.emit("joinCommunity", communityId );
+
+        socket.on('allMessages', (messages) => {
+            console.log(messages);
+
+    const panel = document.querySelector(".chat-panel");
+    panel.innerHTML = ''; 
+
+
+    messages.forEach(message => {
+        const messageDiv = document.createElement("div");
+        if (message.sender === user) {
+            messageDiv.classList.add("self-msg");
+            messageDiv.innerHTML = `<span>Self:</span><p>${message.Message}</p>`;
+        } else {
+            messageDiv.classList.add("chat-msg");
+            messageDiv.innerHTML = `<span>${message.sender}:</span><p>${message.Message}</p>`;
+        }
+        panel.appendChild(messageDiv);
+    });
+});
+
+        btn.addEventListener("click", () => {
+            sendMessage();
+        });
+
+        document.querySelector("#msg-input").addEventListener("keydown", (event) => {
+                if (event.key === "Enter") { // Prevent the default "Enter" behavior (e.g., new line)
+               sendMessage();
+             }
+         });
+
+
+         function sendMessage() {
+            const panel = document.querySelector(".chat-panel");
+            const message = document.querySelector("#msg-input").value;
+            document.querySelector("#msg-input").value = "";
+            if (message) {
+                socket.emit("chatMessage", { username: user, message, communityId });
+            }
+        }
+
+        socket.on("chatMessage", (data) => {
+            const panel = document.querySelector(".chat-panel");
+            const message = document.createElement("div");
+            if(data.username === user){
+                message.classList.add("self-msg");
+                message.innerHTML = `<span>Self:</span><p>${data.message}</p>`;
+            }else{
+            message.classList.add("chat-msg");
+            message.innerHTML = `<span>${data.username}:</span><p>${data.message}</p>`;
+            }
+            panel.appendChild(message);
+        })
+        
     </script>
 </body>
 </html>

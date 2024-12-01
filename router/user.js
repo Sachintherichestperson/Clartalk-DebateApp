@@ -31,6 +31,7 @@ router.get("/",isloggedin,async function(req, res){
     const user = await User.findOne({email: req.user.email}).populate("requests").populate( "Sender" );
     const vedios = await liveMongo.find({ status: "accept"})
     res.render("front-page", {vedios, user})
+    console.log(user.email);
   }catch(err){
     res.status(404).send(err);
   }
@@ -272,9 +273,9 @@ router.post("/Join-community/:id",isloggedin,async (req, res) => {
         community.members.push(req.user._id);
         await community.save();
       }else{
-       console.log("Already a member")
+       res.send("Already a member");
       }
-      
+
       const redirectUrl = req.get("Referrer") || "/";
       res.redirect(redirectUrl);
 
