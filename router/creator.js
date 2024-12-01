@@ -288,7 +288,7 @@ router.post("/reject/:id",isloggedin,async function (req, res) {
   }
 })
 
-router.get("/chat", function(req, res){
+router.get("/Building-The-Community", function(req, res){
   res.render("community-builder")
 })
 
@@ -307,8 +307,7 @@ router.post("/community/builder",upload.single("CommunityDP"), isloggedin, async
 
        user.communities.push(community._id);
        await user.save();
-       res.redirect("/");
-       console.log(community);
+       res.redirect("/community");
   }catch(err){
     res.status(404).send(err)
     console.log(err)

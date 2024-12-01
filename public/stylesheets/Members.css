@@ -1,0 +1,49 @@
+*{
+    overflow-y: hidden;
+}
+body{
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    overflow-y: auto;
+}
+section{
+    background-color: black;
+    padding: 10px;
+    width: 98%;
+}
+.pagename{
+    background-color: rgb(46, 45, 45);
+    padding: 10px;
+    text-align: center;
+}
+h1{
+    font-size: 50px;
+    cursor: default;
+    color: rgb(112, 112, 112);
+}
+.lists{
+    padding: 10px 20px 0 20px;
+    width: 500px;
+    position: relative;
+    left: 460px;
+    background-color: rgb(40, 39, 39);
+    top: 20px;
+    height: 450px;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+.list{
+    border: 1px solid white;
+    padding: 5px;
+    text-align: center;
+    color: white;
+    font-size: 30px;
+    position: relative;
+    top: -10px;
+    cursor: default;
+}
+.list:hover{
+    transform: scale(1.05);
+    box-shadow: 0 8px 15px rgba(12, 5, 3, 0.6);
+}

@@ -54,7 +54,6 @@ nav {
 label {
     font-size: 16px;
     color: #ff9800;
-    margin-bottom: 8px;
     display: block;
 }
 
@@ -115,4 +114,40 @@ input[type="text"]:focus, input[type="file"]:focus {
         font-size: 14px;
         padding: 10px;
     }
+}
+#Private{
+    width: 170px;
+    height: 50px;
+    padding: 5px 10px 5px 15px;
+    font-size: 20px;
+    display: flex;
+    margin-top: 60px;
+    margin-left: 0px;
+    position: relative;
+    top: -30px;
+}
+#Public{
+    width: 170px;
+    height: 50px;
+    padding: 5px 10px 5px 15px;
+    font-size: 20px;
+    display: flex;
+    margin-top: 60px;
+    margin-left: 60px;
+    position: relative;
+    top: -30px;
+}
+.choose{
+    display: flex;
+}
+.label-Private{
+    text-align: center;
+    position: relative;
+    top: -20px;
+}
+.label-Public{
+    text-align: center;
+    position: relative;
+    left: 25px;
+    top: -20px;
 }

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members</title>
+    <link rel="stylesheet" href="/stylesheets/Members.css">
+</head>
+<body>
+    <section>
+        <div class="pagename">
+            <h1>Members of <%= members.CommunityName %></h1>
+        </div>
+        <div class="lists">
+            <% members.members.forEach(function(member){ %> 
+            <p class="list"><%= member.username %></p>
+            <% }) %>
+        </div>
+    </section>
+</body>
+</html>

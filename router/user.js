@@ -282,6 +282,14 @@ router.post("/Join-community/:id",isloggedin,async (req, res) => {
   }catch(err){
     console.log(err);
   }
-} )
+});
 
+router.get("/Members/:id",async (req, res) => {
+  const members = await communityMongo.findById(req.params.id).populate({
+    path: "members",
+    select: "username"
+  });
+
+  res.render("Members", {members});
+})
 module.exports = router;
