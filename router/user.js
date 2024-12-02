@@ -291,5 +291,9 @@ router.get("/Members/:id",async (req, res) => {
   });
 
   res.render("Members", {members});
+});
+
+router.get("/Send-merge-request",async function(req, res){
+  res.render("Send-merge-request")
 })
 module.exports = router;
