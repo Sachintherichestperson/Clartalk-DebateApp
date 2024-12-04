@@ -6,6 +6,14 @@
     <title>ClarTalk</title>
     <link rel="stylesheet" href="./stylesheets/profile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .setting{
+            font-size: 50px;
+            color: white;
+            position: relative;
+            text-align: end;
+        }
+    </style>
 </head>
 <body>
     <section class="contanier">
@@ -42,6 +50,7 @@
             </div>
             </nav>
             <div class="profile-page">
+                <a href="/settings"><div class="setting">*</div></a>
                  <div id="profile-page">
                     <span class="profile-img">
                         <% if(profile && profile.length > 0) { %>

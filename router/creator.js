@@ -99,12 +99,43 @@ router.get("/creator/:id",isloggedin, async function(req, res){
         }
 
         res.render("creatorpage", {vedios})
-        console.log(vedios)
     }catch(err){
         res.send(err)
         console.log(err)
     }
 });
+
+setInterval(async () => {
+  const now = new Date();
+
+  // Get all upcoming live events from the database
+  const liveEvents = await livemongo.find({ Time: { $gt: now } });
+
+  liveEvents.forEach((event) => {
+    const eventTime = new Date(event.Time);
+    const timeLeft = eventTime - now; // Time left in milliseconds
+    const twoHoursInMillis = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+
+    if (timeLeft <= 0) {
+      console.log(`Debate "${event.title}" has started!`);
+    }
+
+    // If the event is 2 hours or less away
+    if (timeLeft <= twoHoursInMillis) {
+      // Calculate remaining time in hours, minutes, and seconds
+      const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+      const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+      
+      // Output the remaining time
+      console.log(`Event "${event.title}" is starting soon! Only ${hours} hours, ${minutes} minutes, ${seconds} seconds left.`);
+      
+      // Optional: You can trigger an email, a push notification, or any other actions here
+    }
+  });
+},60 * 1000); // Check every minute
+
+
 
 router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { name: 'Thumbnail', maxCount: 1 }]), isloggedin, async function (req, res) {
   try {
@@ -117,12 +148,6 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
     let streamingDate = new Date(Time);
     if (streamingDate < now) return res.status(400).send("Streaming date must be in the future!");
 
-    let diff = streamingDate - now;
-    let days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    let hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    let timeLeft = days >= 1 ? `${days}d` : `${hours}h ${minutes}m`;
-
     const opponentUser = await User.findOne({ username: opponent });
     if (!opponentUser) {
       return res.status(404).send("Opponent not found!");
@@ -133,7 +158,7 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
       description,
       Thumbnail: Thumbnail,
       creator: req.user._id,
-      Time: timeLeft,
+      Time: streamingDate,
       opponent: opponentUser._id,
     });
 
@@ -208,8 +233,6 @@ router.get("/opponent-requests/:Id", isloggedin, async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
-
 
 
 router.post("/accept/:id",isloggedin,async function (req, res) {
@@ -288,11 +311,11 @@ router.post("/reject/:id",isloggedin,async function (req, res) {
   }catch(err){
       res.send(err)
   }
-})
+});
 
 router.get("/Building-The-Community", function(req, res){
   res.render("community-builder")
-})
+});
 
 router.post("/community/builder",upload.single("CommunityDP"), isloggedin, async function (req, res) {
   try{
@@ -314,7 +337,8 @@ router.post("/community/builder",upload.single("CommunityDP"), isloggedin, async
     res.status(404).send(err)
     console.log(err)
   }
-})
+});
+
 
 
 module.exports = router;

@@ -6,7 +6,6 @@
     <title>ClarTalk</title>
     <link rel="stylesheet" href="./stylesheets/home.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
 </head>
 <body>
     <section class="container">
@@ -42,19 +41,61 @@
             </nav>
         </header>
         <main class="page">
-            <% vedios.forEach(function(vedio) { %>
-                <a href="/live-content-applying-page/<%= vedio._id %>" class="video-card">
-                    <img src="data:image/jpeg;base64,<%= vedio.Thumbnail.toString('base64') %>" alt="Video Thumbnail">
-                    <div class="video-details">
-                        <h3 class="video-title"><%= vedio.title %></h3>
-                        <p class="video-time">Time Left: <%= vedio.Time %></p>
-                    </div>
-                </a>
-            <% }) %>
-            <div class="instruction">
-                No More Videos
-            </div>
+            <% if (vedios.length > 0) { %>
+                <% vedios.forEach(function(vedio) { %>
+                    <a href="/live-content-applying-page/<%= vedio._id %>" class="video-card">
+                        <img src="data:image/jpeg;base64,<%= vedio.Thumbnail.toString('base64') %>" alt="Video Thumbnail">
+                        <div class="video-details">
+                            <h3 class="video-title"><%= vedio.title %></h3>
+                            <p class="video-time" data-time="<%= vedio.Time %>">Time Left: Calculating...</p>
+                        </div>
+                    </a>
+                <% }) %>
+            <% } else { %>
+                <div class="instruction">
+                    No More Videos
+                </div>
+            <% } %>
         </main>
     </section>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+    
+        // Listen for alerts from the server
+        socket.on("alert", (message) => {
+            alert(message.message);
+        });
+    
+        // Function to calculate and update the "Time Left"
+        function updateTimeLeft() {
+            const now = new Date();
+    
+            document.querySelectorAll('.video-time').forEach((timeElement) => {
+                const videoTime = new Date(timeElement.dataset.time); // Parse video time
+                const timeLeft = videoTime - now; // Calculate remaining time in milliseconds
+    
+                if (timeLeft > 0) {
+                    // Calculate days, hours, and minutes
+                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+    
+                    // Display time left in days, hours, and minutes, or just hours and minutes
+                    if (days > 0) {
+                        timeElement.textContent = `Time Left: ${days}d ${hours}h ${minutes}m`;
+                    } else {
+                        timeElement.textContent = `Time Left: ${hours}h ${minutes}m`;
+                    }
+                } else {
+                    timeElement.textContent = "Event Ended";
+                }
+            });
+        }
+    
+        // Update time every 1 second
+        setInterval(updateTimeLeft, 1000);
+        updateTimeLeft(); // Run the function on page load
+    </script>
 </body>
 </html>

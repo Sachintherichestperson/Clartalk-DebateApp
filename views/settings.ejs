@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            margin: 0;
+            padding: 0;
+            overflow-y: auto;
+            scrollbar-width: none;
+            background-color: black;
+        }
+        section{
+            padding: 10px;
+        }
+        #Header{
+            padding: 30px;
+            text-align: center;
+            align-content: center;
+            background-color: rgb(50, 50, 50);
+        }
+        #Header h1{
+            font-size: 50px;
+            color: white;
+        }
+        .page{
+            background-color: rgb(30, 30, 30);
+            display: block;
+            padding: 20px;
+            border-top: 1px solid white;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+        .content{
+            border: 1px solid white;
+            position: relative;
+            top: 5px;
+            margin-top: 20px;
+            padding: 10px;
+            padding-left: 30px;
+        }
+        .content p{
+            color: white;
+            font-size: 30px;
+        }
+        a{
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <section>
+        <div id="Header">
+            <h1>Settings</h1>
+        </div>
+        <div class="page">
+            <div class="content">
+                    <a href="/creator/creator/upload"><p>Upload-content</p></a>
+            </div>
+            <div class="content">
+                    <a href="/creator/creator/Live"><p>Organise-Live</p></a>
+            </div>
+            <div class="content">
+                     <a href="/creator/Building-The-Community"><p>Create-Community</p></a>
+            </div>
+            <div class="content">
+                    <a href="#"><p>Delete-content</p></a>
+            </div>
+            <div class="content">
+                <a href="#"><p>Delete-Community</p></a>
+            </div>
+            <div class="content">
+                <a href="#"><p>Delete-Profile</p></a>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

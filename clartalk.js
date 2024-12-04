@@ -11,6 +11,7 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 const Message = require("./mongoose/messages-mongo");
 const Community = require("./mongoose/community-mongo");
+const liveMongo = require("./mongoose/live-mongo");
 
 const server = createServer(app);  // Create an HTTP server with Express
 const io = new Server(server);     // Initialize Socket.IO server
@@ -42,7 +43,7 @@ app.use("/creator", creator);
 
 io.on("connection", (socket) => {
 
-
+//chat community
 socket.on("joinCommunity",async (communityId) => {
   try{
       const community = await Community.findById(communityId).populate({
@@ -53,9 +54,8 @@ socket.on("joinCommunity",async (communityId) => {
   }catch(err){
        console.error(err);
   }
-})
-
-  socket.on("chatMessage",async (data) => {
+});
+socket.on("chatMessage",async (data) => {
     const newMessage = await Message.create({
       Message: data.message,
       sender: data.username
@@ -67,9 +67,10 @@ socket.on("joinCommunity",async (communityId) => {
 
 
     io.emit("chatMessage", data);
-  });
-
 });
+});
+//chat community end here
+
 
 // Start the server
 server.listen(3000);

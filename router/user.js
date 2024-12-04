@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../mongoose/user-mongo");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 const {userregister, loginuser, logout} = require("../controller/authcontroller");
 const isloggedin = require("../middleware/isloggedin");
 const vediomongoose = require("../mongoose/vedio-mongo");
@@ -10,6 +10,8 @@ const debatemongoose = require("../mongoose/debate-mongo");
 const liveMongo = require("../mongoose/live-mongo");
 const communityMongo = require("../mongoose/community-mongo");
 const upload = require("../config/multer");
+const schedule = require("node-schedule");
+const Socket  = require("socket.io");
 
 router.get("/register", (req, res) => {
     let err = req.flash("key")
@@ -31,7 +33,6 @@ router.get("/",isloggedin,async function(req, res){
     const user = await User.findOne({email: req.user.email}).populate("requests").populate( "Sender" );
     const vedios = await liveMongo.find({ status: "accept"})
     res.render("front-page", {vedios, user})
-    console.log(user.email);
   }catch(err){
     res.status(404).send(err);
   }
@@ -295,5 +296,10 @@ router.get("/Members/:id",async (req, res) => {
 
 router.get("/Send-merge-request",async function(req, res){
   res.render("Send-merge-request")
-})
+});
+
+router.get("/settings",async function (req, res) {
+  res.render("settings");
+});
+
 module.exports = router;
