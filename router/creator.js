@@ -117,7 +117,6 @@ setInterval(async () => {
     const twoHoursInMillis = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
 
     if (timeLeft <= 0) {
-      console.log(`Debate "${event.title}" has started!`);
     }
 
     // If the event is 2 hours or less away
@@ -127,13 +126,11 @@ setInterval(async () => {
       const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
       
-      // Output the remaining time
-      console.log(`Event "${event.title}" is starting soon! Only ${hours} hours, ${minutes} minutes, ${seconds} seconds left.`);
       
       // Optional: You can trigger an email, a push notification, or any other actions here
     }
   });
-},60 * 1000); // Check every minute
+},60 * 100000); // Check every minute
 
 
 

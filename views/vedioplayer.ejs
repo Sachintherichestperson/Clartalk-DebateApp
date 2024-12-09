@@ -32,13 +32,13 @@
                             </a>
                             <p class="followers-count"><%= follower %> Followers</p>
                         </div>
-                        <a href="/follow/<%= vedios.creator[0]._id %>" class="follow-btn">
+                        <button class="follow-btn" data-creator-id="<%= vedios.creator[0]._id %>">
                             <% if (isFollowing) { %>
                                 <span class="unfollow">Unfollow</span>
                             <% } else { %>
                                 <span class="follow">Follow</span>
                             <% } %>
-                        </a>
+                        </button>
                     </div>
                     <div class="video-info">
                         <p>
@@ -70,4 +70,48 @@
         </div>
     </section>
 </body>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const followbtn = document.querySelector(".follow-btn");
+    const socket = io();
+    const creatorId = "<%= vedios.creator[0]._id %>";
+    const UserId = "<%= user.username %>";
+    
+
+    followbtn.addEventListener("click", () => {
+        socket.emit("Follow", { creatorId, UserId });
+
+        const span = followbtn.querySelector("span");
+    });
+
+    socket.on("FollowStatusUpdated", (data) => {
+        const followbtn = document.querySelector(`.follow-btn[data-creator-id='${data.creatorId}']`);
+        const followersCountElement = document.querySelector(".followers-count");
+
+        if (followbtn) {
+            const span = followbtn.querySelector("span");
+            
+
+            // Update the follow/unfollow button text
+            if (data.isFollowing) {
+                span.classList.remove("follow");
+                span.classList.add("unfollow");
+                span.textContent = "Unfollow";
+            } else {
+                span.classList.remove("unfollow");
+                span.classList.add("follow");
+                span.textContent = "Follow";
+            }
+        }
+
+        // Update the followers count on the page
+        if (followersCountElement) {
+            // console.log(followersCount)
+            console.log("followers Count",data.followersCount)
+            followersCountElement.textContent = `${data.followersCount} Followers`;
+        }
+        
+    });
+</script>
+
 </html>

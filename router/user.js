@@ -26,7 +26,7 @@ router.get("/login", function(req, res){
     res.render("login", {err})
 })
 
-router.post("/login", loginuser)
+router.post("/login", loginuser);
 
 router.get("/",isloggedin,async function(req, res){
   try{
@@ -37,21 +37,23 @@ router.get("/",isloggedin,async function(req, res){
     res.status(404).send(err);
   }
   
-})
+});
 
 router.get("/debate",isloggedin,async function(req, res){
   const user = await User.findOne({email: req.user.email}).populate("requests");
   let vedios = await debatemongoose.find({});
   res.render("debate", { vedios,user });
-})
+});
 
 router.get("/debate/:id",isloggedin, async function(req, res){
-  try{;
+  try{
     let vedios = await debatemongoose.findById(req.params.id)
     .populate({
         path: "creator",
         select: "username followers"
-    })
+    });
+
+    let user = await User.findOne({email: req.user.email });
     
     const followerscount = vedios.creator[0].followers;
     const follower = followerscount.length;
@@ -69,12 +71,12 @@ router.get("/debate/:id",isloggedin, async function(req, res){
         select: "username"
     })
     
-    res.render("vedioplayer", {vedios, suggestions, currentRoute: "debate", follower, isFollowing})
+    res.render("vedioplayer", {vedios, suggestions, currentRoute: "debate", follower, isFollowing, user });
   }catch(err){
     res.send(err)
     console.log(err)
   }
-})
+});
 
 router.get("/podcast", isloggedin, async function(req, res){
   const user = await User.findOne({email: req.user.email}).populate("requests")
@@ -122,32 +124,32 @@ router.get("/community",isloggedin,async function(req, res){
 
   const user = await User.findOne({email: req.user.email}).populate("requests");
   res.render("community", { communities, user } );
-})
-router.get("/logout", logout)
-
-router.get("/follow/:id",isloggedin, async function(req, res){
-  const follow = await User.findById(req.params.id);  
-  const user = await User.findOne({ email: req.user.email }); 
-
-
-  if (!user.following.includes(follow._id)) {
-
-    user.following.push(follow._id);
-    await user.save();
-    
-    follow.followers.push(user._id);
-    await follow.save();
-  } else {
-    user.following.pull(follow._id);
-    await user.save();
-
-    follow.followers.pull(user._id);
-    await follow.save();
-  }
-
-  const redirectUrl = req.get("Referrer") || "/";
-  res.redirect(redirectUrl);
 });
+router.get("/logout", logout);
+
+// router.get("/follow/:id",isloggedin, async function(req, res){
+//   const follow = await User.findById(req.params.id);  
+//   const user = await User.findOne({ email: req.user.email }); 
+
+
+//   if (!user.following.includes(follow._id)) {
+
+//     user.following.push(follow._id);
+//     await user.save();
+    
+//     follow.followers.push(user._id);
+//     await follow.save();
+//   } else {
+//     user.following.pull(follow._id);
+//     await user.save();
+
+//     follow.followers.pull(user._id);
+//     await follow.save();
+//   }
+
+//   const redirectUrl = req.get("Referrer") || "/";
+//   res.redirect(redirectUrl);
+// });
 
 router.get("/community-chat/:id",isloggedin ,async function(req, res){
   try{
@@ -172,7 +174,7 @@ router.get("/profile",isloggedin,async function(req, res){
   const followerCount = user.followers ? user.followers.length : 0;
 
   res.render("profile", { user, totalContent, followerCount, profile });
-})
+});
 
 router.get("/uploaded-content", isloggedin, async function (req, res) {
   try {
