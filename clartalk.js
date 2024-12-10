@@ -58,6 +58,7 @@ socket.on("joinCommunity",async (communityId) => {
        console.error(err);
   }
 });
+//chat message
 socket.on("chatMessage",async (data) => {
     const newMessage = await Message.create({
       Message: data.message,
@@ -72,7 +73,6 @@ socket.on("chatMessage",async (data) => {
     io.emit("chatMessage", data);
 });
 //chat community end here
-
 socket.on("Follow", async (data) => {
   const { creatorId, UserId } = data;
 

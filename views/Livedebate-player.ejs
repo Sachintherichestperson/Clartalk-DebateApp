@@ -3,57 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Video Page</title>
     <link rel="stylesheet" href="/stylesheets/Livedebate-player.css">
-    <style>
-        .link{
-            width: 500px;
-            height: 100px;
-            background-color: #009c00;
-            color: white;
-            font-size: 30px;
-            text-align: center;
-            position: relative;
-            top: 10px;
-            left: -10px;
-        }
-    </style>
 </head>
 <body>
-        <section>
-            <div class="vediopage">
-                <nav>
-                    <img src="/images/nav.png" alt="" class="image">
-                    <input type="text" placeholder="Search" class="search">
-                </nav>
-                <div class="vedioplay"> 
-                    <img src="data:image/jpeg;base64,<%= Live.Thumbnail.toString('base64') %>" alt="" class="vedio">
-                    <p class="title"><%= Live.title %></p>
-                    <div class="Pay">
-                        <img src="/images/Default.png" alt="" class="display">
-                        <a href="/creator/creator/"><p class="name"><%= Live.creator[0].username  %> <span class="sub"><%= follower %> followers</span></p></a>
-                              <a href="#" class="link"><p class="amount">PAY: ₹19</p></a>
+    <section>
+        <div class="vediopage">
+            <nav>
+                <img src="/images/nav.png" alt="Logo" class="logo">
+                <input type="text" placeholder="Search for debates, podcasts, or live streams..." class="search-bar">
+            </nav>
+            <div class="video-and-suggestions">
+                <div class="video-section">
+                    <img src="data:image/jpeg;base64,<%= Live.Thumbnail.toString('base64') %>" alt="" class="video-player">
+                    <p class="video-title"><%= Live.title %></p>
+                        <a href="#" class="link">
+                            <div class="Pay">
+                            <p class="amount">PAY: ₹19</p>
+                            </div>
+                        </a>
+                    <div class="video-user-info">
+                        <% if (Live.creator[0].image > 0) { %>
+                            <img src="data:image/jpeg;base64,<%= Live.creator[0].image.toString('base64') %>" alt="Creator" class="user-avatar">
+                        <% } else { %>
+                            <img src="/images/Default.png" alt="Default Avatar" class="user-avatar">
+                        <% } %>
+                        <div class="creator-details">
+                            <a href="/creator/creator/<%= Live.creator[0]._id %>" class="creator-name">
+                                <%= Live.creator[0].username %>
+                            </a>
+                            <p class="followers-count"><%= follower %> Followers</p>
+                        </div>
+                        <button class="follow-btn" data-creator-id="<%= Live.creator[0]._id %>">
+                            <% if (isFollowing) { %>
+                                <span class="unfollow">Unfollow</span>
+                            <% } else { %>
+                                <span class="follow">Follow</span>
+                            <% } %>
+                        </button>
                     </div>
-                    <div class="info">
-                        <p><span class="views"> 10M Booked</span> <span class="date"> 12/07/2025</span></p>
-                    <p class="Description"> <%= Live.description %> </p>
+                    <div class="video-info">
+                        <p>
+                            <span class="views-count"><%= Live.Views %> Views</span>
+                            <span class="upload-date"> •  </span>
+                        </p>
+                        <div class="description-container">
+                            <p class="video-description"><%= Live.description %></p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="vedios">
-                <% suggestions.forEach(function(suggestion){ %>
-                    <a href="/<%= currentRoute %>/<%= suggestion._id %>">
-                        <div class="suggestions">
-                            <img src="data:image/jpeg;base64,<%= suggestion.Thumbnail.toString('base64') %>" alt="Debate" id="suggested-image">
-                            <div class="about-vedio">
-                                <p class="title-suggestion"><%= suggestion.title %></p>
-                                <p class="user-suggestion"><%= suggestion.creator[0].username %></p>
-                                <p class="about"><span class="view-suggestion"><%= suggestion.Views %> Views</span><span class="date-suggestions"><%  %></span></p>
+                <div class="suggestions-section">
+                    <h2 class="suggestions-header">Up Next</h2>
+                    <% suggestions.forEach(function(suggestion) { %>
+                        <a href="/<%= currentRoute %>/<%= suggestion._id %>" class="suggestion-card">
+                            <img src="data:image/jpeg;base64,<%= suggestion.Thumbnail.toString('base64') %>" alt="Thumbnail" class="suggestion-thumbnail">
+                            <div class="suggestion-info">
+                                <p class="suggestion-title"><%= suggestion.title %></p>
+                                <p class="suggestion-creator"><%= suggestion.creator[0].username %></p>
+                                <p class="suggestion-meta">
+                                    <span class="views"><%= suggestion.Views %> Views</span>
+                                    <span class="upload-date"> • </span>
+                                </p>
                             </div>
-                        </div>
-                    </a>
-                <% }) %>
+                        </a>
+                    <% }) %>
+                </div>
             </div>
-        </section>
+        </div>
+    </section>
 </body>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const followbtn = document.querySelector(".follow-btn");
+    const socket = io();
+    const creatorId = "<%= Live.creator[0]._id %>";
+    const UserId = "<%= user.username %>";
+    
+
+    followbtn.addEventListener("click", () => {
+        socket.emit("Follow", { creatorId, UserId });
+
+        const span = followbtn.querySelector("span");
+    });
+
+    socket.on("FollowStatusUpdated", (data) => {
+        const followbtn = document.querySelector(`.follow-btn[data-creator-id='${data.creatorId}']`);
+        const followersCountElement = document.querySelector(".followers-count");
+
+        if (followbtn) {
+            const span = followbtn.querySelector("span");
+            
+
+            // Update the follow/unfollow button text
+            if (data.isFollowing) {
+                span.classList.remove("follow");
+                span.classList.add("unfollow");
+                span.textContent = "Unfollow";
+            } else {
+                span.classList.remove("unfollow");
+                span.classList.add("follow");
+                span.textContent = "Follow";
+            }
+        }
+
+        // Update the followers count on the page
+        if (followersCountElement) {
+            // console.log(followersCount)
+            console.log("followers Count",data.followersCount)
+            followersCountElement.textContent = `${data.followersCount} Followers`;
+        }
+        
+    });
+</script>
+
 </html>

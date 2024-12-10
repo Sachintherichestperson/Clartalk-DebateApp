@@ -13,22 +13,21 @@ const upload = require("../config/multer");
 const schedule = require("node-schedule");
 const Socket  = require("socket.io");
 
-router.get("/register", (req, res) => {
+
+router.get("/register", (req, res) => {                                                                      //register page
     let err = req.flash("key")
     res.render("Register", { err });
     console.log(err)
 })
+router.post("/register", userregister)                                                                     //register page--Uploader
 
-router.post("/register", userregister)
-
-router.get("/login", function(req, res){
+router.get("/login", function(req, res){                                                                   //Login Page
     let err = req.flash("usernot")
     res.render("login", {err})
-})
+});
+router.post("/login", loginuser)                                                                           //Login Page-Uploader
 
-router.post("/login", loginuser);
-
-router.get("/",isloggedin,async function(req, res){
+router.get("/",isloggedin,async function(req, res){                                                        // front page
   try{
     const user = await User.findOne({email: req.user.email}).populate("requests").populate( "Sender" );
     const vedios = await liveMongo.find({ status: "accept"})
@@ -39,13 +38,13 @@ router.get("/",isloggedin,async function(req, res){
   
 });
 
-router.get("/debate",isloggedin,async function(req, res){
+router.get("/debate",isloggedin,async function(req, res){                                                  //debate page
   const user = await User.findOne({email: req.user.email}).populate("requests");
   let vedios = await debatemongoose.find({});
   res.render("debate", { vedios,user });
 });
 
-router.get("/debate/:id",isloggedin, async function(req, res){
+router.get("/debate/:id",isloggedin, async function(req, res){                                             //debate video-player
   try{
     let vedios = await debatemongoose.findById(req.params.id)
     .populate({
@@ -78,13 +77,13 @@ router.get("/debate/:id",isloggedin, async function(req, res){
   }
 });
 
-router.get("/podcast", isloggedin, async function(req, res){
+router.get("/podcast", isloggedin, async function(req, res){                                               //podcast section Page
   const user = await User.findOne({email: req.user.email}).populate("requests")
   let vedios = await vediomongoose.find({});
   res.render("podcast", { vedios, user });
 });
-
-router.get("/podcast/:id",isloggedin, async function(req, res){
+ 
+router.get("/podcast/:id",isloggedin, async function(req, res){                                            //podcast video-player
     try{
       const user = await User.findOne({email: req.user.email});
     let vedios = await vediomongoose.findById(req.params.id)
@@ -116,7 +115,7 @@ router.get("/podcast/:id",isloggedin, async function(req, res){
     }
 });
 
-router.get("/community",isloggedin,async function(req, res){
+router.get("/community",isloggedin,async function(req, res){                                               //community Page
   const communities = await communityMongo.find().populate({
     path: "createdBy",
     select: "username"
@@ -125,7 +124,7 @@ router.get("/community",isloggedin,async function(req, res){
   const user = await User.findOne({email: req.user.email}).populate("requests");
   res.render("community", { communities, user } );
 });
-router.get("/logout", logout);
+router.get("/logout", logout);                                                                             //Logout route
 
 // router.get("/follow/:id",isloggedin, async function(req, res){
 //   const follow = await User.findById(req.params.id);  
@@ -151,7 +150,7 @@ router.get("/logout", logout);
 //   res.redirect(redirectUrl);
 // });
 
-router.get("/community-chat/:id",isloggedin ,async function(req, res){
+router.get("/community-chat/:id",isloggedin ,async function(req, res){                                    //community-chat/:id Page
   try{
     const community = await communityMongo.findById(req.params.id);
     const user = await User.findOne({email: req.user.email});
@@ -162,7 +161,7 @@ router.get("/community-chat/:id",isloggedin ,async function(req, res){
   }
 });
 
-router.get("/profile",isloggedin,async function(req, res){
+router.get("/profile",isloggedin,async function(req, res){                                                //profile Page
   const user = await User.findOne({email: req.user.email}).populate("followers").populate("vedio").populate("debate").populate("profile").populate("requests");
 
   const videoCount = user.vedio ? user.vedio.length : 0;
@@ -176,7 +175,7 @@ router.get("/profile",isloggedin,async function(req, res){
   res.render("profile", { user, totalContent, followerCount, profile });
 });
 
-router.get("/uploaded-content", isloggedin, async function (req, res) {
+router.get("/uploaded-content", isloggedin, async function (req, res) {                                   //uploaded-content Page
   try {
     const vediosData = await User.findOne({ email: req.user.email }).populate({
       path: "vedio",
@@ -203,12 +202,12 @@ router.get("/uploaded-content", isloggedin, async function (req, res) {
   }
 });
 
-router.get("/My-World",isloggedin, async function(req, res){
+router.get("/My-World",isloggedin, async function(req, res){                                             //Myworld Page
   const communities = await User.findOne({email: req.user.email}).populate("communities");
   res.render("Myworld", { communities })
 });
 
-router.get("/SentRequests",isloggedin, async function (req, res) {
+router.get("/SentRequests",isloggedin, async function (req, res) {                                       //Sent Requests Page
   const contents = await User.findOne({ email: req.user.email }).populate({
     path: "Sender",
     select: "OpponentName",
@@ -220,27 +219,13 @@ router.get("/SentRequests",isloggedin, async function (req, res) {
   res.render("Sentrequests", { contents })
 });
 
-router.get("/live-content-applying-page/:id",isloggedin, async function(req, res){
-  const Live = await liveMongo.findById(req.params.id).populate("creator");
-  
-  const followerscount = Live.creator[0].followers;
-  const follower = followerscount.length;
-
-  const suggestions = await liveMongo.find({ _id: { $ne: Live._id } }).limit(5).populate({
-    path: "creator",
-    select: "username"
-})
-
-  res.render("Livedebate-player", { Live, follower, suggestions, currentRoute: "live-content-applying-page" });
-});
-
-router.get("/update-route/:id",isloggedin, async function(req, res){
+router.get("/update-route/:id",isloggedin, async function(req, res){                                      // update-route/:id  Page
   const profileupdate = await User.findOne({ email: req.user.email }).populate("profile");
   console.log(profileupdate)
   res.render("update-profile", { profileupdate })
 });
 
-router.post("/update-profile", isloggedin, upload.single("profile"), async function (req, res) {
+router.post("/update-profile", isloggedin, upload.single("profile"), async function (req, res) {          // update-profile   Page
   try {
     let { username } = req.body;
     let profileImageBuffer = req.file ? req.file.buffer : null; // Get the file buffer or null if no file is uploaded
@@ -258,7 +243,7 @@ router.post("/update-profile", isloggedin, upload.single("profile"), async funct
   }
 });
 
-router.get("/LeaderBoard",isloggedin,async function(req, res){
+router.get("/LeaderBoard",isloggedin,async function(req, res){                                            //  LeaderBoard Page
   try{
     const user = await User.findOne({email: req.user.email})
     res.render("leaderBoard", {user})
@@ -268,7 +253,7 @@ router.get("/LeaderBoard",isloggedin,async function(req, res){
   }
 });
 
-router.post("/Join-community/:id",isloggedin,async (req, res) => {
+router.post("/Join-community/:id",isloggedin,async (req, res) => {                                 // Join-community/:id Page
   try{
       const community = await communityMongo.findById(req.params.id);
 
@@ -287,7 +272,7 @@ router.post("/Join-community/:id",isloggedin,async (req, res) => {
   }
 });
 
-router.get("/Members/:id",async (req, res) => {
+router.get("/Members/:id",async (req, res) => {                                                    // Members/:id Page
   const members = await communityMongo.findById(req.params.id).populate({
     path: "members",
     select: "username"
@@ -300,8 +285,43 @@ router.get("/Send-merge-request",async function(req, res){
   res.render("Send-merge-request")
 });
 
-router.get("/settings",async function (req, res) {
+router.get("/settings",async function (req, res) {                                                  //settings   Page
   res.render("settings");
 });
+
+router.get("/video-player/:id", async function (req, res) {
+  try{
+     
+  }catch(err){
+    res.status("500").send("Error Occured", err)
+  }
+})
+
+
+
+router.get("/live-content-applying-page/:id",isloggedin, async function(req, res){                       //live-content-applying-page/:id  Page
+  try{
+    const Live = await liveMongo.findById(req.params.id).populate("creator");
+  
+    const followerscount = Live.creator[0].followers;
+    const follower = followerscount.length;
+  
+    const suggestions = await liveMongo.find({ _id: { $ne: Live._id } }).limit(5).populate({
+      path: "creator",
+      select: "username"
+  });
+  const isFollowing = followerscount.includes(req.user._id);
+
+  let user = await User.findOne({email: req.user.email });
+
+  res.render("Livedebate-player", { Live, follower, suggestions, currentRoute: "live-content-applying-page", isFollowing, user });
+  }catch(err){
+        res.send("404").status("Page Not Found");
+  }
+});
+
+
+
+
 
 module.exports = router;

@@ -48,7 +48,11 @@ const userSchema = new mongoose.Schema({
             description: String,
             status: { type: String, default: 'pending' }
         }
-    ]
+    ],
+    Booked: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 });
 
 module.exports = mongoose.model('User', userSchema);
