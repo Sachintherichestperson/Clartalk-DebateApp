@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@paypal/checkout-server-sdk": "^1.0.3",
     "axios": "^1.7.8",
     "bcrypt": "^5.1.1",
     "config": "^3.3.12",
@@ -28,6 +29,7 @@
     "node-cron": "^3.0.3",
     "node-schedule": "^2.1.1",
     "path": "^0.12.7",
+    "razorpay": "^2.9.5",
     "socket.io": "^4.8.1"
   },
   "devDependencies": {

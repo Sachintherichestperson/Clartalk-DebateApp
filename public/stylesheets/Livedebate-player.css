@@ -288,7 +288,7 @@ nav img {
 }
 
 .Pay {
-    background-color: #28a745;
+    background-color: #00b000;
     padding: 10px;
     border-radius: 5px;
     text-align: center;
@@ -298,8 +298,8 @@ nav img {
 }
 
 .Pay:hover {
-    background-color: #218838; /* Darker green when hovered */
-    transform: translateY(-5px); /* Slight lift effect on hover */
+    background-color: #04b72b; /* Darker green when hovered */
+    transform: scale(1.05);
 }
 
 a{

@@ -17,7 +17,7 @@
                 <div class="video-section">
                     <img src="data:image/jpeg;base64,<%= Live.Thumbnail.toString('base64') %>" alt="" class="video-player">
                     <p class="video-title"><%= Live.title %></p>
-                        <a href="#" class="link">
+                        <a href="/payment-for/<%= Live.creator[0]._id %>/payment/<%= Live._id %>" class="link">
                             <div class="Pay">
                             <p class="amount">PAY: ₹19</p>
                             </div>
@@ -115,5 +115,4 @@
         
     });
 </script>
-
 </html>

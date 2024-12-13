@@ -15,7 +15,7 @@
             </nav>
             <div class="video-and-suggestions">
                 <div class="video-section">
-                    <video controls autoplay class="video-player">
+                    <video controls autoplay class="video-player" id="videoPlayer">
                         <source src="data:video/mp4;base64,<%= vedios.vedio.toString('base64') %>" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
@@ -76,6 +76,7 @@
     const socket = io();
     const creatorId = "<%= vedios.creator[0]._id %>";
     const UserId = "<%= user.username %>";
+    const currentRoute = "<%= currentRoute %>";
     
 
     followbtn.addEventListener("click", () => {
@@ -112,6 +113,42 @@
         }
         
     });
-</script>
 
+     const video = document.getElementById("videoPlayer");
+     let startTime = 0;
+     let endTime = 0;
+     let watchTime = 0;
+
+     video.addEventListener("play", () => {
+        startTime = Date.now();
+     });
+     const videoId = "<%= vedios._id %>";
+     console.log("video-Id", videoId);
+     
+     function sendWatchTime() {
+        if(startTime){
+            let endTime = Date.now();
+            watchTime += (endTime - startTime) / 1000;
+            startTime = 0;
+
+            const videoId = "<%= vedios._id %>";
+            console.log("video-Id", videoId);
+
+            fetch("/watch-time", {
+                method: "post",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ watchTime, videoId: "<%= vedios._id %>", videoType: currentRoute })
+            });
+        }
+     }
+
+     video.addEventListener("pause", sendWatchTime);
+     video.addEventListener("ended", sendWatchTime);
+
+     window.addEventListener("beforeunload", () => {
+         sendWatchTime();
+     });
+</script>
 </html>

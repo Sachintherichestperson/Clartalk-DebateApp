@@ -12,6 +12,7 @@ const communityMongo = require("../mongoose/community-mongo");
 const upload = require("../config/multer");
 const schedule = require("node-schedule");
 const Socket  = require("socket.io");
+const Razorpay = require("razorpay");
 
 
 router.get("/register", (req, res) => {                                                                      //register page
@@ -25,6 +26,7 @@ router.get("/login", function(req, res){                                        
     let err = req.flash("usernot")
     res.render("login", {err})
 });
+
 router.post("/login", loginuser)                                                                           //Login Page-Uploader
 
 router.get("/",isloggedin,async function(req, res){                                                        // front page
@@ -77,6 +79,7 @@ router.get("/debate/:id",isloggedin, async function(req, res){                  
   }
 });
 
+
 router.get("/podcast", isloggedin, async function(req, res){                                               //podcast section Page
   const user = await User.findOne({email: req.user.email}).populate("requests")
   let vedios = await vediomongoose.find({});
@@ -85,7 +88,7 @@ router.get("/podcast", isloggedin, async function(req, res){                    
  
 router.get("/podcast/:id",isloggedin, async function(req, res){                                            //podcast video-player
     try{
-      const user = await User.findOne({email: req.user.email});
+      let user = await User.findOne({email: req.user.email });
     let vedios = await vediomongoose.findById(req.params.id)
     .populate({
         path: "creator",
@@ -103,11 +106,14 @@ router.get("/podcast/:id",isloggedin, async function(req, res){                 
       await vedios.save();
     }
 
+
     const suggestions = await vediomongoose.find({ _id: { $ne: vedios._id } }).limit(5).populate({
       path: "creator",
       select: "username"
-  })
-    res.render("vedioplayer", {vedios, suggestions, currentRoute: "podcast", follower, isFollowing})
+  });
+
+
+    res.render("vedioplayer", {vedios, suggestions, currentRoute: "podcast", follower, isFollowing, user});
 
     }catch(err){
       res.send(err)
@@ -124,6 +130,7 @@ router.get("/community",isloggedin,async function(req, res){                    
   const user = await User.findOne({email: req.user.email}).populate("requests");
   res.render("community", { communities, user } );
 });
+
 router.get("/logout", logout);                                                                             //Logout route
 
 // router.get("/follow/:id",isloggedin, async function(req, res){
@@ -272,7 +279,7 @@ router.post("/Join-community/:id",isloggedin,async (req, res) => {              
   }
 });
 
-router.get("/Members/:id",async (req, res) => {                                                    // Members/:id Page
+router.get("/Members/:id",isloggedin,async (req, res) => {                                                    // Members/:id Page
   const members = await communityMongo.findById(req.params.id).populate({
     path: "members",
     select: "username"
@@ -281,23 +288,29 @@ router.get("/Members/:id",async (req, res) => {                                 
   res.render("Members", {members});
 });
 
-router.get("/Send-merge-request",async function(req, res){
+router.get("/Send-merge-request",isloggedin,async function(req, res){
   res.render("Send-merge-request")
 });
 
-router.get("/settings",async function (req, res) {                                                  //settings   Page
+router.get("/settings",isloggedin,async function (req, res) {                                                  //settings   Page
   res.render("settings");
 });
 
-router.get("/video-player/:id", async function (req, res) {
+router.get("/video-player/:id",isloggedin, async function (req, res) {
   try{
      
   }catch(err){
     res.status("500").send("Error Occured", err)
   }
-})
+});
 
-
+router.get('/payment-for/:id/payment/:id', async (req, res) => {
+    try {
+    } catch (error) {
+        console.error('Error creating payment:', error);
+        res.status(500).send('Something went wrong. Try again later.');
+    }
+});
 
 router.get("/live-content-applying-page/:id",isloggedin, async function(req, res){                       //live-content-applying-page/:id  Page
   try{
@@ -317,6 +330,49 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
   res.render("Livedebate-player", { Live, follower, suggestions, currentRoute: "live-content-applying-page", isFollowing, user });
   }catch(err){
         res.send("404").status("Page Not Found");
+  }
+});
+
+router.post('/watch-time', isloggedin, async (req, res) => {
+  console.log('Request received for watch-time route');
+
+  let { watchTime, videoId, videoType } = req.body; // Get watch time, video ID, and video type from the request body
+
+
+  try {
+      // Ensure watchTime is a number
+      watchTime = parseFloat(watchTime);
+
+      if (isNaN(watchTime)) {
+          return res.status(400).json({ message: 'Invalid watch time value.' });
+      }
+
+      const user = await User.findOne({ email: req.user.email });
+
+      let video;
+      if (videoType === 'debate') {
+          video = await debatemongoose.findById(videoId);
+      } else if (videoType === 'podcast') {
+          video = await vediomongoose.findById(videoId);
+      } else {
+          return res.status(400).json({ message: 'Invalid video type.' });
+      }
+
+      if (video) {
+          // Update watch hours
+          user.UserWatchHours = (user.UserWatchHours[0] || 0) + watchTime; // Update the total watch time
+          await user.save();
+
+          video.WatchHours = (video.WatchHours[0] || 0) + watchTime;
+          await video.save();
+
+          res.status(200).json({ message: 'Watch time updated successfully.' });
+      } else {
+          res.status(404).json({ message: 'Video not found.' });
+      }
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error.' });
   }
 });
 

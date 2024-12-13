@@ -24,6 +24,16 @@ const vedioSchema = new mongoose.Schema({
       LikedBy: [{ 
         type: mongoose.Schema.Types.ObjectId, 
         ref: "User" 
+      }],
+      WatchHours: [{
+        type: Number,
+        validate: {
+          validator: function (v) {
+            return typeof v === 'number' && v >= 0; // Validate that it's a positive number
+          },
+          message: props => `${props.value} is not a valid watch time!`
+        },
+        default: 0
       }]
 });
 

@@ -52,6 +52,16 @@ const userSchema = new mongoose.Schema({
     Booked: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
+    }],
+    Rank: [{
+        type: Number
+    }],
+    Rankpoints: [{
+        type: Number
+    }],
+    UserWatchHours: [{
+        type: Number,
+        default: 0
     }]
 });
 
