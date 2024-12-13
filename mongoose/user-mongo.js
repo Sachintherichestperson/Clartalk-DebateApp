@@ -56,9 +56,10 @@ const userSchema = new mongoose.Schema({
     Rank: [{
         type: Number
     }],
-    Rankpoints: [{
-        type: Number
-    }],
+    Rankpoints: {
+        type: Number,
+        default: 0
+    },
     UserWatchHours: [{
         type: Number,
         default: 0

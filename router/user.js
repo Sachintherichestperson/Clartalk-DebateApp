@@ -51,8 +51,11 @@ router.get("/debate/:id",isloggedin, async function(req, res){                  
     let vedios = await debatemongoose.findById(req.params.id)
     .populate({
         path: "creator",
-        select: "username followers"
+        select: "username followers Rankpoints"
     });
+    const creator = await User.findById(vedios.creator[0]._id).populate("Rankpoints")
+    
+
 
     let user = await User.findOne({email: req.user.email });
     
@@ -64,7 +67,12 @@ router.get("/debate/:id",isloggedin, async function(req, res){                  
       vedios.Views += 1;
       vedios.viewedBy.push(req.user._id);
       await vedios.save();
+
+      const points = 10;
+      creator.Rankpoints += points;
+      await creator.save();
     }
+    console.log(creator);
 
 
     const suggestions = await debatemongoose.find({ _id: { $ne: vedios._id } }).limit(5).populate({
@@ -95,6 +103,8 @@ router.get("/podcast/:id",isloggedin, async function(req, res){                 
         select: "username followers"
     });
 
+    const creator = await User.findById(vedios.creator[0]._id).populate("Rankpoints")
+
     const followerscount = vedios.creator[0].followers;
     const follower = followerscount.length;
     const isFollowing = followerscount.includes(req.user._id);
@@ -104,6 +114,10 @@ router.get("/podcast/:id",isloggedin, async function(req, res){                 
       vedios.Views += 1;
       vedios.viewedBy.push(user._id);
       await vedios.save();
+
+      const points = 10;
+      creator.Rankpoints += points;
+      await creator.save();
     }
 
 
@@ -334,7 +348,6 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
 });
 
 router.post('/watch-time', isloggedin, async (req, res) => {
-  console.log('Request received for watch-time route');
 
   let { watchTime, videoId, videoType } = req.body; // Get watch time, video ID, and video type from the request body
 
