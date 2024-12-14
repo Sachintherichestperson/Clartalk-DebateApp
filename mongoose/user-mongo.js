@@ -54,7 +54,8 @@ const userSchema = new mongoose.Schema({
         ref: 'User'
     }],
     Rank: [{
-        type: Number
+        type: Number,
+        default: 0
     }],
     Rankpoints: {
         type: Number,

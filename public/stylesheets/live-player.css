@@ -1,146 +1,308 @@
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
 * {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
-/* 33B816 */
-html {
-	font-size: 10px;
-}
+
 body {
-	background: #eee;
-	font-size: 1.6rem;
-	font-family: "Lora", serif;
-}
-ul li {
-	list-style: none;
-}
-
-/* || standard fonts */
-.lg-h-font {
-	font-size: 3.2rem;
-}
-.h-font {
-	font-size: 1.9rem;
-}
-.p-font {
-	font-size: 1.4rem;
-}
-.s-font {
-	font-size: 1rem;
+    background: linear-gradient(135deg, #2a3d7d, #b21f1f, #fdbb2d);
+    font-family: 'Roboto', sans-serif; /* General font */
+    color: white;
+    line-height: 1.6;
+    padding: 20px;
+	scrollbar-width: none;
 }
 
-/* || styling main container */
-.main-container {
-	height: 100vh;
-	display: flex;
+section {
+    display: flex;
 }
 
-/* || styling caller list - side menu*/
-.caller-list-heading {
-	margin: 1rem 1.5rem;
-}
-.caller-list-wrapper {
-	flex-basis: 30rem;
-	border-right: 1px solid black;
-	height: 100%;
-	background: white;
-}
-.caller-list > li {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 1rem;
-	background: #eee;
-	margin: .5rem;
-	border-radius: 5px;
-	cursor: pointer;
-	font-size: 1.6rem;
-}
-.call-btn {
-	border: none;
-	background: transparent;
-	color: black;
+.container {
+    min-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-/* || video call container styling */
-.video-call-container {
-	flex: 1;
+/* Video Section */
+.player {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 30px;
+    width: inherit;
+}
 
-	display: flex;
+.local-video, .remote-video {
+    width: 48%;
+    height: 450px;
+    background-color: #1f1f2e;
+    position: relative;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.local-video:before, .remote-video:before {
+    content: "Live";
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    background: rgba(255, 0, 0, 0.7);
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 700; /* Bold for emphasis */
+    font-family: 'Bebas Neue', sans-serif; /* Bold, uppercase style */
+}
+
+.local-video:hover, .remote-video:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.6);
+}
+
+/* About Video Section */
+.about-video {
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+    margin-top: 30px;
+}
+
+.Watch {
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 30px;
+    position: relative;
+    margin-bottom: 50px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif; /* Clean modern sans-serif */
+    font-weight: 600; /* Slightly bold for emphasis */
+}
+
+.Watch {
+    background-color: #383838;
+}
+
+.Watch:hover {
+    background-color: #303130;
+    transform: scale(1.02);
+}
+
+/* User Info Section */
+.video-user-info {
+    display: flex;
+    align-items: center;
+    background-color: #2d3e50;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    margin-bottom: 20px;
+    position: relative;
+    top: 20px;
+}
+
+.user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 15px;
+    border: 2px solid #00bcd4;
+}
+
+.creator-details {
+    flex-grow: 1;
+}
+
+.creator-name {
+    font-size: 22px;
+    font-family: 'Bebas Neue', sans-serif; /* Bold uppercase for names */
+    font-weight: bold;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.creator-name:hover {
+    color: #ff9800;
+}
+
+.followers-count {
+    font-size: 16px;
+    color: #b0bec5;
+    margin-top: 5px;
+    font-family: 'Lora', serif; /* Light serif for contrast */
+}
+
+.follow-btn {
+    color: white;
+    padding: 10px 0px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    font-family: 'Montserrat', sans-serif; /* Clean sans-serif for buttons */
+}
+
+.follow {
+    background-color: #0056b3;
+    padding: 12px 24px;
+    border-radius: 25px;
+}
+
+.follow:hover {
+    background-color: #013c7b;
+}
+
+.unfollow {
+    background-color: #d41919;
+    padding: 12px 24px;
+    border-radius: 25px;
+}
+
+.unfollow:hover {
+    background-color: #e12f2f;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .video-user-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .user-avatar {
+        width: 60px;
+        height: 60px;
+    }
+
+    .creator-name {
+        font-size: 20px;
+    }
+
+    .followers-count {
+        font-size: 14px;
+    }
+
+    .follow-btn {
+        padding: 8px 15px;
+    }
+
+    .player {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .local-video, .remote-video {
+        width: 100%;
+        height: auto;
+    }
+
+    .about-video {
+        padding: 15px;
+    }
+}
+
+/* Updated Comments Section */
+.comments {
+    background-color: #303130;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+	align-items: flex-start;
+    flex-direction: column;
+    position: relative; /* Ensure this container is positioned relative */
+	height: 650px;
+}
+
+.comment-input {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: absolute; /* Fix the input at the bottom */
+    bottom: 0; /* Align it to the bottom of the .comments container */
+    left: 0; /* Align to the left side */
+    padding: 20px; /* Add padding for spacing */
+    background-color: #303130; /* Background color for the input area */
+    z-index: 10; /* Ensure it stays on top */
+}
+
+
+.comment-input input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    border: none;
+    background-color: #383838;
+    color: white;
+    margin-bottom: 15px;
+}
+
+#commentButton {
+    padding: 10px 20px;
+    background-color: #ff9800;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+}
+
+#commentButton:hover {
+    background-color: #e68a00;
+    transform: scale(1.02);
+}
+
+#comment-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.single-comment {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+    cursor: pointer;
 	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-
-}
-.video-streams {
-	display: flex;
-	gap: 2rem;
-}
-.local-video,
-.remote-video {
-	flex: 1;
-	width: 50rem;
-	min-height: 40rem;
-	max-height: 50rem;
-	background: black;
-	overflow: hidden;
 }
 
-.local-video video,
-.remote-video video {
-	width: 100%;
-	height: 100%;
-	/* object-fit: cover; */
+.single-comment strong {
+    font-weight: bold;
+    color: #ff9800;
+	font-size: 18px;
 }
 
-.call {
-	border: none;
-	outline: none;
-
-	width: 5rem;
-	height: 5rem;
-	background: white;
-	box-shadow: 0 0 15px 15px rgba(0, 0, 0, 0.2);
-	border-radius: 50%;
-	margin: 2rem 0; 
-	cursor: pointer;
+.comment-input {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: baseline;
 }
 
-.d-none {
-	display: none;
-}
-
-.username-input {
-	margin: 2rem 0;
-}
-.username-input input {
-	width: 30rem;
-	height: 4rem;
-	padding: 5px;
-	outline: none;
-	border: none;
-	box-shadow: inset 0 0 15px 15px rgba(0, 0, 0, 0.2);
-	font-family: 'Lora', sans-serif;
-	font-weight: 500;
-}
-.username-input input::placeholder {
-	font-family: "Lora", serif;
-}
-.username-input button {
-	height: 4rem;
-	outline: none;
-	border: none;
-	background: darkgreen;
+.comment-btn{
 	color: white;
-	padding: 0 1rem;
-	font-family: "Lora", serif;
-	font-weight: 500;
-	letter-spacing: 1px;
+	font-size: 30px;
 	cursor: pointer;
-	text-transform: uppercase;
 }
-video {
-    transform: scaleX(-1); /* Flips the video horizontally */
+
+/* Hide the comments section by default */
+.comments {
+    display: none;
 }
+
+/* Show the comments when the checkbox is checked */
+.comments-toggle:checked + .comments {
+    display: block;
+}
+

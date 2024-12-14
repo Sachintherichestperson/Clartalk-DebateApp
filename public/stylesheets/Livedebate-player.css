@@ -310,3 +310,18 @@ a{
     color: white;
     font-weight: bold;
 }
+
+.Watch{
+    background-color: #383838;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 30px;
+    position: relative;
+    margin-bottom: 50px;
+}
+
+.Watch:hover {
+    background-color: #303130; /* Darker green when hovered */
+    transform: scale(1.02);
+}

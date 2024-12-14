@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending Requests</title>
+    <link rel="stylesheet" href="/stylesheets/requests.css">
+</head>
+<body>
+    <section class="container">
+        <header>
+            <div class="branding">
+                <img src="/images/nav.png" alt="ClarTalk Logo">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search topics, debates...">
+                </div>
+            </div>
+    <h1>Pending Requests</h1>
+    <% if (hoursLeft <= 6.8) { %>
+    <div class="request-card">
+        <p><strong>Title:</strong><%= content[0].title %></p>
+        <p><strong>Description:</strong><%= content[0].description %></p>
+        <p><strong>Opponent:</strong><%= content[0].opponent[0].username %></p>
+        <p><strong>Time:</strong><%= hoursLeft %></p>   
+        <div class="request-actions">
+            <form action="/creator/debator-page/<%= content[0]._id %>" method="post" class="request-form">
+                <input type="hidden" name="requestId" value="<%= content._id %>">
+                <button type="submit" name="action" value="accept" class="action-btn">Start The Debate</button>
+            </form>
+        </div>
+    </div>
+    <% }else{ %>
+        <div class="request-card">
+        <strong>Time:</strong>You will recieve a notification to start the debate when 30 minutes are Left for debate</p>
+    </div>
+    <% } %>
+        <div class="no-requests">
+            <p>No requests available.</p>
+        </div>
+    </section>
+</body>
+</html>

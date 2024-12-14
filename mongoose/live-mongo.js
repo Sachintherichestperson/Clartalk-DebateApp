@@ -25,7 +25,11 @@ const vedioSchema = new mongoose.Schema({
     Booking: {
         type: Number,
         default: 0
-    }
+    },
+    BookingDoneBy: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }]
 });
 
 module.exports = mongoose.model('live', vedioSchema);

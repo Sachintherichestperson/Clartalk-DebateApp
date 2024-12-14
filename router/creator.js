@@ -336,6 +336,24 @@ router.post("/community/builder",upload.single("CommunityDP"), isloggedin, async
   }
 });
 
-
+router.post("/debator-page/:id",isloggedin,async function (req, res) {
+   try{
+      const Live = await livemongo.findById(req.params.id).populate({
+          path: "creator",
+          select: "followers username"
+        });
+      
+        const user = await User.findOne({email: req.user.email});
+      
+        const followerscount = Live.creator[0].followers;
+          const follower = followerscount.length;
+          const isFollowing = followerscount.includes(req.user._id);
+      
+        res.render("live-debater-page", { Live, user, isFollowing,follower });
+   }catch(err){
+    res.status(404).send(err)
+    console.log(err)
+   }
+});
 
 module.exports = router;

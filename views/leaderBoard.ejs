@@ -54,106 +54,13 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <% LeaderBoards.forEach(function(LeaderBoard){ %> 
                     <tr>
-                        <td>1</td>
-                        <td>JohnDoe</td>
-                        <td>1500</td>
+                        <td><%= LeaderBoard.Rank %></td>
+                        <td><%= LeaderBoard.username %></td>
+                        <td><%= LeaderBoard.Rankpoints %></td>
                     </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>JaneSmith</td>
-                        <td>1300</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Mike123</td>
-                        <td>1200</td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>Alexandra</td>
-                        <td>1100</td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td>Maximus</td>
-                        <td>1000</td>
-                    </tr>
-                    <tr>
-                        <td>6</td>
-                        <td>JohnDoe</td>
-                        <td>1500</td>
-                    </tr>
-                    <tr>
-                        <td>7</td>
-                        <td>JaneSmith</td>
-                        <td>1300</td>
-                    </tr>
-                    <tr>
-                        <td>8</td>
-                        <td>Mike123</td>
-                        <td>1200</td>
-                    </tr>
-                    <tr>
-                        <td>9</td>
-                        <td>Alexandra</td>
-                        <td>1100</td>
-                    </tr>
-                    <tr>
-                        <td>10</td>
-                        <td>Maximus</td>
-                        <td>1000</td>
-                    </tr>
-                    <tr>
-                        <td>11</td>
-                        <td>JohnDoe</td>
-                        <td>1500</td>
-                    </tr>
-                    <tr>
-                        <td>12</td>
-                        <td>JaneSmith</td>
-                        <td>1300</td>
-                    </tr>
-                    <tr>
-                        <td>13</td>
-                        <td>Mike123</td>
-                        <td>1200</td>
-                    </tr>
-                    <tr>
-                        <td>14</td>
-                        <td>Alexandra</td>
-                        <td>1100</td>
-                    </tr>
-                    <tr>
-                        <td>15</td>
-                        <td>Maximus</td>
-                        <td>1000</td>
-                    </tr>
-                    <tr>
-                        <td>16</td>
-                        <td>JohnDoe</td>
-                        <td>1500</td>
-                    </tr>
-                    <tr>
-                        <td>17</td>
-                        <td>JaneSmith</td>
-                        <td>1300</td>
-                    </tr>
-                    <tr>
-                        <td>18</td>
-                        <td>Mike123</td>
-                        <td>1200</td>
-                    </tr>
-                    <tr>
-                        <td>19</td>
-                        <td>Alexandra</td>
-                        <td>1100</td>
-                    </tr>
-                    <tr>
-                        <td>20</td>
-                        <td>Maximus</td>
-                        <td>1000</td>
-                    </tr>
+                    <% }) %>
                 </tbody>
             </table>
         </div>

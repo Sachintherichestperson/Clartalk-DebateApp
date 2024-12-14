@@ -264,13 +264,24 @@ router.post("/update-profile", isloggedin, upload.single("profile"), async funct
   }
 });
 
-router.get("/LeaderBoard",isloggedin,async function(req, res){                                            //  LeaderBoard Page
-  try{
-    const user = await User.findOne({email: req.user.email})
-    res.render("leaderBoard", {user})
-  }catch(err){
-    res.send(err)
-    console.log(err)
+router.get("/LeaderBoard", isloggedin, async function (req, res) { // LeaderBoard Page
+  try {
+    const user = await User.findOne({ email: req.user.email });
+
+    // Fetch top users sorted by Rankpoints in descending order
+    const LeaderBoards = await User.find().sort({ Rankpoints: -1 }).limit(10);
+
+    // Assign ranks to users
+    LeaderBoards.forEach((creator, index) => {
+      creator.Rank = index + 1; // Rank starts from 1
+    });
+
+    console.log("LeaderBoard with Ranks:", LeaderBoards);
+
+    res.render("leaderBoard", { user, LeaderBoards });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Internal Server Error");
   }
 });
 
@@ -318,8 +329,11 @@ router.get("/video-player/:id",isloggedin, async function (req, res) {
   }
 });
 
-router.get('/payment-for/:id/payment/:id', async (req, res) => {
+router.get('/payment-for/:id/payment/:id',isloggedin, async (req, res) => {
     try {
+      const Live = await liveMongo.findById(req.params.id)
+
+      res.render("payment", { Live });
     } catch (error) {
         console.error('Error creating payment:', error);
         res.status(500).send('Something went wrong. Try again later.');
@@ -329,7 +343,14 @@ router.get('/payment-for/:id/payment/:id', async (req, res) => {
 router.get("/live-content-applying-page/:id",isloggedin, async function(req, res){                       //live-content-applying-page/:id  Page
   try{
     const Live = await liveMongo.findById(req.params.id).populate("creator");
-  
+
+    const viewers = await liveMongo.findById(req.params.id).populate({
+      path: "BookingDoneBy",
+      select: "username"
+    });
+    const Booking = viewers.BookingDoneBy.some(id => id.equals(req.user.id))
+    console.log(Booking);
+
     const followerscount = Live.creator[0].followers;
     const follower = followerscount.length;
   
@@ -341,7 +362,7 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
 
   let user = await User.findOne({email: req.user.email });
 
-  res.render("Livedebate-player", { Live, follower, suggestions, currentRoute: "live-content-applying-page", isFollowing, user });
+  res.render("Livedebate-player", { Live, follower, suggestions, currentRoute: "live-content-applying-page", isFollowing, user, Booking });
   }catch(err){
         res.send("404").status("Page Not Found");
   }
@@ -389,8 +410,69 @@ router.post('/watch-time', isloggedin, async (req, res) => {
   }
 });
 
+router.post("/Booking-Done/:id",isloggedin, async function (req, res) {
+  try{
+    const Live = await liveMongo.findById(req.params.id).populate({
+      path: "BookingDoneBy",
+      select: "username"
+    });
+    const user = await User.findOne({ email: req.user.email })
+  
+    const userId = req.user._id;
+      
+    if (!Live.BookingDoneBy.some(id => id.equals(user._id))) {
+      Live.BookingDoneBy.push(user._id);
+      await Live.save();
+      console.log("Booking not done");
+    }else{
+      console.log("Booking Done")
+    }
+
+   res.redirect(`/live-content-applying-page/${req.params.id}`);
+  }catch(err){
+     res.redirect("/")
+  }
+});
+
+router.get("/Livedebate/:id",isloggedin, async function (req, res) {
+  const Live = await liveMongo.findById(req.params.id).populate({
+    path: "creator",
+    select: "followers username"
+  });
+
+  const user = await User.findOne({email: req.user.email});
+
+  const followerscount = Live.creator[0].followers;
+    const follower = followerscount.length;
+    const isFollowing = followerscount.includes(req.user._id);
+
+  res.render("live-player", { Live, user, isFollowing,follower });
+})
+
+router.get("/start-debate",isloggedin, async function (req, res) {
+  const user = await User.findOne({email: req.user.email}).populate({
+    path: "Live",
+    select: "title description Thumbnail Time Views"
+  });
+  
+  const content = await liveMongo.find({}).populate({
+    path: "creator",
+    select: "username",
+  }).populate({
+    path: "opponent",
+    select: "username"
+  });
+
+  const Time =  new Date(user.Live[0]?.Time).getTime();
+  const TimeLeft = Time - Date.now();
 
 
+const hours = TimeLeft / (1000 * 60 * 60)    // Convert ms to hours
+const hoursLeft = hours.toFixed(2);
+console.log('Time Left in Hours:', hoursLeft);
+
+  res.render("start-debate", {user, content, hoursLeft});
+});
 
 
 module.exports = router;
