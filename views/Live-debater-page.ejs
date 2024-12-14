@@ -99,35 +99,30 @@
             background-color: rgba(255, 255, 255, 0.2);
         }
 
-        /* Follow Button Section */
-        .follow-btn {
+        /* End Call Button Section */
+        .end-call-btn {
             padding: 12px 30px;
             font-size: 16px;
             border: none;
             border-radius: 25px;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            background: linear-gradient(135deg, #ff4b2b, #ff416c);
             color: white;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
             text-transform: uppercase;
-            display: inline-block;
-            margin-top: 25px;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
-        .follow-btn:hover {
-            background: linear-gradient(135deg, #ff4b2b, #ff416c);
-            transform: scale(1.05);
+        .end-call-btn:hover {
+            background: linear-gradient(135deg, #f38a1f, #f92f3f);
+            transform: scale(1.05) translateX(-50%);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .followers-count {
-            font-size: 18px;
-            color: #f0f0f0;
-            margin-top: 10px;
-            font-weight: 600;
         }
 
         /* Responsive adjustments */
@@ -147,7 +142,7 @@
                 align-items: flex-start;
             }
 
-            .follow-btn {
+            .end-call-btn {
                 width: 100%;
                 padding: 15px 40px;
                 font-size: 18px;
@@ -165,6 +160,8 @@
                 </div>
                 <div class="remote-video">
                     <video id="remoteVideo" autoplay muted playsinline></video>
+                    <!-- End Call Button inside the remote-video div -->
+                    <button class="end-call-btn">End Call</button>
                 </div>
             </div>
 
