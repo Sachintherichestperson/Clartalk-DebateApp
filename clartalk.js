@@ -117,7 +117,50 @@ socket.on("Follow", async (data) => {
   }
 });
 
+// socket.on("sendLive", (liveId) => {
+//   socket.join(liveId); // Join the live room
+//   console.log(`User joined room: ${liveId}`);
+// });
 
+// // Relay signaling messages
+// socket.on("signal", ({ liveId, data }) => {
+//   socket.to(liveId).emit("signal", data);
+// });
+
+// socket.on("disconnect", () => {
+//   console.log("A user disconnected:", socket.id);
+// });
+
+
+// socket.on("sendLive", (liveId) => {
+//   socket.join(liveId);
+//   console.log(`User ${socket.id} joined room: ${liveId}`);
+
+//   // Notify others in the room about the new participant
+//   socket.to(liveId).emit("user-joined", socket.id);
+
+//   // Handle signaling messages
+//   socket.on("signal", ({ data }) => {
+//       socket.to(liveId).emit("signal", { sender: socket.id, data });
+//   });
+// });
+
+
+
+
+socket.on("join-room", ({ roomId }) => {
+        socket.join(roomId);
+        socket.to(roomId).emit("user-joined", socket.id);
+    });
+
+    socket.on("signal", ({ data, sender, target }) => {
+        io.to(target).emit("signal", { data, sender });
+    });
+
+    socket.on("disconnect", () => {
+        console.log("User disconnected:", socket.id);
+        socket.broadcast.emit("user-left", socket.id);
+    });
 });
 // Start the server
 server.listen(3000);

@@ -450,28 +450,37 @@ router.get("/Livedebate/:id",isloggedin, async function (req, res) {
 })
 
 router.get("/start-debate",isloggedin, async function (req, res) {
-  const user = await User.findOne({email: req.user.email}).populate({
-    path: "Live",
-    select: "title description Thumbnail Time Views"
-  });
-  
-  const content = await liveMongo.find({}).populate({
-    path: "creator",
-    select: "username",
-  }).populate({
-    path: "opponent",
-    select: "username"
-  });
-
-  const Time =  new Date(user.Live[0]?.Time).getTime();
-  const TimeLeft = Time - Date.now();
+  // const content = await User.findOne({ email: req.user.email }).populate({
+  //   path: "requests", // Assuming `requests` field has the request information
+  //   populate: [{
+  //     path: "requestId", // This holds the details of the request (opponent details, etc.)
+  //     select: "title description Time"
+  //   }]
+  // }).populate({
+  //   path: "Sender",
+  //   populate: [{
+  //     path: "requestId", select: "title description Time"
+  //   }]
+  // });
 
 
-const hours = TimeLeft / (1000 * 60 * 60)    // Convert ms to hours
-const hoursLeft = hours.toFixed(2);
-console.log('Time Left in Hours:', hoursLeft);
 
-  res.render("start-debate", {user, content, hoursLeft});
+const content = await User.findOne({email: req.user.email}).populate({
+  path: "Live",
+  select: "title description Time"
+});
+
+ 
+const Time =  new Date(content.Live[0].Time).getTime();
+const TimeLeft = Time - Date.now();
+
+
+const hours = TimeLeft / (1000 * 60 * 60)
+const hoursLeft = hours.toFixed(1);
+console.log(hoursLeft);
+
+
+  res.render("start-debate", { content, hoursLeft });
 });
 
 

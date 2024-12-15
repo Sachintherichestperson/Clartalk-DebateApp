@@ -265,6 +265,8 @@ router.post("/accept/:id",isloggedin,async function (req, res) {
       { new: true }
     );
 
+    opponent.Live.push(updateVideo);
+    await opponent.save();
     res.redirect("/");
   }catch(err){
       res.send(err)

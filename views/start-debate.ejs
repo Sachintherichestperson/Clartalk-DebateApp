@@ -16,15 +16,15 @@
                 </div>
             </div>
     <h1>Pending Requests</h1>
-    <% if (hoursLeft <= 6.8) { %>
+    <% if (hoursLeft <= 47.84) { %>
     <div class="request-card">
-        <p><strong>Title:</strong><%= content[0].title %></p>
-        <p><strong>Description:</strong><%= content[0].description %></p>
-        <p><strong>Opponent:</strong><%= content[0].opponent[0].username %></p>
+        <p><strong>Title:</strong><%= content.Live[0].title %></p>
+        <p><strong>Description:</strong><%= content.Live[0].description %></p>
+        <p><strong>Opponent:</strong><%= content.Live.opponent %></p>
         <p><strong>Time:</strong><%= hoursLeft %></p>   
         <div class="request-actions">
-            <form action="/creator/debator-page/<%= content[0]._id %>" method="post" class="request-form">
-                <input type="hidden" name="requestId" value="<%= content._id %>">
+            <form action="/creator/debator-page/<%= content.Live[0]._id %>" method="post" class="request-form">
+                <input type="hidden" name="requestId" value="<%= content.Live[0]._id %>">
                 <button type="submit" name="action" value="accept" class="action-btn">Start The Debate</button>
             </form>
         </div>
