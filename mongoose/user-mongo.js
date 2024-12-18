@@ -67,4 +67,18 @@ const userSchema = new mongoose.Schema({
     }]
 });
 
+userSchema.statics.updateRanks = async function () {
+    try {
+        const users = await this.find().sort({ Rankpoints: -1 }); // Sort by Rankpoints
+        let rank = 1;
+        for (let user of users) {
+            user.Rank = rank++; // Assign rank
+            await user.save();  // Save each user
+        }
+    } catch (err) {
+        console.error("Error updating ranks:", err);
+        throw err;
+    }
+};
+
 module.exports = mongoose.model('User', userSchema);

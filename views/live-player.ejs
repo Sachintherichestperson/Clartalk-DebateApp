@@ -12,10 +12,10 @@
         <div class="container">
             <div class="player">
                 <div class="local-video">
-                    <video id="localVideo" autoplay muted playsinline></video>
+                    <video id="debater1Video" autoplay playsinline></video>
                 </div>
                 <div class="remote-video">
-                    <video id="remoteVideo" autoplay muted playsinline></video>
+                    <video id="debater2Video" autoplay playsinline></video>
                 </div>
             </div>
             <div class="about-video">
@@ -45,66 +45,57 @@
             <i class="fas fa-comment"></i> 
         </label>
         <input type="checkbox" id="commentsToggle" class="comments-toggle" hidden>
-            <div class="comments">
-                <div class="comment-list">
-                    <ul id="commentList">
-                            <li class="single-comment">
-                                <strong>Krishna tera Shaka : </strong>
-                                <p>Me hu Daro Mat Sachin, Tum Bus Mehnat Karte Raho aur mere Priyata ka nam lete Raho, Aur Jo Tum Kar Rahe Ho Wo Karte Raho</p>
-                            </li>
-                    </ul>
-                </div>
-                <div class="comment-input">
-                    <input type="text" placeholder="Add a comment" id="commentInput">
-                    <button id="commentButton">Comment</button>
-                </div>
+        <div class="comments">
+            <div class="comment-list">
+                <ul id="commentList">
+                    <li class="single-comment">
+                        <strong>Krishna tera Shaka : </strong>
+                        <p>Me hu Daro Mat Sachin, Tum Bus Mehnat Karte Raho aur mere Priyata ka nam lete Raho, Aur Jo Tum Kar Rahe Ho Wo Karte Raho</p>
+                    </li>
+                </ul>
+            </div>
+            <div class="comment-input">
+                <input type="text" placeholder="Add a comment" id="commentInput">
+                <button id="commentButton">Comment</button>
+            </div>
         </div>
     </section>
 
     <script src="/javascript/socket.io.js"></script>
-    <script src="/javascript/main.js"></script>
     <script>
-        const followbtn = document.querySelector(".follow-btn");
-    const socket = io();
-    const creatorId = "<%= Live.creator[0]._id %>";
-    const UserId = "<%= user.username %>";
-    
+        const socket = io(); // Connect to the signaling server
+        const debater1Video = document.getElementById('debater1Video');
+        const debater2Video = document.getElementById('debater2Video');
 
-    followbtn.addEventListener("click", () => {
-        socket.emit("Follow", { creatorId, UserId });
-
-        const span = followbtn.querySelector("span");
-    });
-
-    socket.on("FollowStatusUpdated", (data) => {
-        const followbtn = document.querySelector(`.follow-btn[data-creator-id='${data.creatorId}']`);
-        const followersCountElement = document.querySelector(".followers-count");
-
-        if (followbtn) {
-            const span = followbtn.querySelector("span");
-            
-
-            // Update the follow/unfollow button text
-            if (data.isFollowing) {
-                span.classList.remove("follow");
-                span.classList.add("unfollow");
-                span.textContent = "Unfollow";
-            } else {
-                span.classList.remove("unfollow");
-                span.classList.add("follow");
-                span.textContent = "Follow";
-            }
-        }
-
-        // Update the followers count on the page
-        if (followersCountElement) {
-            // console.log(followersCount)
-            console.log("followers Count",data.followersCount)
-            followersCountElement.textContent = `${data.followersCount} Followers`;
-        }
+        // Assume that the server will handle the signaling and provide video streams for both debaters.
         
-    });
+        // Handle incoming streams for both debaters
+        socket.on('stream', (data) => {
+            if (data.debaterId === 'debater1') {
+                debater1Video.srcObject = data.stream; // Assign stream for debater 1
+            } else if (data.debaterId === 'debater2') {
+                debater2Video.srcObject = data.stream; // Assign stream for debater 2
+            }
+        });
 
+        // Handle comments
+        document.getElementById('commentButton').addEventListener('click', () => {
+            const commentInput = document.getElementById('commentInput');
+            const comment = commentInput.value.trim();
+            if (comment) {
+                socket.emit('comment', { user: 'Viewer', text: comment });
+                commentInput.value = ''; // Clear input
+            }
+        });
+
+        // Listen for comments from the server
+        socket.on('comment', (data) => {
+            const commentList = document.getElementById('commentList');
+            const commentItem = document.createElement('li');
+            commentItem.className = 'single-comment';
+            commentItem.innerHTML = `<strong>${data.user}:</strong> <p>${data.text}</p>`;
+            commentList.appendChild(commentItem);
+        });
     </script>
 </body>
 </html>

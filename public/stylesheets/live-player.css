@@ -306,3 +306,9 @@ section {
     display: block;
 }
 
+
+video{
+    object-fit: cover;
+    height: 430px;
+    width: 100%;
+}

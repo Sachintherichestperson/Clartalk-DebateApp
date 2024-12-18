@@ -14,12 +14,12 @@ const Message = require("./mongoose/messages-mongo");
 const Community = require("./mongoose/community-mongo");
 const liveMongo = require("./mongoose/live-mongo");
 const debatemongoose = require("./mongoose/debate-mongo");
-const User = require("./mongoose/user-mongo")
+const User = require("./mongoose/user-mongo");
 
-const server = createServer(app);  // Create an HTTP server with Express
-const io = new Server(server);     // Initialize Socket.IO server
+const server = createServer(app);
+const io = new Server(server);
 
-const allusers = {};  // Store connected users (optional, for managing chat state)
+const allusers = {};
 
 require("dotenv").config();
 
@@ -39,116 +39,68 @@ app.use(
 
 app.use(flash());
 
-// Routers
 app.use("/", user);
 app.use("/creator", creator);
 
-
 io.on("connection", (socket) => {
+    socket.on("joinCommunity", async (communityId) => {
+        try {
+            const community = await Community.findById(communityId).populate({
+                path: "Messages",
+                select: "Message sender"
+            });
+            socket.emit("allMessages", community.Messages);
+        } catch (err) {
+            console.error(err);
+        }
+    });
 
-//chat community
-socket.on("joinCommunity",async (communityId) => {
-  try{
-      const community = await Community.findById(communityId).populate({
-        path: "Messages",
-        select: "Message sender"
-  });
-      socket.emit("allMessages", community.Messages);
-  }catch(err){
-       console.error(err);
-  }
-});
-//chat message
-socket.on("chatMessage",async (data) => {
-    const newMessage = await Message.create({
-      Message: data.message,
-      sender: data.username
-  });
+    socket.on("chatMessage", async (data) => {
+        const newMessage = await Message.create({
+            Message: data.message,
+            sender: data.username
+        });
 
-    const community = await Community.findById(data.communityId);
-    community.Messages.push(newMessage._id);
-    await community.save();
+        const community = await Community.findById(data.communityId);
+        community.Messages.push(newMessage._id);
+        await community.save();
 
+        io.emit("chatMessage", data);
+    });
 
-    io.emit("chatMessage", data);
-});
-//chat community end here
-socket.on("Follow", async (data) => {
-  const { creatorId, UserId } = data;
+    socket.on("Follow", async (data) => {
+        const { creatorId, UserId } = data;
 
-  const creator = await User.findById(creatorId);  // Creator user
-  const user = await User.findOne({ username: UserId });  // Logged-in user
+        const creator = await User.findById(creatorId);
+        const user = await User.findOne({ username: UserId });
 
-  if (!user) {
-    console.log('User not found');
-    return;
-  }
+        if (!user || !creator) {
+            console.log('User or Creator not found');
+            return;
+        }
 
-  if (!creator) {
-    console.log('Creator not found');
-    return;
-  }
+        if (!user.following.includes(creatorId)) {
+            user.following.push(creatorId);
+            creator.followers.push(user._id);
+            creator.followersCount += 1;
 
-  // Check if the user is following the creator
-  if (!user.following.includes(creatorId)) {
-    // Follow: Add creator to user's following and vice versa
-    user.following.push(creatorId);
-    creator.followers.push(user._id);  // Add user to creator's followers list
-    creator.followersCount += 1;  // Increment followers count
+            await user.save();
+            await creator.save();
 
-    // Save both user and creator data
-    await user.save();
-    await creator.save();
+            io.emit("FollowStatusUpdated", { creatorId, UserId, isFollowing: true, followersCount: creator.followers.length });
+        } else {
+            user.following.pull(creatorId);
+            creator.followers.pull(user._id);
+            creator.followersCount -= 1;
 
-    // Emit the updated follow status with the new follower count
-    io.emit("FollowStatusUpdated", { creatorId, UserId, isFollowing: true, followersCount: creator.followers.length  });
-  } else {
-    // Unfollow: Remove creator from user's following and vice versa
-    user.following.pull(creatorId);
-    creator.followers.pull(user._id);
-    creator.followersCount -= 1;  // Decrement followers count
+            await user.save();
+            await creator.save();
 
-    // Save both user and creator data
-    await user.save();
-    await creator.save();
+            io.emit("FollowStatusUpdated", { creatorId, UserId, isFollowing: false, followersCount: creator.followers.length });
+        }
+    });
 
-    // Emit the updated follow status with the new follower count
-    io.emit("FollowStatusUpdated", { creatorId, UserId, isFollowing: false, followersCount: creator.followers.length  });
-  }
-});
-
-// socket.on("sendLive", (liveId) => {
-//   socket.join(liveId); // Join the live room
-//   console.log(`User joined room: ${liveId}`);
-// });
-
-// // Relay signaling messages
-// socket.on("signal", ({ liveId, data }) => {
-//   socket.to(liveId).emit("signal", data);
-// });
-
-// socket.on("disconnect", () => {
-//   console.log("A user disconnected:", socket.id);
-// });
-
-
-// socket.on("sendLive", (liveId) => {
-//   socket.join(liveId);
-//   console.log(`User ${socket.id} joined room: ${liveId}`);
-
-//   // Notify others in the room about the new participant
-//   socket.to(liveId).emit("user-joined", socket.id);
-
-//   // Handle signaling messages
-//   socket.on("signal", ({ data }) => {
-//       socket.to(liveId).emit("signal", { sender: socket.id, data });
-//   });
-// });
-
-
-
-
-socket.on("join-room", ({ roomId }) => {
+    socket.on("join-room", ({ roomId }) => {
         socket.join(roomId);
         socket.to(roomId).emit("user-joined", socket.id);
     });
@@ -157,10 +109,16 @@ socket.on("join-room", ({ roomId }) => {
         io.to(target).emit("signal", { data, sender });
     });
 
+    socket.on("send-debate-stream", ({ roomId, streamData, debaterId }) => {
+        console.log(`Sending stream data from ${debaterId} to room ${roomId}`);
+        socket.to(roomId).emit("receive-debate-stream", { streamData, debaterId });
+    });
+
     socket.on("disconnect", () => {
-        console.log("User disconnected:", socket.id);
         socket.broadcast.emit("user-left", socket.id);
     });
 });
-// Start the server
-server.listen(3000);
+
+server.listen(3000, () => {
+    console.log("Server is running on port 3000");
+});

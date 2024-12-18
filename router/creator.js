@@ -75,9 +75,10 @@ router.post("/upload",upload.fields([{ name: 'vedio', maxCount: 1 }, { name: 'Th
     }
  })
 
-router.get("/creator/live", function(req, res){
-    res.render("live-uploader")
-})
+router.get("/creator/live",isloggedin ,async function(req, res){
+  const live = await User.findOne({email: req.user.email});
+    res.render("live-uploader", { live });
+});
 
 
 router.get("/creator/:id",isloggedin, async function(req, res){
@@ -136,7 +137,7 @@ setInterval(async () => {
 
 router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { name: 'Thumbnail', maxCount: 1 }]), isloggedin, async function (req, res) {
   try {
-    let { title, description, creator, Time, opponent } = req.body;
+    let { title, description, creator, Time, opponent, Type } = req.body;
 
     let Thumbnail = req.files.Thumbnail[0].buffer;
     let uploadDate = new Date();
@@ -157,6 +158,7 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
       creator: req.user._id,
       Time: streamingDate,
       opponent: opponentUser._id,
+      Type,
     });
 
     const user = await User.findOne({ email: req.user.email });

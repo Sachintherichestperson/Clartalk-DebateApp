@@ -19,7 +19,8 @@ router.get("/register", (req, res) => {                                         
     let err = req.flash("key")
     res.render("Register", { err });
     console.log(err)
-})
+});
+
 router.post("/register", userregister)                                                                     //register page--Uploader
 
 router.get("/login", function(req, res){                                                                   //Login Page
@@ -71,8 +72,9 @@ router.get("/debate/:id",isloggedin, async function(req, res){                  
       const points = 10;
       creator.Rankpoints += points;
       await creator.save();
+
+      await User.updateRanks();
     }
-    console.log(creator);
 
 
     const suggestions = await debatemongoose.find({ _id: { $ne: vedios._id } }).limit(5).populate({
@@ -118,6 +120,8 @@ router.get("/podcast/:id",isloggedin, async function(req, res){                 
       const points = 10;
       creator.Rankpoints += points;
       await creator.save();
+
+      await User.updateRanks();
     }
 
 
@@ -237,7 +241,7 @@ router.get("/SentRequests",isloggedin, async function (req, res) {              
       select: "username"
     }
   });
-  res.render("Sentrequests", { contents })
+  res.render("Sentrequests", { contents });
 });
 
 router.get("/update-route/:id",isloggedin, async function(req, res){                                      // update-route/:id  Page

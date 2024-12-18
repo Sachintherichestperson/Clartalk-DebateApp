@@ -29,7 +29,12 @@ const vedioSchema = new mongoose.Schema({
     BookingDoneBy: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
-    }]
+    }],
+    Type: {
+        type: String,
+        enum: ['trending', 'regular'], // 'trending' if radio selected, 'regular' otherwise
+        default: 'regular',
+    },
 });
 
 module.exports = mongoose.model('live', vedioSchema);
