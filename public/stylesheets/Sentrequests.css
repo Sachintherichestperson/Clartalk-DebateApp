@@ -9,9 +9,13 @@
         }
 
         /* Title Style */
-        h1 {
+        .headings {
             color: #ff9800;
-            margin-top: 50px;
+            height: 100px;
+            background: #333;
+            text-align: center;
+            align-content: center;
+            margin-top: 20px;
         }
 
         /* Request Card Style */
@@ -96,3 +100,4 @@
             display: inline-block;
             margin-top: 15px;
         }
+        

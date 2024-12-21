@@ -15,28 +15,29 @@
                     <input type="text" placeholder="Search topics, debates...">
                 </div>
             </div>
-    <h1>Pending Requests</h1>
-    <% if (hoursLeft <= 47.84) { %>
-    <div class="request-card">
-        <p><strong>Title:</strong><%= content.Live[0].title %></p>
-        <p><strong>Description:</strong><%= content.Live[0].description %></p>
-        <p><strong>Opponent:</strong><%= content.Live.opponent %></p>
-        <p><strong>Time:</strong><%= hoursLeft %></p>   
-        <div class="request-actions">
-            <form action="/creator/debator-page/<%= content.Live[0]._id %>" method="post" class="request-form">
-                <input type="hidden" name="requestId" value="<%= content.Live[0]._id %>">
-                <button type="submit" name="action" value="accept" class="action-btn">Start The Debate</button>
-            </form>
-        </div>
-    </div>
-    <% }else{ %>
-        <div class="request-card">
-        <strong>Time:</strong>You will recieve a notification to start the debate when 30 minutes are Left for debate</p>
-    </div>
-    <% } %>
-        <div class="no-requests">
-            <p>No requests available.</p>
-        </div>
+        </header>
+        <h1>Pending Requests</h1>
+
+        <% if (content && content.length > 0) { %>
+            <% content.forEach(function(live) { %>
+                <div class="request-card">
+                    <p><strong>Title:</strong> <%= live.title %></p>
+                    <p><strong>Description:</strong> <%= live.description %></p>
+                    <p><strong>Opponent:</strong> <!--problem here to access opponent--><%= live.opponent %></p>      
+                    <p><strong>Time:</strong> <%= live.hoursLeft %> hours left</p>
+                    <div class="request-actions">
+                        <form action="/creator/debator-page/<%= live._id %>" method="post" class="request-form">
+                            <input type="hidden" name="requestId" value="<%= live._id %>">
+                            <button type="submit" name="action" value="accept" class="action-btn">Start The Debate</button>
+                        </form>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="request-card">
+                <p>No pending debate requests at the moment.</p>
+            </div>
+        <% } %>
     </section>
 </body>
 </html>

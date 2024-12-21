@@ -9,9 +9,10 @@
     
 </head>
 <body>
-
-    <!-- Displaying Sent Requests -->
-    <h1>Sent Requests</h1>
+   
+    <div class="headings">
+        <h1>Sent Requests</h1>
+    </div>
 
         <% contents.Sender.forEach(function(content) { %>
             <div class="request-card">
@@ -26,8 +27,8 @@
 
         <!-- Delete Request Button -->
         <div class="delete-form">
-            <form action="/creator/delete/<%= content.opponentId %>" method="post">
-                <input type="hidden" name="requestId" value="<%= content.opponentId %>">
+            <form action="/creator/delete/<%= content.requestId %>" method="post">
+                <input type="hidden" name="requestId" value="<%= content.requestId %>">
                 <button type="submit" class="delete-btn">Delete</button>
             </form>
         </div>

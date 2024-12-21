@@ -360,4 +360,41 @@ router.post("/debator-page/:id",isloggedin,async function (req, res) {
    }
 });
 
+router.post("/delete/:id", isloggedin, async function (req, res) {
+  const liveId = req.params.id;
+
+  try {
+    // Remove the live video reference from the User documents
+    await User.updateMany(
+      { "requests.requestId": liveId }, // Find users who have this liveId in their requests
+      { $pull: { "requests": { requestId: liveId } } } // Remove the reference from requests array
+    );
+
+    await User.updateMany(
+      { "Sender.requestId": liveId }, // Find users who have this liveId in their Sender
+      { $pull: { "Sender": { requestId: liveId } } } // Remove the reference from Sender array
+    );
+
+    await User.updateMany(
+      { "Live": liveId }, // Find users who have this liveId in their Live array
+      { $pull: { "Live": liveId } } // Remove the reference from Live array
+    );
+
+    // Permanently delete the live video from the live collection
+    const liveVideo = await livemongo.findByIdAndDelete(liveId);
+
+    if (!liveVideo) {
+      return res.status(404).send("Live video not found");
+    }
+
+    // Redirect to SentRequests page after deletion
+    res.redirect("/SentRequests");
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error deleting live video");
+  }
+});
+
+
 module.exports = router;

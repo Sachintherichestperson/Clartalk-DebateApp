@@ -235,12 +235,13 @@ router.get("/My-World",isloggedin, async function(req, res){                    
 router.get("/SentRequests",isloggedin, async function (req, res) {                                       //Sent Requests Page
   const contents = await User.findOne({ email: req.user.email }).populate({
     path: "Sender",
-    select: "OpponentName",
+    select: "OpponentName requestId",
     populate: {
       path: "OpponentName",
       select: "username"
     }
   });
+
   res.render("Sentrequests", { contents });
 });
 
@@ -353,7 +354,6 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
       select: "username"
     });
     const Booking = viewers.BookingDoneBy.some(id => id.equals(req.user.id))
-    console.log(Booking);
 
     const followerscount = Live.creator[0].followers;
     const follower = followerscount.length;
@@ -451,41 +451,45 @@ router.get("/Livedebate/:id",isloggedin, async function (req, res) {
     const isFollowing = followerscount.includes(req.user._id);
 
   res.render("live-player", { Live, user, isFollowing,follower });
-})
-
-router.get("/start-debate",isloggedin, async function (req, res) {
-  // const content = await User.findOne({ email: req.user.email }).populate({
-  //   path: "requests", // Assuming `requests` field has the request information
-  //   populate: [{
-  //     path: "requestId", // This holds the details of the request (opponent details, etc.)
-  //     select: "title description Time"
-  //   }]
-  // }).populate({
-  //   path: "Sender",
-  //   populate: [{
-  //     path: "requestId", select: "title description Time"
-  //   }]
-  // });
-
-
-
-const content = await User.findOne({email: req.user.email}).populate({
-  path: "Live",
-  select: "title description Time"
 });
 
- 
-const Time =  new Date(content.Live[0].Time).getTime();
-const TimeLeft = Time - Date.now();
+router.get("/start-debate", isloggedin, async function (req, res) {
+  try {
+    const content = await User.findOne({ email: req.user.email }).populate({
+      path: "Live",
+      select: "title description Time opponent",
+      populate: {
+        path: "opponent",
+        select: "username"
+      }
+    });
 
+    // Filter and calculate hoursLeft for active debates only
+    const updatedContent = content.Live.filter((liveContent) => {
+      const Time = new Date(liveContent.Time).getTime();
+      const TimeLeft = Time - Date.now();
+      return TimeLeft > 0; // Include only future debates
+    }).map((liveContent) => {
+      const Time = new Date(liveContent.Time).getTime();
+      const TimeLeft = Time - Date.now();
+      const hours = TimeLeft / (1000 * 60 * 60);
+      const hoursLeft = hours.toFixed(1);
 
-const hours = TimeLeft / (1000 * 60 * 60)
-const hoursLeft = hours.toFixed(1);
-console.log(hoursLeft);
+      return {
+        ...liveContent.toObject(), // Convert Mongoose document to plain object
+        hoursLeft,
+        opponent: liveContent.opponent[0].username    //problem here should be solved only 0th index name getting
+      };
+    });
+    
 
-
-  res.render("start-debate", { content, hoursLeft });
+    res.render("start-debate", { content: updatedContent });
+  } catch (err) {
+    res.send(err);
+    console.log(err);
+  }
 });
+
 
 
 module.exports = router;
