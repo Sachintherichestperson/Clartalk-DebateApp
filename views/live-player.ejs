@@ -12,10 +12,12 @@
         <div class="container">
             <div class="player">
                 <div class="local-video">
-                    <video id="debater1Video" autoplay playsinline></video>
+                    <video id="localVideo" autoplay muted playsinline></video>
                 </div>
                 <div class="remote-video">
-                    <video id="debater2Video" autoplay playsinline></video>
+                    <video id="remoteVideo" autoplay muted playsinline></video>
+                    <!-- End Call Button inside the remote-video div -->
+                    <button class="end-call-btn">End Call</button>
                 </div>
             </div>
             <div class="about-video">
@@ -41,6 +43,9 @@
                 </button>
             </div> 
         </div>
+        <% if(source === "button"){ %>
+            <button class="start-stream-btn">Start Stream</button>
+            <% } %>
         <label class="comment-btn" for="commentsToggle">
             <i class="fas fa-comment"></i> 
         </label>
@@ -61,41 +66,144 @@
         </div>
     </section>
 
-    <script src="/javascript/socket.io.js"></script>
-    <script>
-        const socket = io(); // Connect to the signaling server
-        const debater1Video = document.getElementById('debater1Video');
-        const debater2Video = document.getElementById('debater2Video');
+<script src="/javascript/socket.io.js"></script>
+<script>
+    const button = document.querySelector(".start-stream-btn");
+const socket = io(); // Connect to the signaling server
+const configuration = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };    
+let localStream = null;
+let peerConnections = {};
+let isStreamer = false; // Default is viewer
 
-        // Assume that the server will handle the signaling and provide video streams for both debaters.
-        
-        // Handle incoming streams for both debaters
-        socket.on('stream', (data) => {
-            if (data.debaterId === 'debater1') {
-                debater1Video.srcObject = data.stream; // Assign stream for debater 1
-            } else if (data.debaterId === 'debater2') {
-                debater2Video.srcObject = data.stream; // Assign stream for debater 2
-            }
-        });
+// Get user media (streamer's video and audio)
+async function initLocalStream() {
+    try {
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        const localVideo = document.getElementById("localVideo");
+        localVideo.srcObject = localStream;
+        localVideo.play();
+        console.log("Local stream initialized.");
+    } catch (error) {
+        console.error("Error accessing media devices:", error);
+    }
+}
 
-        // Handle comments
-        document.getElementById('commentButton').addEventListener('click', () => {
-            const commentInput = document.getElementById('commentInput');
-            const comment = commentInput.value.trim();
-            if (comment) {
-                socket.emit('comment', { user: 'Viewer', text: comment });
-                commentInput.value = ''; // Clear input
-            }
-        });
+// Create a new RTCPeerConnection for a peer
+function createPeerConnection(peerId) {
+    if (peerConnections[peerId]) {
+        console.log(`Peer connection for ${peerId} already exists.`);
+        return peerConnections[peerId];
+    }
 
-        // Listen for comments from the server
-        socket.on('comment', (data) => {
-            const commentList = document.getElementById('commentList');
-            const commentItem = document.createElement('li');
-            commentItem.className = 'single-comment';
-            commentItem.innerHTML = `<strong>${data.user}:</strong> <p>${data.text}</p>`;
-            commentList.appendChild(commentItem);
+    console.log(`Creating peer connection for ${peerId}`);
+    const peerConnection = new RTCPeerConnection(configuration);
+    peerConnections[peerId] = peerConnection;
+
+    // Attach local stream for streamer
+    if (isStreamer && localStream) {
+        localStream.getTracks().forEach((track) => {
+            peerConnection.addTrack(track, localStream);
         });
-    </script>
+    }
+
+    peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+            socket.emit("signal", { data: { candidate: event.candidate }, sender: socket.id, target: peerId });
+        }
+    };
+
+    peerConnection.ontrack = (event) => {
+        console.log("Received remote track for", peerId);
+        const remoteVideo = document.getElementById("remoteVideo");
+        if (!remoteVideo.srcObject) {
+            remoteVideo.srcObject = event.streams[0];
+        }
+    };
+
+    return peerConnection;
+}
+
+// Handle incoming signals (SDP and ICE candidates)
+async function handleSignal({ data, sender }) {
+    let peerConnection = peerConnections[sender];
+    if (!peerConnection) {
+        console.log(`Peer connection for ${sender} does not exist, creating it now.`);
+        peerConnection = createPeerConnection(sender);
+    }
+
+    if (data.sdp) {
+        console.log("Received SDP:", data.sdp.type);
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp));
+        if (data.sdp.type === "offer") {
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+            socket.emit("signal", { data: { sdp: peerConnection.localDescription }, sender: socket.id, target: sender });
+        }
+    } else if (data.candidate) {
+        console.log("Received ICE candidate.");
+        await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+    }
+}
+
+// Initialize for Streamers
+async function initializeStream() {
+    await initLocalStream();
+    isStreamer = true;
+    socket.emit("join-room", { roomId: "your-room-id" }); // Replace with dynamic room ID
+}
+
+// Initialize for Viewers
+function initializeViewer() {
+    isStreamer = false;
+    socket.emit("join-room", { roomId: "your-room-id" }); // Replace with dynamic room ID
+}
+
+// Handle user joining
+socket.on("user-joined", (peerId) => {
+    console.log("User joined:", peerId);
+
+    if (isStreamer && !peerConnections[peerId]) {
+        createPeerConnection(peerId);
+        createOffer(peerId);
+    }
+});
+
+// Create an offer for a peer
+async function createOffer(peerId) {
+    console.log(`Creating offer for ${peerId}`);
+    const peerConnection = peerConnections[peerId];
+    if (!peerConnection) {
+        console.error(`Peer connection for ${peerId} not found!`);
+        return;
+    }
+
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+    socket.emit("signal", { data: { sdp: peerConnection.localDescription }, sender: socket.id, target: peerId });
+}
+
+// Handle user leaving
+socket.on("user-left", (peerId) => {
+    console.log("User left:", peerId);
+    if (peerConnections[peerId]) {
+        peerConnections[peerId].close();
+        delete peerConnections[peerId];
+    }
+});
+
+// Handle signal
+socket.on("signal", handleSignal);
+
+// Event Listeners
+button.addEventListener("click", () => {
+    initializeStream();
+});
+
+// Initialize viewer
+if (!button) {
+    initializeViewer();
+}
+
+</script>
 </body>
 </html>

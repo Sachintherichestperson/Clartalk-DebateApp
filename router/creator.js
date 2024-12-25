@@ -320,13 +320,14 @@ router.get("/Building-The-Community", function(req, res){
 
 router.post("/community/builder",upload.single("CommunityDP"), isloggedin, async function (req, res) {
   try{
-       let{ CommunityName, CommunityisAbout, CommunityDP } = req.body;
+       let{ CommunityName, CommunityisAbout, CommunityDP, CommunityType } = req.body;
        const user = await User.findOne({email: req.user.email});
 
 
        const community = await communitymongo.create({
          CommunityName,
          CommunityisAbout,
+         CommunityType,
          CommunityDP: req.file.buffer,
          creator: user._id
        });

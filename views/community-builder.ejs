@@ -14,25 +14,29 @@
         <form id="creator-community" method="post" enctype="multipart/form-data" action="/creator/community/builder">
             <div class="input">
             <label for="creator-community">Community-Name</label>
-            <input type="text" name="CommunityName" placeholder="Input Your Community-Name">
+            <input type="text" name="CommunityName" placeholder="Input Your Community-Name" required>
         </div>
         <div class="input">
             <label for="creator-community">About-Community</label>
-            <input type="text" name="CommunityisAbout" placeholder="Input Your Community-Description">
+            <input type="text" name="CommunityisAbout" placeholder="Input Your Community-Description" required>
         </div>
         <div class="input">
             <label for="creator-community">Community-Thumbnail</label>
-            <input type="file" name="CommunityDP" placeholder="Input Your Community-DisplayImage" class="file">
+            <input type="file" name="CommunityDP" placeholder="Input Your Community-DisplayImage" class="file" required>
         </div>
         <p class="instruction">Select content type:</p>
         <div class="choose">
             <label for="Public">
-                <input type="radio" id="Public" name="contentType" value="Public" class="class" required>
+                <input type="radio" id="Public" name="CommunityType" value="Public" class="class" required>
                 <p class="label-Public">Public</p>
             </label>
             <label for="Private">
-                <input type="radio" id="Private" name="contentType" value="Private" class="class" required>
+                <input type="radio" id="Private" name="CommunityType" value="Private" class="class" required>
                 <p class="label-Private">Private</p>
+            </label>
+            <label for="Special">
+                <input type="radio" id="Special" name="CommunityType" value="Special" class="class" required>
+                <p class="label-Special">Special</p>
             </label>
         </div>
             <input type="submit" value="Submit" class="submit">

@@ -53,9 +53,19 @@
                 <input type="text" placeholder="Type your message" id="msg-input" class="message-input">
                 <input type="submit" id="send-btn" value="Send" class="send-btn">
                 <% }else{%>
+                    <% if (community.CommunityChat === "Public"){ %>
                     <form action="/Join-community/<%= community._id %>" method="post">
                     <input type="submit" value="Join The Community" id="Add-input" class="Add-input" readonly>
-                </form>
+                    </form>
+                    <% }else if (community.CommunityType === "Public" ) { %>
+                        <form action="/Join-community/<%= community._id %>" method="post">
+                        <input type="submit" value="Request To Join" id="Add-input" class="Add-input" readonly>
+                        </form>
+                    <% }else{ %>
+                    <form  id="paymentForm">
+                        <button id="rzp-button1" id="Add-input" class="Add-input">Pay</button>
+                    </form>
+                    <%}%>
                 <%}%>
             </div>
         </div>
@@ -137,5 +147,36 @@
         });
 
     </script>
+     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+     <script>
+         const community = "<%= community._id %>"; // Dynamically set the live._id from your backend
+         const options = {
+             key: "rzp_test_HPAKSJHzTmYhop", // Replace with your Razorpay test/live Key ID
+             amount: 1900, // Amount in paise (₹500)
+             currency: "INR",
+             name: "Your Company Name",
+             description: "Test Transaction",
+             handler: function (response) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/Community/${community}/payment`;
+             },
+             prefill: {
+                 name: "Test User",
+                 email: "test.user@example.com",
+                 contact: "9999999999"
+             },
+             theme: {
+                 color: "#3399cc"
+             }
+         };
+ 
+         const rzp = new Razorpay(options);
+ 
+         document.getElementById("rzp-button1").onclick = function (e) {
+             rzp.open();
+             e.preventDefault();
+         };
+     </script>
 </body>
 </html>

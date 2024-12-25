@@ -312,3 +312,28 @@ video{
     height: 430px;
     width: 100%;
 }
+
+.end-call-btn {
+    padding: 12px 30px;
+    font-size: 16px;
+    border: none;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #ff4b2b, #ff416c);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    text-transform: uppercase;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.end-call-btn:hover {
+    background: linear-gradient(135deg, #f38a1f, #f92f3f);
+    transform: scale(1.05) translateX(-50%);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}

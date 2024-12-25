@@ -309,6 +309,15 @@ router.post("/Join-community/:id",isloggedin,async (req, res) => {              
   }
 });
 
+router.post("/Community/:id/payment",isloggedin,async (req, res) => {                                 // Join-community/:id Page
+  try{
+      const community = await communityMongo.findById(req.params.id);
+      res.render("payment-for-community", { community });
+  }catch(err){
+    console.log(err);
+  }
+});
+
 router.get("/Members/:id",isloggedin,async (req, res) => {                                                    // Members/:id Page
   const members = await communityMongo.findById(req.params.id).populate({
     path: "members",
@@ -414,7 +423,7 @@ router.post('/watch-time', isloggedin, async (req, res) => {
   }
 });
 
-router.post("/Booking-Done/:id",isloggedin, async function (req, res) {
+router.get("/Booking-Done/:id",isloggedin, async function (req, res) {
   try{
     const Live = await liveMongo.findById(req.params.id).populate({
       path: "BookingDoneBy",
@@ -432,7 +441,26 @@ router.post("/Booking-Done/:id",isloggedin, async function (req, res) {
       console.log("Booking Done")
     }
 
+    console.log("Payement Done", Live.BookingDoneBy);
+
    res.redirect(`/live-content-applying-page/${req.params.id}`);
+  }catch(err){
+     res.redirect("/")
+  }
+});
+
+router.post("/Booking-Done-for-community/:id",isloggedin, async function (req, res) {
+  try{
+    const community = await communityMongo.findById(req.params.id);
+
+      if(!community.members.includes(req.user._id)){
+        community.members.push(req.user._id);
+        await community.save();
+      }else{
+       res.send("Already a member");
+      }
+
+   res.redirect(`/community-chat/${req.params.id}`);
   }catch(err){
      res.redirect("/")
   }
@@ -450,7 +478,9 @@ router.get("/Livedebate/:id",isloggedin, async function (req, res) {
     const follower = followerscount.length;
     const isFollowing = followerscount.includes(req.user._id);
 
-  res.render("live-player", { Live, user, isFollowing,follower });
+    const source = req.query.source || "default";
+
+  res.render("live-player", { Live, user, isFollowing,follower, source });
 });
 
 router.get("/start-debate", isloggedin, async function (req, res) {
@@ -489,7 +519,5 @@ router.get("/start-debate", isloggedin, async function (req, res) {
     console.log(err);
   }
 });
-
-
 
 module.exports = router;
