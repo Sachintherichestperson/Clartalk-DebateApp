@@ -4,9 +4,9 @@ const User = require("../mongoose/user-mongo");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const upload = require("../config/multer");
-const vediomongoose = require("../mongoose/vedio-mongo");
+const podcastsmongoose = require("../mongoose/podcasts-mongo");
 const isloggedin = require("../middleware/isloggedin");
-const debatemongoose = require("../mongoose/debate-mongo");
+const videomongoose = require("../mongoose/video-mongo");
 const livemongo = require("../mongoose/live-mongo");
 const communitymongo = require("../mongoose/community-mongo");
 const competitionmongo = require("../mongoose/competition-mongo");
@@ -35,7 +35,7 @@ router.post("/upload",upload.fields([{ name: 'vedio', maxCount: 1 }, { name: 'Th
       let uploadDate = new Date();
  
       if(contentType === "podcast"){
-         let content = await vediomongoose.create({
+         let content = await podcastsmongoose.create({
              title, 
              description,
              vedio: vedio, 
@@ -51,8 +51,8 @@ router.post("/upload",upload.fields([{ name: 'vedio', maxCount: 1 }, { name: 'Th
          await user.save();
          res.redirect("/")
 
-      }else if (contentType === "debate") {
-     let debate = await debatemongoose.create({
+      }else if (contentType === "video") {
+     let debate = await videomongoose.create({
          title, 
          description,
          vedio: vedio, 
@@ -72,7 +72,7 @@ router.post("/upload",upload.fields([{ name: 'vedio', maxCount: 1 }, { name: 'Th
   }
     }catch(err){
      res.send(err)
-     console.log("error for router.post catch part ==== ",err)
+     console.log("error", err)
     }
 });
 

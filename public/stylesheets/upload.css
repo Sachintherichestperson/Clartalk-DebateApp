@@ -90,7 +90,7 @@ h1{
 a{
     text-decoration: none;
 }
-#debate{
+#video{
     width: 170px;
     height: 50px;
     padding: 5px 10px 5px 15px;
@@ -119,7 +119,7 @@ a{
     position: relative;
     left: 30px;
 }
-.label-debate{
+.label-video{
     font-size: 30px;
     position: relative;
     height: 30px;

@@ -5,8 +5,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const {userregister, loginuser, logout} = require("../controller/authcontroller");
 const isloggedin = require("../middleware/isloggedin");
-const vediomongoose = require("../mongoose/vedio-mongo");
-const debatemongoose = require("../mongoose/debate-mongo");
+const podcastsmongoose = require("../mongoose/podcasts-mongo");
+const videomongoose = require("../mongoose/video-mongo");
 const liveMongo = require("../mongoose/live-mongo");
 const communityMongo = require("../mongoose/community-mongo");
 const competitionMongo = require("../mongoose/competition-mongo");
@@ -14,7 +14,6 @@ const upload = require("../config/multer");
 const schedule = require("node-schedule");
 const Socket  = require("socket.io");
 const Razorpay = require("razorpay");
-
 
 router.get("/register", (req, res) => {                                                                      //register page
     let err = req.flash("key")
@@ -44,13 +43,13 @@ router.get("/",isloggedin,async function(req, res){                             
 
 router.get("/debate",isloggedin,async function(req, res){                                                  //debate page
   const user = await User.findOne({email: req.user.email}).populate("requests");
-  let vedios = await debatemongoose.find({});
+  let vedios = await videomongoose.find({});
   res.render("debate", { vedios,user });
 });
 
 router.get("/debate/:id",isloggedin, async function(req, res){                                             //debate video-player
   try{
-    let vedios = await debatemongoose.findById(req.params.id)
+    let vedios = await videomongoose.findById(req.params.id)
     .populate({
         path: "creator",
         select: "username followers Rankpoints"
@@ -78,7 +77,7 @@ router.get("/debate/:id",isloggedin, async function(req, res){                  
     }
 
 
-    const suggestions = await debatemongoose.find({ _id: { $ne: vedios._id } }).limit(5).populate({
+    const suggestions = await videomongoose.find({ _id: { $ne: vedios._id } }).limit(5).populate({
         path: "creator",
         select: "username"
     })
@@ -93,14 +92,14 @@ router.get("/debate/:id",isloggedin, async function(req, res){                  
 
 router.get("/podcast", isloggedin, async function(req, res){                                               //podcast section Page
   const user = await User.findOne({email: req.user.email}).populate("requests")
-  let vedios = await vediomongoose.find({});
+  let vedios = await podcastsmongoose.find({});
   res.render("podcast", { vedios, user });
 });
  
 router.get("/podcast/:id",isloggedin, async function(req, res){                                            //podcast video-player
     try{
       let user = await User.findOne({email: req.user.email });
-    let vedios = await vediomongoose.findById(req.params.id)
+    let vedios = await podcastsmongoose.findById(req.params.id)
     .populate({
         path: "creator",
         select: "username followers"
@@ -126,7 +125,7 @@ router.get("/podcast/:id",isloggedin, async function(req, res){                 
     }
 
 
-    const suggestions = await vediomongoose.find({ _id: { $ne: vedios._id } }).limit(5).populate({
+    const suggestions = await podcastsmongoose.find({ _id: { $ne: vedios._id } }).limit(5).populate({
       path: "creator",
       select: "username"
   });
@@ -399,9 +398,9 @@ router.post('/watch-time', isloggedin, async (req, res) => {
 
       let video;
       if (videoType === 'debate') {
-          video = await debatemongoose.findById(videoId);
+          video = await videomongoose.findById(videoId);
       } else if (videoType === 'podcast') {
-          video = await vediomongoose.findById(videoId);
+          video = await podcastsmongoose.findById(videoId);
       } else {
           return res.status(400).json({ message: 'Invalid video type.' });
       }

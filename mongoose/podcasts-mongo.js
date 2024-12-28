@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const vedioSchema = new mongoose.Schema({
+const podcastsSchema = new mongoose.Schema({
     title: String,
     description: String,            
     vedio: Buffer,
@@ -37,4 +37,4 @@ const vedioSchema = new mongoose.Schema({
       }]
 });
 
-module.exports = mongoose.model('vedio', vedioSchema);
+module.exports = mongoose.model('podcasts', podcastsSchema);
