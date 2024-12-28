@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build Your World</title>
+    <link rel="stylesheet" href="/stylesheets/Community-builder.css">
+</head>
+<body>
+    <section class="page">
+        <nav>
+            Introduce The Hunger
+        </nav>
+        <form id="creator-community" method="post" enctype="multipart/form-data" action="/creator/competition/builded">
+            <div class="input">
+            <label for="creator-Competition">Competiton-Name</label>
+            <input type="text" name="CompetitionName" placeholder="Input Your Competition-Name" required>
+        </div>
+        <div class="input">
+            <label for="creator-Competition">About-Competiton</label>
+            <input type="text" name="CompetitionisAbout" placeholder="Input Your Competition-Description" required>
+        </div>
+        <div class="input">
+            <label for="creator-Competition">Competiton-Thumbnail</label>
+            <input type="file" name="CompetitionDP" placeholder="Input Your Competition-DisplayImage" class="file" required>
+        </div>
+        <div class="Price-input">
+            <label for="Competition-price">Fees:</label>
+            <input type="number" name="fees" id="fees" placeholder="Enter the fees (optional)">
+        </div>
+            <input type="submit" value="Submit" class="submit">
+        </form>
+    </section>
+</body>
+</html>

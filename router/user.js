@@ -9,6 +9,7 @@ const vediomongoose = require("../mongoose/vedio-mongo");
 const debatemongoose = require("../mongoose/debate-mongo");
 const liveMongo = require("../mongoose/live-mongo");
 const communityMongo = require("../mongoose/community-mongo");
+const competitionMongo = require("../mongoose/competition-mongo");
 const upload = require("../config/multer");
 const schedule = require("node-schedule");
 const Socket  = require("socket.io");
@@ -478,7 +479,7 @@ router.get("/Livedebate/:id",isloggedin, async function (req, res) {
     const follower = followerscount.length;
     const isFollowing = followerscount.includes(req.user._id);
 
-    const source = req.query.source || "default";
+    const source = req.query.source || "link";
 
   res.render("live-player", { Live, user, isFollowing,follower, source });
 });
@@ -518,6 +519,11 @@ router.get("/start-debate", isloggedin, async function (req, res) {
     res.send(err);
     console.log(err);
   }
+});
+
+router.get("/MUN-competetion",isloggedin, async function(req, res){
+  const competition = await competitionMongo.find({});
+     res.render("MUN-PAGE", { competition });
 });
 
 module.exports = router;

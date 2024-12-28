@@ -100,20 +100,31 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("join-room", ({ roomId }) => {
-        socket.join(roomId);
-        socket.to(roomId).emit("user-joined", socket.id);
-    });
-
-    socket.on("signal", ({ data, sender, target }) => {
-        io.to(target).emit("signal", { data, sender });
-    });
-
-    socket.on("send-debate-stream", ({ roomId, streamData, debaterId }) => {
-        console.log(`Sending stream data from ${debaterId} to room ${roomId}`);
-        socket.to(roomId).emit("receive-debate-stream", { streamData, debaterId });
-    });
-
+    socket.on('join-room', (data) => {
+        socket.join(data.roomId); // Join the room
+        console.log("User joined the room:", data.roomId);
+    
+        // Notify other users in the room that a new user has joined
+        socket.to(data.roomId).emit('user-joined', socket.id);
+      });
+    
+      // Handle stream start (streamer)
+      socket.on('start-stream', (data) => {
+        socket.join(data.roomId); // Streamer joins the room
+        console.log("Streamer started stream in room:", data.roomId);
+    
+        // Notify viewers to join the stream
+        socket.to(data.roomId).emit('stream-started', socket.id);
+      });
+    
+      // Handle signaling data (SDP and ICE candidates)
+      socket.on('signal', (data) => {
+        socket.to(data.target).emit('signal', {
+          data: data.data,
+          sender: data.sender,
+        });
+      });
+      
     socket.on("disconnect", () => {
         socket.broadcast.emit("user-left", socket.id);
     });

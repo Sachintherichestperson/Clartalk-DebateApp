@@ -9,6 +9,7 @@ const isloggedin = require("../middleware/isloggedin");
 const debatemongoose = require("../mongoose/debate-mongo");
 const livemongo = require("../mongoose/live-mongo");
 const communitymongo = require("../mongoose/community-mongo");
+const competitionmongo = require("../mongoose/competition-mongo");
 const app = express();
 const { createServer } = require("http");
 const { Server } = require("socket.io");
@@ -200,7 +201,6 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
   }
 });
 
-
 router.get("/opponent-requests/:Id", isloggedin, async (req, res) => {
   try {
     // Fetch the user by email and populate the requests
@@ -232,7 +232,6 @@ router.get("/opponent-requests/:Id", isloggedin, async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
 
 router.post("/accept/:id",isloggedin,async function (req, res) {
   try{
@@ -274,7 +273,6 @@ router.post("/accept/:id",isloggedin,async function (req, res) {
       res.send(err)
   }
 });
-
 
 router.post("/reject/:id",isloggedin,async function (req, res) {
   try{
@@ -397,5 +395,21 @@ router.post("/delete/:id", isloggedin, async function (req, res) {
   }
 });
 
+router.get("/Create-The-Competition",isloggedin, function(req, res){
+  res.render("competition-creator");
+});
+
+router.post("/competition/builded",upload.single("CompetitionDP"), isloggedin, async function (req, res) {
+  let { CompetitionName, CompetitionisAbout, CompetitionDP } = req.body;
+
+  const competition = await competitionmongo.create({
+    CompetitionName,
+    CompetitionisAbout,
+    CompetitionDP: req.file.buffer
+  });
+
+  res.redirect("/MUN-competetion");
+
+});
 
 module.exports = router;
