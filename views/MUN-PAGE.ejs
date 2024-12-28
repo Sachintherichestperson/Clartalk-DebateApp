@@ -221,7 +221,7 @@ header {
                     <i class="fas fa-tv"></i> Live
                 </a>
                 <a href="debate" class="nav-link">
-                    <i class="fas fa-comments"></i> Debates
+                    <i class="fas fa-comments"></i> Entertainment
                 </a>
                 <a href="podcast" class="nav-link">
                     <i class="fas fa-podcast"></i> Podcasts
@@ -235,7 +235,7 @@ header {
                 <a href="/LeaderBoard" class="nav-link">
                     <i class="fas fa-trophy"></i> Leaderboard
                 </a>
-                <a href="/MUN" class="nav-link  active">
+                <a href="/MUN-competetion" class="nav-link  active">
                     <i class="fas fa-trophy"></i> MUN
                 </a>
                 <a href="/profile" class="nav-link">
@@ -253,8 +253,8 @@ header {
                     <h4><%= competition.CompetitionName %></h4>
                     <p><%= competition.CompetitionisAbout %></p>
                 </div>
-                <a href="/Discover-Page-For-MUN-page" id="routetag">Discover More</a>
-            </div>    
+                <a href="/Discover-Page-of-MUN/<%= competition._id %>" id="routetag">Check It</a>
+            </div>
             <% }) %>   
         </div>
     </section>

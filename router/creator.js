@@ -24,7 +24,7 @@ const allusers = {};
 
 router.get("/creator/upload", function(req, res){
     res.render("upload")
-})
+});
 
 router.post("/upload",upload.fields([{ name: 'vedio', maxCount: 1 }, { name: 'Thumbnail', maxCount: 1 }]),isloggedin,async function(req, res){
     try{
@@ -74,13 +74,12 @@ router.post("/upload",upload.fields([{ name: 'vedio', maxCount: 1 }, { name: 'Th
      res.send(err)
      console.log("error for router.post catch part ==== ",err)
     }
- })
+});
 
 router.get("/creator/live",isloggedin ,async function(req, res){
   const live = await User.findOne({email: req.user.email});
     res.render("live-uploader", { live });
 });
-
 
 router.get("/creator/:id",isloggedin, async function(req, res){
     try{
@@ -106,35 +105,6 @@ router.get("/creator/:id",isloggedin, async function(req, res){
         console.log(err)
     }
 });
-
-setInterval(async () => {
-  const now = new Date();
-
-  // Get all upcoming live events from the database
-  const liveEvents = await livemongo.find({ Time: { $gt: now } });
-
-  liveEvents.forEach((event) => {
-    const eventTime = new Date(event.Time);
-    const timeLeft = eventTime - now; // Time left in milliseconds
-    const twoHoursInMillis = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
-
-    if (timeLeft <= 0) {
-    }
-
-    // If the event is 2 hours or less away
-    if (timeLeft <= twoHoursInMillis) {
-      // Calculate remaining time in hours, minutes, and seconds
-      const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-      const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-      
-      
-      // Optional: You can trigger an email, a push notification, or any other actions here
-    }
-  });
-},60 * 100000); // Check every minute
-
-
 
 router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { name: 'Thumbnail', maxCount: 1 }]), isloggedin, async function (req, res) {
   try {

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competition Page</title>
+    <link rel="stylesheet" href="/stylesheets/MUN-competition-page.css">
+</head>
+<body>
+    <section class="container">
+        <header>
+            <div class="branding">
+                <img src="/images/nav.png" alt="ClarTalk Logo">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search topics, debates...">
+                </div>
+            </div>
+        </header>
+        <h1>Global Horizons: MUN 2025</h1>
+        <div class="competition">
+            <div class="banner">
+                <img src="/images/dhruv.jpg" alt="Competition Banner">
+            </div>
+            <div class="about-banner">
+                <div class="competition-name">
+                    <p><%= competition.CompetitionName %></p>
+                </div>
+                <div class="about-competition">
+                    <p><%= competition.CompetitionisAbout %></p>
+                </div>
+                <div class="details">
+                    <p><span>Location:</span> <%= competition.Location || "Online" %></p>
+                    <% if(competition.fees){ %>
+                    <p><span>Entry Fees:</span> ₹<%= competition.fees %></p>
+                    <% } %>
+                </div>
+                <div id="btn">
+                    <a href="#">Pay Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

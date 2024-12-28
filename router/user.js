@@ -526,4 +526,11 @@ router.get("/MUN-competetion",isloggedin, async function(req, res){
      res.render("MUN-PAGE", { competition });
 });
 
+router.get("/Discover-Page-of-MUN/:id",isloggedin, async function(req, res){
+  const competition = await competitionMongo.findById(req.params.id); 
+  
+  res.render("MUN-competition-page", { competition });
+
+});
+
 module.exports = router;
