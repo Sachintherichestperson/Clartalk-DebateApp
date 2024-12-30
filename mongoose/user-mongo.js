@@ -51,7 +51,7 @@ const userSchema = new mongoose.Schema({
     ],
     Booked: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'live'
     }],
     Rank: [{
         type: Number,

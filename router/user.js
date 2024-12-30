@@ -14,6 +14,7 @@ const upload = require("../config/multer");
 const schedule = require("node-schedule");
 const Socket  = require("socket.io");
 const Razorpay = require("razorpay");
+const userMongo = require("../mongoose/user-mongo");
 
 router.get("/register", (req, res) => {                                                                      //register page
     let err = req.flash("key")
@@ -150,30 +151,6 @@ router.get("/community",isloggedin,async function(req, res){                    
 });
 
 router.get("/logout", logout);                                                                             //Logout route
-
-// router.get("/follow/:id",isloggedin, async function(req, res){
-//   const follow = await User.findById(req.params.id);  
-//   const user = await User.findOne({ email: req.user.email }); 
-
-
-//   if (!user.following.includes(follow._id)) {
-
-//     user.following.push(follow._id);
-//     await user.save();
-    
-//     follow.followers.push(user._id);
-//     await follow.save();
-//   } else {
-//     user.following.pull(follow._id);
-//     await user.save();
-
-//     follow.followers.pull(user._id);
-//     await follow.save();
-//   }
-
-//   const redirectUrl = req.get("Referrer") || "/";
-//   res.redirect(redirectUrl);
-// });
 
 router.get("/community-chat/:id",isloggedin ,async function(req, res){                                    //community-chat/:id Page
   try{
@@ -382,9 +359,7 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
 });
 
 router.post('/watch-time', isloggedin, async (req, res) => {
-
   let { watchTime, videoId, videoType } = req.body; // Get watch time, video ID, and video type from the request body
-
 
   try {
       // Ensure watchTime is a number
@@ -433,12 +408,20 @@ router.get("/Booking-Done/:id",isloggedin, async function (req, res) {
   
     const userId = req.user._id;
       
-    if (!Live.BookingDoneBy.some(id => id.equals(user._id))) {
+    if (!Live.BookingDoneBy.includes(user._id)) {
       Live.BookingDoneBy.push(user._id);
+      Live.Booking += 1
       await Live.save();
       console.log("Booking not done");
     }else{
       console.log("Booking Done")
+    }
+    if (!user.Booked.includes(Live._id)){
+      user.Booked.push(Live._id)
+      await user.save();
+      console.log("Booked not recieved the Live Id");
+    }else{
+      console.log("Booked recieved the Live Id")
     }
 
     console.log("Payement Done", Live.BookingDoneBy);
@@ -530,6 +513,25 @@ router.get("/Discover-Page-of-MUN/:id",isloggedin, async function(req, res){
   
   res.render("MUN-competition-page", { competition });
 
+});
+
+router.get("/My-ticket",isloggedin,async function(req, res){
+  const tickets = await User.findOne({ email: req.user.email }).populate({
+    path: "Booked",
+    select: "title Thumbnail Booking Time creator",
+    populate: [
+    {
+      path: "creator",
+      select: "username"
+    },
+    {
+      path: "opponent",
+      select: "username"
+    }
+  ]
+  });
+
+  res.render("tickets", { tickets });
 });
 
 module.exports = router;
