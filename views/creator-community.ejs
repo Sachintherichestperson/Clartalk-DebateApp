@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClarTalk</title>
+    <link rel="stylesheet" href="/stylesheets/creatorpage.css">
+    <style>
+        .group {
+    width: 300px;
+    background: #1f1f1f;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: auto;
+}
+
+.group:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 15px rgba(255, 87, 34, 0.6);
+}
+
+.chat {
+    text-align: center;
+}
+
+.community-name {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #ff9800;
+}
+
+.msg span {
+    font-size: 14px;
+    color: #aaa;
+}
+
+.msg p {
+    font-size: 16px;
+    margin-top: 5px;
+    color: white;
+}
+
+.button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #ff5722, #ff9800);
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+.button:hover {
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+    box-shadow: 0 6px 12px rgba(255, 87, 34, 0.8);
+}
+
+a {
+    text-decoration: none;
+}
+
+    </style>
+</head>
+<body>
+    <section class="container">
+        <header>
+            <div class="branding">
+                <img src="/images/nav.png" alt="ClarTalk Logo">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search topics, debates...">
+                </div>
+            </div>
+            <nav class="navigation">
+                <a href="/creator/content/<%= user._id %>" class="nav-link">
+                    <i class="fas fa-comments"></i> Content
+                </a>
+                <a href="/creator/creator/Debates/<%= user._id %>" class="nav-link">
+                    <i class="fas fa-podcast"></i> Debates
+                </a>
+                <a href="" class="nav-link active">
+                    <i class="fas fa-users"></i> Community
+                </a>
+                <a href="/creator/creator/MUN/<%= user._id %>" class="nav-link">
+                    <i class="fas fa-trophy"></i> MUN
+                </a>
+            </nav>
+        </header>
+            <div class="page">
+                <section class="group">
+                    <div class="chat">
+                        <strong class="community-name"> community.CommunityName </strong>
+                        <div class="msg">
+                            <p><span>About:</span> community.CommunityisAbout </p>
+                        </div>
+                        <a href="/community-chat/">
+                            <div class="button">Join Chat</div>
+                        </a>
+                    </div>
+                </section>
+            </div>            
+        </div>
+    </section>
+</body>
+</html>

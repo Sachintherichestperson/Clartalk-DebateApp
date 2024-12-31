@@ -30,43 +30,43 @@ router.post("/upload",upload.fields([{ name: 'vedio', maxCount: 1 }, { name: 'Th
     try{
       let {title, description, contentType} = req.body;
  
-      let vedio = req.files.vedio[0].buffer;
+      let videodata = req.files.vedio[0].buffer;
       let Thumbnail = req.files.Thumbnail[0].buffer;
       let uploadDate = new Date();
  
       if(contentType === "podcast"){
-         let content = await podcastsmongoose.create({
+         let podcast = await podcastsmongoose.create({
              title, 
              description,
-             vedio: vedio, 
+             vedio: videodata, 
              Thumbnail: Thumbnail,
              createdAt: uploadDate
          });
  
          const user = await User.findOne({email: req.user.email});
-         content.creator.push(user._id)
-         await content.save();
+         podcast.creator.push(user._id)
+         await podcast.save();
  
-         user.vedio.push(content._id);
+         user.podcast.push(podcast._id);
          await user.save();
-         res.redirect("/")
+         res.redirect("/podcast")
 
       }else if (contentType === "video") {
-     let debate = await videomongoose.create({
+     let video = await videomongoose.create({
          title, 
          description,
-         vedio: vedio, 
+         vedio: videodata, 
          Thumbnail: Thumbnail,
          createdAt: uploadDate
      });
  
          const user = await User.findOne({email: req.user.email});
-         debate.creator.push(user._id)
-         await debate.save();
+         video.creator.push(user._id)
+         await video.save();
  
-         user.debate.push(debate._id);
+         user.vedio.push(video._id);
          await user.save();
-         res.redirect("/")
+         res.redirect("/debate")
   }else{
      res.render("/")
   }
@@ -81,29 +81,34 @@ router.get("/creator/live",isloggedin ,async function(req, res){
     res.render("live-uploader", { live });
 });
 
-router.get("/creator/:id",isloggedin, async function(req, res){
-    try{
+router.get("/content/:id", isloggedin, async function(req, res) {
+  try {
+      const user = await User.findById(req.params.id)
+          .populate({
+              path: "vedio",
+              select: "title description createdAt Thumbnail Views"
+          })
+          .populate({
+              path: "podcast",
+              select: "title description createdAt Thumbnail Views"
+          }).populate("communities");
 
-        const user = await User.findById(req.params.id).populate({
-            path: "vedio",
-            select: "title description createdAt Thumbnail"
-        }).populate({
-            path: "debate",
-            select: "title description createdAt Thumbnail"
-        });
-         
-        const vedios = [...(user.vedio || []), ...(user.debate || [])];
+      if (!user) {
+          return res.status(404).send("User not found");
+      }
 
 
-        if (!user) {
-            return res.status(404).send("User not found");
-        }
+      // Add a `type` property to distinguish between videos and podcasts
+      const vedios = [
+          ...user.vedio.map(v => ({ ...v.toObject(), type: "debate" })),
+          ...user.podcast.map(p => ({ ...p.toObject(), type: "podcast" }))
+      ];
 
-        res.render("creatorpage", {vedios})
-    }catch(err){
-        res.send(err)
-        console.log(err)
-    }
+      res.render("creatorpage", { vedios, user });
+  } catch (err) {
+      res.status(500).send(err.message);
+      console.log(err);
+  }
 });
 
 router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { name: 'Thumbnail', maxCount: 1 }]), isloggedin, async function (req, res) {
@@ -380,6 +385,34 @@ router.post("/competition/builded",upload.single("CompetitionDP"), isloggedin, a
 
   res.redirect("/MUN-competetion");
 
+});
+
+router.get("/creator/Debates/:id", isloggedin, async function (req, res) {  
+  const user = await User.findById(req.user._id); 
+  res.render("creator-debate", { user });
+});
+
+router.get("/creator/community/:Id", isloggedin, async function (req, res) {
+  try {
+      const communities = await communitymongo.find({});
+      const user = await User.findById(req.user._id); // Assuming req.user contains the logged-in user's data.
+
+      if (!user) {
+          return res.status(404).send("User not found");
+      }
+
+      res.render("creator-community", { communities, user });
+  } catch (err) {
+      res.status(500).send(err.message);
+      console.log(err);
+  }
+});
+
+router.get("/creator/MUN/:Id", isloggedin, async function(req, res){
+  const communities = await communitymongo.find({});
+  const competitions = await competitionmongo.find({});
+  const user = await User.findById(req.user._id);
+  res.render("creator-MUN", { competitions, communities, user });
 });
 
 module.exports = router;

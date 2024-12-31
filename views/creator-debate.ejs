@@ -16,10 +16,10 @@
                 </div>
             </div>
             <nav class="navigation">
-                <a href="" class="nav-link active">
+                <a href="/creator/content/<%= user._id %>" class="nav-link">
                     <i class="fas fa-comments"></i> Content
                 </a>
-                <a href="/creator/creator/Debates/<%= user._id %>" class="nav-link">
+                <a href="" class="nav-link active">
                     <i class="fas fa-podcast"></i> Debates
                 </a>
                 <a href="/creator/creator/community/<%= user._id %>" class="nav-link ">
@@ -31,18 +31,16 @@
             </nav>
         </header>
             <div class="page">
-                <% vedios.forEach(function(vedio){ %>
                     <div class="videos">
-                        <a href="<%= vedio.type === 'podcast' ? '/podcast/' + vedio._id : '/debate/' + vedio._id %>">
-                            <img src="data:image/jpeg;base64,<%= vedio.Thumbnail.toString('base64') %>" alt="<%= vedio.type %>-thumbnail">
+                        <a href="#">
+                            <img src="/images/dhruv.jpg" alt="">
                             <div class="video-details">
-                                <p class="video-title"><%= vedio.title %></p>
-                                <p class="video-time"><%= vedio.createdAt.toLocaleDateString('en-GB') %></p>
-                                <p class="Views"><%= vedio.Views %> Views</p>
+                                <p class="video-title">vedio.title</p>
+                                <p class="video-time">vedio.createdAt.toLocaleDateString('en-GB')</p>
+                                <p class="Views">120292 Views</p>
                             </div>
                         </a>
                     </div>
-                <% }) %>
             </div>            
         </div>
     </section>

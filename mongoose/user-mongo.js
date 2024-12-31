@@ -9,13 +9,13 @@ const userSchema = new mongoose.Schema({
         type: Buffer,
     },
     communities: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Community' }],
+    podcast: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "podcasts"
+    }],
     vedio: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "vedio"
-    }],
-    debate: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "debate"
     }],
     followers: [{ 
         type: mongoose.Schema.Types.ObjectId,

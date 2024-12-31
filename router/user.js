@@ -90,7 +90,6 @@ router.get("/debate/:id",isloggedin, async function(req, res){                  
   }
 });
 
-
 router.get("/podcast", isloggedin, async function(req, res){                                               //podcast section Page
   const user = await User.findOne({email: req.user.email}).populate("requests")
   let vedios = await podcastsmongoose.find({});
@@ -164,10 +163,10 @@ router.get("/community-chat/:id",isloggedin ,async function(req, res){          
 });
 
 router.get("/profile",isloggedin,async function(req, res){                                                //profile Page
-  const user = await User.findOne({email: req.user.email}).populate("followers").populate("vedio").populate("debate").populate("profile").populate("requests");
+  const user = await User.findOne({email: req.user.email}).populate("followers").populate("vedio").populate("podcast").populate("profile").populate("requests");
 
   const videoCount = user.vedio ? user.vedio.length : 0;
-  const debateCount = user.debate ? user.debate.length : 0;
+  const debateCount = user.podcast ? user.podcast.length : 0;
   const totalContent = videoCount + debateCount;
 
   const profile = user.profile;
@@ -184,15 +183,15 @@ router.get("/uploaded-content", isloggedin, async function (req, res) {         
       select: "title description Thumbnail createdAt Views"
     });
 
-    const debatesData = await User.findOne({ email: req.user.email }).populate({
-      path: "debate",
+    const podcastData = await User.findOne({ email: req.user.email }).populate({
+      path: "podcast",
       select: "title description Thumbnail createdAt Views"
     });
 
     // Combine and sort by createdAt date
     const allContent = [
       ...(vediosData?.vedio || []).map(vedio => ({ ...vedio.toObject(), type: "vedio" })),
-      ...(debatesData?.debate || []).map(debate => ({ ...debate.toObject(), type: "debate" }))
+      ...(podcastData?.debate || []).map(debate => ({ ...debate.toObject(), type: "debate" }))
     ];
 
     allContent.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
