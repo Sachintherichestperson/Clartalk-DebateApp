@@ -52,6 +52,10 @@ h1 {
     margin: 0;
 }
 
+a{
+    text-decoration: none;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     #Content {
@@ -100,6 +104,11 @@ h1 {
 }
 
 .video-time {
+    font-size: 14px;
+    color: #aaaaaa;
+}
+
+.Views{
     font-size: 14px;
     color: #aaaaaa;
 }

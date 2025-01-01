@@ -178,25 +178,28 @@ router.get("/profile",isloggedin,async function(req, res){                      
 
 router.get("/uploaded-content", isloggedin, async function (req, res) {                                   //uploaded-content Page
   try {
-    const vediosData = await User.findOne({ email: req.user.email }).populate({
-      path: "vedio",
-      select: "title description Thumbnail createdAt Views"
-    });
+    const user = await User.findOne({ email: req.user.email })
+              .populate({
+                  path: "vedio",
+                  select: "title description createdAt Thumbnail Views"
+              })
+              .populate({
+                  path: "podcast",
+                  select: "title description createdAt Thumbnail Views"
+              });
+    
+          if (!user) {
+              return res.status(404).send("User not found");
+          }
+    
+    
+          // Add a `type` property to distinguish between videos and podcasts
+          const vedios = [
+              ...user.vedio.map(v => ({ ...v.toObject(), type: "debate" })),
+              ...user.podcast.map(p => ({ ...p.toObject(), type: "podcast" }))
+          ];
 
-    const podcastData = await User.findOne({ email: req.user.email }).populate({
-      path: "podcast",
-      select: "title description Thumbnail createdAt Views"
-    });
-
-    // Combine and sort by createdAt date
-    const allContent = [
-      ...(vediosData?.vedio || []).map(vedio => ({ ...vedio.toObject(), type: "vedio" })),
-      ...(podcastData?.debate || []).map(debate => ({ ...debate.toObject(), type: "debate" }))
-    ];
-
-    allContent.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    res.render("Uploaded-content-profile", { allContent });
+    res.render("Uploaded-content-profile", { vedios, user });
   } catch (err) {
     console.error(err);
     res.status(500).send("An error occurred while fetching data.");
