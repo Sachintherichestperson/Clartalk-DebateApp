@@ -257,7 +257,6 @@ router.get("/LeaderBoard", isloggedin, async function (req, res) { // LeaderBoar
       creator.Rank = index + 1; // Rank starts from 1
     });
 
-    console.log("LeaderBoard with Ranks:", LeaderBoards);
 
     res.render("leaderBoard", { user, LeaderBoards });
   } catch (err) {
