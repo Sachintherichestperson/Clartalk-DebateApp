@@ -9,6 +9,12 @@ module.exports.userregister = async (req, res) => {
              req.flash("key", "user already registered")
             return res.redirect("/register")
         }
+
+        const usernameId = await User.find({ username: req.body.username });
+        if(usernameId){
+            req.flash("key", "username not available");
+           return res.redirect("/register")
+       }
     let {username, email, password } = req.body;
     bcrypt.genSalt(10, function(err, salt) {
         bcrypt.hash(password, salt, async function(err, hash) {
