@@ -10,7 +10,7 @@ module.exports.userregister = async (req, res) => {
             return res.redirect("/register")
         }
 
-        const usernameId = await User.find({ username: req.body.username });
+        const usernameId = await User.findOne({ username: req.body.username });
         if(usernameId){
             req.flash("key", "username not available");
            return res.redirect("/register")
