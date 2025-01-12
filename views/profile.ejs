@@ -6,52 +6,44 @@
     <title>ClarTalk</title>
     <link rel="stylesheet" href="./stylesheets/profile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <style>
-        .setting{
-            font-size: 50px;
-            color: white;
-            position: relative;
-            text-align: end;
-        }
-    </style>
 </head>
 <body>
     <section class="contanier">
         <div class="home">
-            <nav>
-            <div class="image">
-                <img src="/images/nav.png" alt="clartalk">
-            </div>
-            <div class="navigation">
-                <a href="/" class="nav-link">
-                    <i class="fas fa-tv"></i> Live
-                </a>
-                <a href="debate" class="nav-link">
-                    <i class="fas fa-comments"></i> Entertainment
-                </a>
-                <a href="podcast" class="nav-link">
-                    <i class="fas fa-podcast"></i> Podcasts
-                </a>
-                <a href="/community" class="nav-link">
-                    <i class="fas fa-users"></i> Community
-                </a>
-                <a href="/creator/opponent-requests/<%= user._id %>" class="nav-link">
-                    <i class="fas fa-envelope"></i> Requests
-                </a>
-                <a href="/LeaderBoard" class="nav-link">
-                    <i class="fas fa-trophy"></i> Leaderboard
-                </a>
-                <a href="/MUN-competetion" class="nav-link">
-                    <i class="fas fa-trophy"></i> MUN
-                </a>
-                <a href="/profile" class="nav-link active">
-                    <i class="fas fa-user"></i> Profile
-                </a>
-            </div>
-            <div class="Points">
-                <p>Ranking: <%= user.Rank %></p>
-            </div>
-            </nav>
+            <header>
+                <div class="branding">
+                    <img src="/images/nav.png" alt="ClarTalk Logo">
+                </div>
+                <div class="Points">
+                    <p>Ranking: <%= user.Rank %></p>
+                </div>
+                <nav class="navigation">
+                    <a href="/" class="nav-link">
+                        <i class="fas fa-tv"></i> Live
+                    </a>
+                    <a href="debate" class="nav-link">
+                        <i class="fas fa-comments"></i> Entertainment
+                    </a>
+                    <a href="podcast" class="nav-link">
+                        <i class="fas fa-podcast"></i> Podcasts
+                    </a>
+                    <a href="/community" class="nav-link">
+                        <i class="fas fa-users"></i> Community
+                    </a>
+                    <a href="/creator/opponent-requests/<%= user._id %>" class="nav-link">
+                        <i class="fas fa-envelope"></i> Requests
+                    </a>
+                    <a href="/LeaderBoard" class="nav-link">
+                        <i class="fas fa-trophy"></i> Leaderboard
+                    </a>
+                    <a href="/MUN-competetion" class="nav-link">
+                        <i class="fas fa-trophy"></i> MUN
+                    </a>
+                    <a href="/profile" class="nav-link active">
+                        <i class="fas fa-user"></i> Profile
+                    </a>
+                </nav>
+            </header>
             <div class="profile-page">
                 <a href="/settings"><div class="setting"><i class="fa fa-cog"></i></div></a>
                  <div id="profile-page">

@@ -1,10 +1,17 @@
-/* General Settings */
+@media screen {
 body {
     background-color: #121212;
     font-family: 'Roboto', sans-serif;
     margin: 0;
     color: #ffffff;
     overflow-x: hidden;
+}
+
+.setting{
+    font-size: 50px;
+    color: white;
+    position: relative;
+    text-align: end;
 }
 
 /* Container and Header */
@@ -21,45 +28,67 @@ body {
     padding: 20px;
 }
 
-/* Navigation Bar */
-nav {
+header {
     background-color: #1e1e1e;
-    width: 100%;
-    padding: 0px 0;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 15px;
 }
-
-nav .image {
+.branding {
     display: flex;
-    justify-content: center;
     align-items: center;
-    gap: 20px;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1200px;
     height: 100px;
+    position: relative;
+    left: 200px;
 }
 
-nav img {
-    height: 250px;
-    width: 250px;
+.branding img {
+    height: 200px;
+    width: 200px;
     object-fit: contain;
-
+}
+.search-bar {
+    flex: 1;
+    margin-left: 20px;
+    display: flex;
+    align-items: center;
+}
+.search-bar input {
+    width: 100%;
+    max-width: 500px;
+    background-color: #333;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 20px;
+    font-size: 16px;
+    color: #ffffff;
+    outline: none;
+    transition: all 0.3s ease;
 }
 
-nav .Points {
-    color: #ff9800;
+.search-bar input:hover {
+    background-color: #444;
 }
 
-nav .navigation {
+.search-bar input:focus {
+    background-color: #444;
+    transform: scale(1.05);
+}
+/* Navigation Bar */
+.navigation {
     display: flex;
     justify-content: center;
     gap: 20px;
     width: 100%;
     max-width: 1200px;
+    margin-top: 10px;
 }
-
-nav a {
+.nav-link {
     color: #ffffff;
     text-decoration: none;
     padding: 10px 20px;
@@ -70,9 +99,15 @@ nav a {
     transition: all 0.3s ease;
 }
 
-nav a:hover {
+.nav-link:hover {
     background: linear-gradient(135deg, #ff5722, #ff9800);
     transform: scale(1.1);
+}
+
+.navigation a:hover, .navigation a.active {
+    background: linear-gradient(135deg, #ff5722, #ff9800);
+    color: white;
+    box-shadow: 0 4px 10px rgba(255, 87, 34, 0.5);
 }
 
 /* Profile Page Section */
@@ -195,6 +230,7 @@ a{
     color: white;
     box-shadow: 0 4px 10px rgba(255, 87, 34, 0.5);
 }
+}
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -216,5 +252,131 @@ a{
     .My-videos {
         width: 100%;
         margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .branding {
+        justify-content: center;
+        width: 300px;
+        position: relative;
+        left: 0px;
+        height: 60px;
+    }
+
+    .branding img {
+        height: 60px;
+        width: 200px;
+        object-fit: cover;
+        position: absolute;
+        left: 0px;
+    }
+
+    .input {
+        margin-top: 30px;
+        justify-content: unset;
+        gap: 0;
+    }
+
+    header {
+        background-color: #1e1e1e;
+        padding: 20px 5px 0 5px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+    }
+
+    .home {
+        padding: 5px;
+    }
+
+    .Points{
+       position: absolute;
+       left: 230px;
+       top: 40px;
+       color: #ff9800;
+    }
+
+    .setting{
+        font-size: 20px;
+        width: 50px;
+        position: relative;
+        text-align: end;
+        left: 220px;
+    }
+
+    .navigation {
+        display: flex;
+        justify-content: center;
+        width: 300px;
+        height: 50px;
+        margin-top: 10px;
+        background-color: #262626;
+        flex-wrap: wrap;
+        flex-direction: column;
+        overflow-y: auto;
+        scrollbar-width: none;
+        position: relative;
+    }
+
+    .nav-link {
+        font-size: 14px;
+        padding: 8px 15px;
+        text-align: center;
+        background: linear-gradient(135deg, #363535, #454444);
+    }
+
+    .profile-img img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .username {
+        font-size: 20px;
+        color: #ff9800;
+    }
+
+    #About-user{
+        margin-top: 10px;
+        width: 180px;
+    }
+
+    .profile-page{
+        width: 280px;
+    }
+
+    .setting{
+        font-size: 20px;
+    }
+
+    .input {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: unset;
+        align-items: unset;
+        width: 275px;
+        padding: 5px;
+        gap: 5px;
+    }
+     
+    .My-videos {
+        background: #333;
+        color: white;
+        font-size: 16px;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        text-align: center;
+        max-width: 75px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+    }
+
+    .My-videos p{
+        font-size: 14px;
+        width: 200px;
     }
 }
