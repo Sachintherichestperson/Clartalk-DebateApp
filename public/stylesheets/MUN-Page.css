@@ -242,7 +242,7 @@ header {
     .navigation {
         display: flex;
         justify-content: center;
-        width: 300px;
+        width: 100%;
         height: 50px;
         margin-top: 10px;
         background-color: #262626;
@@ -258,6 +258,44 @@ header {
         text-align: center;
         background: linear-gradient(135deg, #363535, #454444);
     }
+
+    .competition-name p {
+        font-size: 16px;
+        line-height: 1.5;
+        color: #d1d5db;
+        height: 150px;
+        overflow: hidden;
+    }
+    .box-banner {
+        width: 100%;
+        background: radial-gradient(circle at center, #0066ff, #003366);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        height: unset;
+    }
+    .box-banner img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+    .competition-name h4 {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        position: relative;
+        top: -30px;
+    }
+    .competition-name p {
+        font-size: 16px;
+        line-height: 1.5;
+        color: #d1d5db;
+        height: 150px;
+        overflow: hidden;
+        position: relative;
+        top: -20px;
+    }
 }
-
-

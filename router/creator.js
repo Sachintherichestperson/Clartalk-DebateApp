@@ -375,12 +375,16 @@ router.get("/Create-The-Competition",isloggedin, function(req, res){
 });
 
 router.post("/competition/builded",upload.single("CompetitionDP"), isloggedin, async function (req, res) {
-  let { CompetitionName, CompetitionisAbout, CompetitionDP } = req.body;
+  let { CompetitionName, CompetitionisAbout, CompetitionDP, location, Date, fees, createdBy } = req.body;
 
   const competition = await competitionmongo.create({
     CompetitionName,
     CompetitionisAbout,
-    CompetitionDP: req.file.buffer
+    CompetitionDP: req.file.buffer,
+    location,
+    Date,
+    fees, 
+    createdBy
   });
 
   res.redirect("/MUN-competetion");

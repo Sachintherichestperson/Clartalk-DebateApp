@@ -35,6 +35,8 @@
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
+    "connect-livereload": "^0.6.1",
+    "livereload": "^0.9.3",
     "mocha": "^10.8.2"
   }
 }
