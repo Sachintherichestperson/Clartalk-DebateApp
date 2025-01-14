@@ -1,16 +1,15 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+ @media screen {
 
 body {
     background: linear-gradient(135deg, #2a3d7d, #b21f1f, #fdbb2d);
-    font-family: 'Roboto', sans-serif; /* General font */
+    font-family: 'Roboto', sans-serif; 
     color: white;
     line-height: 1.6;
     padding: 20px;
 	scrollbar-width: none;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 section {
@@ -23,7 +22,6 @@ section {
     padding: 20px;
 }
 
-/* Video Section */
 .player {
     display: flex;
     justify-content: space-between;
@@ -51,8 +49,8 @@ section {
     padding: 8px 15px;
     border-radius: 5px;
     font-size: 14px;
-    font-weight: 700; /* Bold for emphasis */
-    font-family: 'Bebas Neue', sans-serif; /* Bold, uppercase style */
+    font-weight: 700; 
+    font-family: 'Bebas Neue', sans-serif; 
 }
 
 .local-video:hover, .remote-video:hover {
@@ -60,7 +58,6 @@ section {
     box-shadow: 0 12px 25px rgba(0, 0, 0, 0.6);
 }
 
-/* About Video Section */
 .about-video {
     background-color: rgba(0, 0, 0, 0.8);
     padding: 25px;
@@ -77,8 +74,8 @@ section {
     position: relative;
     margin-bottom: 50px;
     cursor: pointer;
-    font-family: 'Montserrat', sans-serif; /* Clean modern sans-serif */
-    font-weight: 600; /* Slightly bold for emphasis */
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
 }
 
 .Watch {
@@ -90,7 +87,6 @@ section {
     transform: scale(1.02);
 }
 
-/* User Info Section */
 .video-user-info {
     display: flex;
     align-items: center;
@@ -118,7 +114,7 @@ section {
 
 .creator-name {
     font-size: 22px;
-    font-family: 'Bebas Neue', sans-serif; /* Bold uppercase for names */
+    font-family: 'Bebas Neue', sans-serif;
     font-weight: bold;
     color: #ffffff;
     text-decoration: none;
@@ -132,7 +128,7 @@ section {
     font-size: 16px;
     color: #b0bec5;
     margin-top: 5px;
-    font-family: 'Lora', serif; /* Light serif for contrast */
+    font-family: 'Lora', serif;
 }
 
 .follow-btn {
@@ -144,7 +140,7 @@ section {
     transition: background-color 0.3s ease;
     text-decoration: none;
     display: inline-block;
-    font-family: 'Montserrat', sans-serif; /* Clean sans-serif for buttons */
+    font-family: 'Montserrat', sans-serif; 
 }
 
 .follow {
@@ -167,46 +163,6 @@ section {
     background-color: #e12f2f;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .video-user-info {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .user-avatar {
-        width: 60px;
-        height: 60px;
-    }
-
-    .creator-name {
-        font-size: 20px;
-    }
-
-    .followers-count {
-        font-size: 14px;
-    }
-
-    .follow-btn {
-        padding: 8px 15px;
-    }
-
-    .player {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .local-video, .remote-video {
-        width: 100%;
-        height: auto;
-    }
-
-    .about-video {
-        padding: 15px;
-    }
-}
-
-/* Updated Comments Section */
 .comments {
     background-color: #303130;
     margin: 0 auto;
@@ -214,7 +170,7 @@ section {
     display: flex;
 	align-items: flex-start;
     flex-direction: column;
-    position: relative; /* Ensure this container is positioned relative */
+    position: relative;
 	height: 650px;
 }
 
@@ -223,12 +179,12 @@ section {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    position: absolute; /* Fix the input at the bottom */
-    bottom: 0; /* Align it to the bottom of the .comments container */
-    left: 0; /* Align to the left side */
-    padding: 20px; /* Add padding for spacing */
-    background-color: #303130; /* Background color for the input area */
-    z-index: 10; /* Ensure it stays on top */
+    position: absolute;
+    bottom: 0; 
+    left: 0; 
+    padding: 20px;
+    background-color: #303130; 
+    z-index: 10;
 }
 
 
@@ -296,12 +252,6 @@ section {
 	cursor: pointer;
 }
 
-/* Hide the comments section by default */
-.comments {
-    display: none;
-}
-
-/* Show the comments when the checkbox is checked */
 .comments-toggle:checked + .comments {
     display: block;
 }
@@ -336,4 +286,225 @@ video{
     background: linear-gradient(135deg, #f38a1f, #f92f3f);
     transform: scale(1.05) translateX(-50%);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+} 
+
+@media (max-width: 768px) {
+    .video-user-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .user-avatar {
+        width: 60px;
+        height: 60px;
+    }
+
+    .creator-name {
+        font-size: 20px;
+    }
+
+    .followers-count {
+        font-size: 14px;
+    }
+
+    .follow-btn {
+        padding: 8px 15px;
+    }
+
+    .player {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .local-video, .remote-video {
+        width: 100%;
+        height: auto;
+    }
+
+    .about-video {
+        padding: 15px;
+    }
+}
+
+
+
+
+
+
+@media (orientation: landscape) {
+    body{
+        background: linear-gradient(135deg, #2a3d7d, #b21f1f, #fdbb2d);
+        padding: 2px;
+    }
+    .container {
+        padding: 10px;
+        min-width: unset;
+    }
+    .comment-btn {
+        color: white;
+        cursor: pointer;
+        position: absolute;
+        z-index: 10;
+        right: 10px;
+    }
+    .comment-i{
+        font-size: 30px;
+    }
+    .player{
+        display: flex;
+        flex-direction: row;
+        gap: 0;
+        justify-content: unset;
+        margin-bottom: 0;
+    }
+    video{
+        height: 95vh;
+        width: 100%;
+        background: black;
+    }
+    .local-video:before, .remote-video:before{
+        content: "Live";
+        position: absolute;
+        top: 7px;
+        left: 5px;
+        background: rgba(255, 0, 0, 0.7);
+        padding: 1px 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: 700; 
+        font-family: 'Bebas Neue', sans-serif;   
+    }
+    .remote-video, .local-video{
+        height: 95vh;
+        width: 100%;
+    }
+    .remote-video{
+        position: relative;
+        left: 2px;
+    }
+    .end-call-btn {
+        padding: 5px 10px;
+        font-size: 13px;
+        border: none;
+        border-radius: 25px;
+        background: linear-gradient(135deg, #ff4b2b, #ff416c);
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        text-transform: capitalize;
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    .video-user-info {
+        display: flex;
+        background-color: #2d3e50;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        margin-bottom: 20px;
+        position: relative;
+        top: 20px;
+        flex-direction: row;
+    }
+    section{
+        display: flex;
+        flex-direction: column;
+    }
+    .follow{
+        background-color: #0056b3;
+        padding: 12px 24px;
+        border-radius: 25px;
+        color: white;
+        font-size: 16px;
+        border: none;
+    }
+    .follow:hover {
+        background-color: #0056b3;
+    }
+    .unfollow{
+        background-color: #b30000;
+        padding: 12px 24px;
+        border-radius: 25px;
+        color: white;
+        font-size: 16px;
+        border: none;
+    }
+    .unfollow:hover {
+        background-color: #b30000;
+    }
+    .comments{
+        display: none;
+    }
+    .comments {
+        background-color: transparent;
+        margin: 0 auto;
+        padding: 20px;
+        align-items: flex-start;
+        flex-direction: column;
+        position: absolute;
+        height: 180px;
+        margin-left: 5px;
+        width: 25%;
+        right: 5px;
+        margin-top: 70px;
+    }
+    .single-comment strong {
+        font-weight: bold;
+        color: #ff9800;
+        font-size: 13px;
+    }
+    .single-comment p{
+        background: transparent;
+        border-radius: 10px;
+        margin-bottom: 5px;
+        font-size: 10px;
+        display: flex;
+        align-items: flex-start;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease;
+        cursor: pointer;
+        flex-direction: column;
+    }
+    .single-comment{
+        border: 1px solid #292929a3;
+        background: transparent;
+    }
+    .local-video:hover, .remote-video:hover {
+        transform: unset;
+        box-shadow: unset;
+    }
+    .comment-input{
+        width: 250%;
+        gap: unset;
+        display: flex;
+        position: absolute;
+        left: unset;
+        background-color: transparent;
+        z-index: 10;
+        padding: unset;
+        transform: translateX(-80%);
+    }
+    .comment-input input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 16px;
+        border: none;
+        background-color: #383838;
+        color: white;
+        margin-bottom: unset;
+    }
+    .comments-toggle:checked + .comments {
+        display: block;
+    }
+    .comments-toggle:checked + .comment-input {
+        display: flex;
+    }
+    
 }

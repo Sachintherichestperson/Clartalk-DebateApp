@@ -15,6 +15,9 @@
                     <video id="localVideo" autoplay muted playsinline></video>
                 </div>
                 <div class="remote-video">
+                    <label class="comment-btn" for="commentsToggle">
+                        <i class="fas fa-comment comment-i"></i> 
+                    </label>
                     <video id="remoteVideo" autoplay muted playsinline></video>
                     <!-- End Call Button inside the remote-video div -->
                     <button class="end-call-btn">End Call</button>
@@ -34,36 +37,30 @@
                     </a>
                     <p class="followers-count"><%= follower %> Followers</p>
                 </div>
-                <button class="follow-btn" data-creator-id="<%= Live.creator[0]._id %>">
-                    <% if (isFollowing) { %>
-                        <span class="unfollow">Unfollow</span>
-                    <% } else { %>
-                        <span class="follow">Follow</span>
-                    <% } %>
-                </button>
+                <% if (isFollowing) { %>
+                    <button class="unfollow" data-creator-id="<%= Live.creator[0]._id %>">Unfollow</button>
+                <% } else { %>
+                    <button class="follow" data-creator-id="<%= Live.creator[0]._id %>">follow</button>
+                <% } %>
             </div> 
         </div>
         <% if(source === "button"){ %>
             <button class="start-stream-btn">Start Stream</button>
             <% } %>
-        <label class="comment-btn" for="commentsToggle">
-            <i class="fas fa-comment"></i> 
-        </label>
+        </div>
         <input type="checkbox" id="commentsToggle" class="comments-toggle" hidden>
         <div class="comments">
             <div class="comment-list">
-                <ul id="commentList">
                     <li class="single-comment">
                         <strong>Krishna tera Shaka : </strong>
                         <p>Me hu Daro Mat Sachin, Tum Bus Mehnat Karte Raho aur mere Priyata ka nam lete Raho, Aur Jo Tum Kar Rahe Ho Wo Karte Raho</p>
                     </li>
-                </ul>
             </div>
             <div class="comment-input">
                 <input type="text" placeholder="Add a comment" id="commentInput">
                 <button id="commentButton">Comment</button>
             </div>
-        </div>
+            </div>
     </section>
 
 <script src="/javascript/socket.io.js"></script>
@@ -226,6 +223,36 @@
     if (window.location.search.includes("source=link")) {
         initializeViewer();
     }
+
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const commentsToggle = document.querySelector('.comments-toggle');
+    const commentsSection = document.querySelector('.comments');
+    const commentBtn = document.querySelector('.comment-btn');
+
+    // Toggle comments visibility when the toggle is clicked
+    commentsToggle.addEventListener('change', function() {
+        if (commentsToggle.checked) {
+            commentsSection.style.display = 'block';
+        } else {
+            commentsSection.style.display = 'none';
+        }
+    });
+
+    // Close comments when clicking anywhere outside the comments section
+    document.addEventListener('click', function(event) {
+        if (!commentsSection.contains(event.target) && !commentBtn.contains(event.target) && !commentsToggle.contains(event.target)) {
+            commentsSection.style.display = 'none';
+            commentsToggle.checked = false; // Optionally uncheck the toggle when clicking outside
+        }
+    });
+
+    // Prevent closing comments when clicking inside the comment input or button
+    commentsSection.addEventListener('click', function(event) {
+        event.stopPropagation();
+    });
+});
 
 </script>
 </body>
