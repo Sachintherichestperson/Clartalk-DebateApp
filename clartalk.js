@@ -102,7 +102,6 @@ io.on("connection", (socket) => {
 
     socket.on('join-room', (data) => {
         socket.join(data.roomId); // Join the room
-        console.log("User joined the room:", data.roomId);
     
         // Notify other users in the room that a new user has joined
         socket.to(data.roomId).emit('user-joined', socket.id);

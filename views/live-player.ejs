@@ -19,8 +19,10 @@
                         <i class="fas fa-comment comment-i"></i> 
                     </label>
                     <video id="remoteVideo" autoplay muted playsinline></video>
+                    <% if(source === "button"){ %>
                     <!-- End Call Button inside the remote-video div -->
                     <button class="end-call-btn">End Call</button>
+                    <% } %>
                 </div>
             </div>
             <div class="about-video">
@@ -38,9 +40,9 @@
                     <p class="followers-count"><%= follower %> Followers</p>
                 </div>
                 <% if (isFollowing) { %>
-                    <button class="unfollow" data-creator-id="<%= Live.creator[0]._id %>">Unfollow</button>
+                    <button class="unfollow" data-creator-id="<%= Live.creator[0]._id %>" id="follow-btn">Unfollow</button>
                 <% } else { %>
-                    <button class="follow" data-creator-id="<%= Live.creator[0]._id %>">follow</button>
+                    <button class="follow" data-creator-id="<%= Live.creator[0]._id %>" id="follow-btn">follow</button>
                 <% } %>
             </div> 
         </div>
@@ -226,34 +228,32 @@
 
 </script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-    const commentsToggle = document.querySelector('.comments-toggle');
+    document.addEventListener("DOMContentLoaded", function () {
+    const commentsToggle = document.querySelector('#commentsToggle');
     const commentsSection = document.querySelector('.comments');
     const commentBtn = document.querySelector('.comment-btn');
 
-    // Toggle comments visibility when the toggle is clicked
-    commentsToggle.addEventListener('change', function() {
-        if (commentsToggle.checked) {
-            commentsSection.style.display = 'block';
-        } else {
-            commentsSection.style.display = 'none';
-        }
+    // Show comments when the comment icon is clicked
+    commentBtn.addEventListener('click', function () {
+        commentsToggle.checked = !commentsToggle.checked;
+        commentsSection.style.display = commentsToggle.checked ? 'block' : 'none';
     });
 
     // Close comments when clicking anywhere outside the comments section
-    document.addEventListener('click', function(event) {
-        if (!commentsSection.contains(event.target) && !commentBtn.contains(event.target) && !commentsToggle.contains(event.target)) {
+    document.addEventListener('click', function (event) {
+        if (!commentsSection.contains(event.target) &&
+            !commentBtn.contains(event.target) &&
+            !commentsToggle.contains(event.target)) {
             commentsSection.style.display = 'none';
-            commentsToggle.checked = false; // Optionally uncheck the toggle when clicking outside
+            commentsToggle.checked = false; // Uncheck the toggle
         }
     });
 
-    // Prevent closing comments when clicking inside the comment input or button
-    commentsSection.addEventListener('click', function(event) {
+    // Prevent event propagation when clicking inside the comments section
+    commentsSection.addEventListener('click', function (event) {
         event.stopPropagation();
     });
 });
-
 </script>
 </body>
 </html>
