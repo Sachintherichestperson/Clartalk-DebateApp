@@ -25,12 +25,15 @@
                     <% } %>
                 </div>
             </div>
+            <% if(source === "link"){ %>
             <div class="about-video">
                 <p class="title"><%= Live.title %></p>
                 <div class="description">
                     <p><%= Live.description %></p>
                 </div>
+            <% } %>
             </div>
+            <% if(source === "link"){ %>
             <div class="video-user-info">
                 <img src="/images/Default.png" alt="Default Avatar" class="user-avatar">
                 <div class="creator-details">
@@ -39,10 +42,13 @@
                     </a>
                     <p class="followers-count"><%= follower %> Followers</p>
                 </div>
+            <% } %>
+                <% if(source === "link"){ %>
                 <% if (isFollowing) { %>
                     <button class="unfollow" data-creator-id="<%= Live.creator[0]._id %>" id="follow-btn">Unfollow</button>
                 <% } else { %>
                     <button class="follow" data-creator-id="<%= Live.creator[0]._id %>" id="follow-btn">follow</button>
+                <% } %>
                 <% } %>
             </div> 
         </div>
@@ -50,6 +56,7 @@
             <button class="start-stream-btn">Start Stream</button>
             <% } %>
         </div>
+        <% if(source === "link"){ %>
         <input type="checkbox" id="commentsToggle" class="comments-toggle" hidden>
         <div class="comments">
             <div class="comment-list">
@@ -62,9 +69,10 @@
                 <input type="text" placeholder="Add a comment" id="commentInput">
                 <button id="commentButton">Comment</button>
             </div>
+            <% } %>
             </div>
     </section>
-
+<script src="/javascript/main.js"></script>
 <script src="/javascript/socket.io.js"></script>
 <script>
     const button = document.querySelector(".start-stream-btn");
@@ -73,7 +81,7 @@
     let localStream = null;
     let peerConnections = {};
     let isStreamer = false; // Default is viewer
-    let roomId = "your-room-id"; // Replace with dynamic room ID
+    let roomId = "<%= RoomId %>"; // Replace with dynamic room ID
 
     // Get user media (streamer's video and audio)
     async function initLocalStream() {
@@ -104,7 +112,7 @@
             localStream.getTracks().forEach((track) => {
                 peerConnection.addTrack(track, localStream);
             });
-        }
+        };
 
         peerConnection.onicecandidate = (event) => {
             if (event.candidate) {
@@ -113,17 +121,18 @@
         };
 
         peerConnection.ontrack = (event) => {
-                console.log("Received remote track for", peerId);
-                const remoteVideo = document.getElementById("remoteVideo");
-                const localVideo = document.getElementById("localVideo");
-                if (!remoteVideo.srcObject) {
-                    remoteVideo.srcObject = event.streams[0];  // Assign the remote stream to the remote video element
-                    console.log(`Assigned stream for peer: ${peerId} to remoteVideo`);
-                } else if (!localVideo.srcObject) {
-                    localVideo.srcObject = event.streams[0];  // Assign the remote stream to the local video element
-                    console.log(`Assigned stream for peer: ${peerId} to localVideo`);
-                }
-        };
+    console.log("Received remote track for", peerId);
+    const remoteVideo = document.getElementById("remoteVideo");
+    const localVideo = document.getElementById("localVideo");
+
+    if (!remoteVideo.srcObject) {
+        remoteVideo.srcObject = event.streams[0];  // Assign the remote stream to the remote video element
+        console.log(`Assigned stream for peer: ${peerId} to remoteVideo`);
+    } else if (!localVideo.srcObject) {
+        localVideo.srcObject = event.streams[0];  // Assign the remote stream to the local video element
+        console.log(`Assigned stream for peer: ${peerId} to localVideo`);
+    }
+};
         
         return peerConnection;
     }
@@ -171,7 +180,7 @@
         console.log("User joined:", peerId);
 
         if (isStreamer && !peerConnections[peerId]) {
-            createPeerConnection(peerId, false);  // For remote peer
+            createPeerConnection(peerId, true);  // For remote peer
             createOffer(peerId);
         }
 
@@ -226,34 +235,6 @@
         initializeViewer();
     }
 
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-    const commentsToggle = document.querySelector('#commentsToggle');
-    const commentsSection = document.querySelector('.comments');
-    const commentBtn = document.querySelector('.comment-btn');
-
-    // Show comments when the comment icon is clicked
-    commentBtn.addEventListener('click', function () {
-        commentsToggle.checked = !commentsToggle.checked;
-        commentsSection.style.display = commentsToggle.checked ? 'block' : 'none';
-    });
-
-    // Close comments when clicking anywhere outside the comments section
-    document.addEventListener('click', function (event) {
-        if (!commentsSection.contains(event.target) &&
-            !commentBtn.contains(event.target) &&
-            !commentsToggle.contains(event.target)) {
-            commentsSection.style.display = 'none';
-            commentsToggle.checked = false; // Uncheck the toggle
-        }
-    });
-
-    // Prevent event propagation when clicking inside the comments section
-    commentsSection.addEventListener('click', function (event) {
-        event.stopPropagation();
-    });
-});
 </script>
 </body>
 </html>

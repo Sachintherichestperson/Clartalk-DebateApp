@@ -464,7 +464,10 @@ router.get("/Livedebate/:id",isloggedin, async function (req, res) {
 
     const source = req.query.source || "link";
 
-  res.render("live-player", { Live, user, isFollowing,follower, source });
+    const RoomId = `${req.params.id}`;
+
+
+  res.render("live-player", { Live, user, isFollowing,follower, source, RoomId });
 });
 
 router.get("/start-debate", isloggedin, async function (req, res) {

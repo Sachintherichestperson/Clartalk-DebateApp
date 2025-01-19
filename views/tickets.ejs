@@ -16,7 +16,7 @@
         </nav>
             <div class="ticket-box">
                 <% tickets.Booked.forEach(function(ticket){ %>
-                <div class="ticket debate">
+                <div class="ticket-debate">
                     <div class="top">
                         <h1>Ticket Pass</h1>
                         <div class="big">
@@ -28,11 +28,11 @@
                         <div class="column">
                             <div class="row row-1">
                                 <p><span>Title</span><%= ticket.title %></p>
+                                <p class="row--right"><span>Between</span><%= ticket.creator[0].username %> vs <%= ticket.opponent[0].username %></p>
                             </div>
                             <div class="row row-2">
                                 <p><span>Starting Time</span><%= new Date(ticket.Time).toLocaleDateString('en-GB') %></p>
                                 <p class="row--center"><span>Departs</span><%= new Date(ticket.Time).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Kolkata' }) %></p>
-                                <p class="row--right"><span>Between</span><%= ticket.creator[0].username %> vs <%= ticket.opponent[0].username %></p>
                             </div>
                             <div class="row row-3">
                                 <p><span>Viewer</span><%= tickets.username %></p>
@@ -43,6 +43,9 @@
                     </div>
                 </div>
                 <% }) %>
+            </div>
+            <div class="extra">
+                <h1>No More Tickets</h1>
             </div>
         </section>
 </body>

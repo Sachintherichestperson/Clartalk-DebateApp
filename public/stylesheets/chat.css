@@ -284,10 +284,10 @@ form .Add-input{
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    max-height: unset;
+    max-height: 56vh;
     overflow-y: auto;
     scrollbar-width: none;
-    min-height: 75vh;
+    min-height: 55vh;
 }
 .clip-icon{
     font-size: 25px;

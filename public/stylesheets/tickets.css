@@ -1,3 +1,4 @@
+@media screen {
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap");
 
 body, p, h1 {
@@ -48,7 +49,7 @@ h1 {
     margin: auto;
 }
 
-.debate {
+.ticket-debate {
   display: block;
   /* height: 375px; */
   width: 370px;
@@ -58,14 +59,14 @@ h1 {
   background: linear-gradient(135deg, #333, #444);
 }
 
-.debate .top {
+.ticket-debate .top {
   height: 220px;
   background: linear-gradient(135deg, #2d0061, #074582, #17171a);;
   border-top-right-radius: 25px;
   border-top-left-radius: 25px;
 }
 
-.debate .top h1 {
+.ticket-debate .top h1 {
   text-transform: uppercase;
   font-size: 12px;
   letter-spacing: 2;
@@ -76,7 +77,7 @@ h1 {
   transform: translateX(-50%);
 }
 
-.debate .bottom {
+.ticket-debate .bottom {
   height: 355px;
   background: white;
   border-bottom-right-radius: 25px;
@@ -228,3 +229,83 @@ color: #e0e0e0;
   color: #000;
   background: #ffcc05;
 }
+}
+
+
+@media (max-width: 480px){
+  body{
+    margin: 0;
+    padding: 0;
+    font-family: "Open Sans", sans-serif;
+  }
+  
+  .ticket-debate .top {
+    background: linear-gradient(135deg, #074582, #074582, #074582);
+    border-top-right-radius: 25px;
+    border-top-left-radius: 25px;
+    height: 40%;
+  }
+
+  .ticket-debate .bottom {
+    height: unset;
+    background: white;
+    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 25px;
+    padding: 1px 0px 10px 0px;
+}
+
+  .ticket-debate {
+    display: block;
+    box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.3);
+    z-index: 3;
+    background: red;
+    width: unset;
+    margin-bottom: 20px;
+  }
+  .ticket-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    max-width: unset;
+    margin: auto;
+    padding: unset;
+  }
+
+  .top .big {
+    position: relative;
+    top: 50px;
+    font-size: 45px;
+    font-weight: 700;
+    line-height: 0.8;
+}
+
+.top .big .to {
+  position: relative;
+  left: 10px;
+  font-size: 25px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  }
+
+  .top .big .from {
+    color: #e0e0e0;
+    text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000;
+  }
+  .bottom .row--right {
+    text-align: right;
+  }
+
+  .bottom .bar--code {
+    width: 60%;
+    margin-left: 10px;
+    position: relative;
+  }
+  .extra h1{
+    color: white;
+    margin-top: 120px;
+    font-size: 1.5rem;
+  }
+}
+
