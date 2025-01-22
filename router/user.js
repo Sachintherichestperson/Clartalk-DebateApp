@@ -538,4 +538,76 @@ router.get("/My-ticket",isloggedin,async function(req, res){
   res.render("tickets", { tickets });
 });
 
+router.get("/Delete-Account", isloggedin, async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+        // Delete the user
+        await User.findByIdAndDelete(userId);
+
+        // Clear the JWT cookie
+        res.clearCookie("user");
+
+        // Redirect to a farewell or goodbye page
+        res.render("goodbye");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while deleting the user.");
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 module.exports = router;

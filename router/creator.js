@@ -419,4 +419,38 @@ router.get("/creator/MUN/:Id", isloggedin, async function(req, res){
   res.render("creator-MUN", { competitions, communities, user });
 });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 module.exports = router;

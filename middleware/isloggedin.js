@@ -3,7 +3,6 @@ const User = require("../mongoose/user-mongo");
 
 module.exports = async function (req, res, next) {
     if (!req.cookies.user) {
-        console.log("No token found in cookies.");
         return res.redirect("/register");  
     }
 
@@ -18,7 +17,6 @@ module.exports = async function (req, res, next) {
         req.user = user;
         next();
     } catch (error) {
-        console.error("Token verification failed:", error.message);
         res.redirect("/register"); // Redirect to login on token verification failure
     }
 };
