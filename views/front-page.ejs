@@ -62,6 +62,12 @@
             <% } %>
         </main>
     </section>
+    <div class="banner" style="display: none;">
+        <a href="#$">
+            <img src="/images/banner.png" alt="" class="banner-image">
+        </a>
+        <button class="close-button"><i class="fas fa-times"></i></button>
+    </div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
@@ -101,5 +107,43 @@
         setInterval(updateTimeLeft, 1000);
         updateTimeLeft(); // Run the function on page load
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const banner = document.querySelector('.banner');
+            const closeButton = document.querySelector('.close-button');
+            const body = document.body;
+            const container = document.querySelector('.container');
+    
+            // Get the unique user ID or username from a data attribute or server-rendered value
+            const userId = "<%= user._id %>"; // Replace this with the correct variable holding the user ID
+    
+            // Unique key for the user
+            const bannerKey = `bannerShown_${userId}`;
+    
+            // Show Banner Functionality
+            function showBanner() {
+                banner.style.display = 'block';
+                container.classList.add('blur');
+                body.classList.add('no-scroll');
+            }
+    
+            // Hide Banner Functionality
+            closeButton.addEventListener('click', () => {
+                banner.style.display = 'none';
+                container.classList.remove('blur');
+                body.classList.remove('no-scroll');
+    
+                // Store in sessionStorage that the banner was shown for this user
+                sessionStorage.setItem(bannerKey, 'true');
+            });
+    
+            // Check if the banner has been shown for this user
+            if (!sessionStorage.getItem(bannerKey)) {
+                showBanner();
+            }
+        });
+    </script>
+    
+       
 </body>
 </html>

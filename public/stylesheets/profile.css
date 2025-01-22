@@ -14,7 +14,6 @@ body {
     text-align: end;
 }
 
-/* Container and Header */
 .contanier {
     width: 100%;
     height: 100%;
@@ -23,9 +22,7 @@ body {
 .home {
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    padding: 20px;
 }
 
 header {
@@ -112,13 +109,14 @@ header {
 
 /* Profile Page Section */
 .profile-page {
-    width: 100%;
-    max-width: 1400px;
+    width: 80%;
     padding: 20px;
     margin-top: 30px;
     background-color: #1f1f1f;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    position: relative;
+    left: 6%;
 }
 
 #profile-page {
@@ -188,6 +186,7 @@ header {
     display: flex;
     justify-content: center;
     gap: 20px;
+    flex-wrap: wrap;
 }
 
 .input-a {
@@ -232,32 +231,193 @@ a{
 }
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    nav .nav {
+@media (max-width: 820px){
+    .branding {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        height: 100px;
+        position: relative;
+        left: 0px;
+    }
+    .search-bar input {
+        display: none;
+    }
+    .navigation {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        height: 50px;
+        margin-top: 10px;
+        background-color: #262626;
         flex-direction: column;
-        align-items: flex-start;
+        overflow-y: auto;
+        scrollbar-width: none;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .search-bar .Search-icon{
+        font-size: 35px;
+        position: absolute;
+        right: 20px;
+    }
+    .Points{
+        position: absolute;
+        right: 40px;
+        font-size: 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    .branding {
+        justify-content: center;
+        position: relative;
+        left: 0px;
+        height: 60px;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .Points{
+        position: absolute;
+        color: #ff9800;
+        right: 40px;
+     }
+
+    .branding img {
+        height: 60px;
+        width: 200px;
+        object-fit: cover;
+        position: absolute;
+        left: 0px;
+    }
+
+    .branding input {
+        font-size: 14px;
+        padding: 10px 15px;
+        border-radius: 20px;
+        position: absolute;
+        top: 25px;
+        display: none;
+    }
+
+    .search-bar .Search-icon{
+        font-size: 30px;
+        position: absolute;
+        left: 260px;
+    }
+
+    header {
+        background-color: #1e1e1e;
+        padding: 20px 5px 0 5px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+    }
+
+    .navigation {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        height: 50px;
+        margin-top: 10px;
+        background-color: #262626;
+        flex-direction: column;
+        overflow-y: auto;
+        scrollbar-width: none;
+        flex-wrap: wrap;
         gap: 10px;
     }
 
-    .profile-page {
-        padding: 10px;
+    .nav-link {
+        font-size: 14px;
+        padding: 8px 15px;
+        text-align: center;
+        background: linear-gradient(135deg, #363535, #454444);
     }
 
-    .input {
-        flex-direction: column;
-        align-items: center;
+    .video-card {
+        max-width: 280px;
     }
 
-    .My-videos {
+    .video-card img {
+        height: 150px;
+    }
+
+    .video-title {
+        font-size: 16px;
+    }
+
+    .instruction {
+        font-size: 16px;
+    }
+
+    .blur {
+        filter: blur(8px);
+        pointer-events: none; /* Prevent interactions */
+    }
+    
+    /* Prevent Scroll */
+    .no-scroll {
+        overflow: hidden;
+    }
+    
+    .banner {
+        position: absolute;
+        top: 200px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        text-align: center;
+        background-color: red;
+        width: 80%;
+        height: auto;
+    }
+    
+    .banner img {
+        height: auto;
+        display: block;
         width: 100%;
-        margin-bottom: 10px;
+        height: auto;
     }
+    .close-button {
+        position: absolute;
+        top: -15px;
+        right: -15px;
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #333;
+        background-color: #ff9800;
+        border-radius: 50%;
+        z-index: 1001;
+    }
+    .close-button i{
+        z-index: 1001;
+    }
+    .close-button:hover {
+        transform: scale(1.5);
+    }
+    .profile-page {
+        width: 80%;
+        padding: 20px;
+        margin-top: 30px;
+        background-color: #1f1f1f;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        position: relative;
+        left: 6%;
+    }
+
+
+
 }
 
 @media (max-width: 480px) {
     .branding {
-        width: 300px;
         position: relative;
         left: 0px;
         height: 60px;
@@ -286,13 +446,10 @@ a{
         gap: 0;
     }
 
-    .home {
-        padding: 5px;
-    }
-
     .Points{
-       position: relative;
+       position: absolute;
        color: #ff9800;
+       right: 40px;
     }
 
     .navigation {
@@ -334,7 +491,7 @@ a{
     }
 
     .profile-page{
-        width: 95%;
+        width: 80%;
         position: relative;
     }
 
