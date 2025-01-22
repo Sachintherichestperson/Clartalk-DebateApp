@@ -3,34 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creator page</title>
+    <title>Creator Page</title>
     <link rel="stylesheet" href="/stylesheets/upload.css">
 </head>
 <body>
     <section>
-        <h1>UPLOAD PODCAST VEDIO</h1>
-        <div class="form">
+        <h1 class="main-heading">Upload Your Podcast or Video</h1>
+        <div class="form-container">
             <form action="/creator/upload" method="post" enctype="multipart/form-data">
-                <h4 class="image-heading">Upload Thumbnail</h4>
-                <input type="file" name="Thumbnail" class="image">
-                <h4 class="vedio-heading">Upload vedio</h4>
-                <input type="file" name="vedio" class="vedio">
-                <input type="text" name="title" id="title" placeholder="Give Title">
-                <input type="text" name="description" id="description" placeholder="Give description">
+                <div class="input-group">
+                    <h4 class="form-label">Upload Thumbnail</h4>
+                    <input type="file" name="Thumbnail" class="form-input">
+                </div>
 
-               
-    <p class="instruction">Select content type:</p>
-        <div class="choose">
-            <label for="video">
-                <input type="radio" id="video" name="contentType" value="video" class="class" required>
-                <p class="label-video">Video</p>
-            </label>
-            <label for="podcast">
-                <input type="radio" id="podcast" name="contentType" value="podcast" class="class" required>
-                <p class="label-podcast">Podcast</p>
-            </label>
-        </div>
-                <input type="submit" value="Submit" id="button">
+                <div class="input-group">
+                    <h4 class="form-label">Upload Video</h4>
+                    <input type="file" name="vedio" class="form-input">
+                </div>
+
+                <div class="input-group">
+                    <input type="text" name="title" id="title" placeholder="Enter Title">
+                </div>
+
+                <div class="input-group">
+                    <textarea name="description" id="description" placeholder="Enter Description"></textarea>
+                </div>
+
+                <p class="instruction">Select Content Type:</p>
+                <div class="radio-container">
+                    <label>
+                        <input type="radio" id="video" name="contentType" value="video" required>
+                        <span>Video</span>
+                    </label>
+                    <label>
+                        <input type="radio" id="podcast" name="contentType" value="podcast" required>
+                        <span>Podcast</span>
+                    </label>
+                </div>
+
+                <button type="submit" id="submit-button">Submit</button>
             </form>
         </div>
     </section>

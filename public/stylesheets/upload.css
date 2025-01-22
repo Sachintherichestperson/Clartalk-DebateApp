@@ -1,149 +1,157 @@
-body{
-    background-color: black;
-    position: relative;
+/* General Styles */
+body {
+    background-color: #000000; /* Dark background for ClarTalk theme */
+    color: #ffffff; /* White text for contrast */
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+section {
     width: 100%;
-    top: 10px;
-    left: 550px;
-    overflow-y: auto;
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
 }
-form{
-    background-color: grey;
-    position: relative;
-    width: 450px;
-    height: 700px;
-    border-radius: 40px;
-}
-h1{
-    color: white;
-    font-size: 30px;
-}
-.vedio{
-    padding: 0px 0px 10px 20px;
-    border: none;
-    font-size: 30px;
-    top: -30px;
-    position: relative;
-}
-.image{
-    padding: 10px 0px 10px 20px;
-    border: none;
-    font-size: 30px;
-}
-#title{
-    padding: 16px 130px 15px 20px;
-    left: 20px;
-    border-radius: 30px;
-    /* top: 10px; */
-    border: none;
-    position: relative;
-    font-size: 20px;
-    background-color: rgba(41, 40, 40, 0.963)
-}
-#description{
-    padding: 16px 130px 15px 20px;
-    left: 20px;
-    border-radius: 30px;
-    font-size: 20px;
-    top: 10px;
-    border: none;
-    position: relative;
-    background-color: rgba(41, 40, 40, 0.963)
-}
-#button{
-    padding: 20px 150px 20px 150px;
-    position: relative;
-    top: -80px;
-    border-radius: 30px;
-    left: 30px;
-    border: none;
-    font-size: 30px;
-    background-color: rgb(0, 0, 122);
-    color: white
-}
-.vedio-heading{
-    top: -30px;
-    font-size: 30px;
-    position: relative;
-    left: 30px;
-    height: 10px;
-}
-.image-heading{
-    top: 20px;
-    font-size: 30px;
-    position: relative;
-    left: 30px;
-    height: 10px;
-}
-.flash-message {
-    position: relative;
-    top: 10px;
-    background-color: red;
-    padding: 10px 20px 10px 20px; 
-    max-width: 500px;
-    min-width: 300px;
-    border-radius: 7px;
-    font-size: 23px; 
-    color: white; 
-    text-align: center; 
-    animation: fadeOut 3s forwards;
-}
-a{
-    text-decoration: none;
-}
-#video{
-    width: 170px;
-    height: 50px;
-    padding: 5px 10px 5px 15px;
-    font-size: 20px;
-    display: flex;
-    margin-top: 60px;
-    margin-left: 0px;
-    position: relative;
-    top: -30px;
-}
-#podcast{
-    width: 170px;
-    height: 50px;
-    padding: 5px 10px 5px 15px;
-    font-size: 20px;
-    display: flex;
-    margin-top: 60px;
-    margin-left: 60px;
-    position: relative;
-    top: -30px;
-}
-.instruction{
-    font-size: 30px;
-    color: black;
-    font-weight: 900;
-    position: relative;
-    left: 30px;
-}
-.label-video{
-    font-size: 30px;
-    position: relative;
-    height: 30px;
-    top: -160px;
+
+h1.main-heading {
+    font-size: 32px;
     text-align: center;
-    font-weight: 800;
+    color: #f2f2f2; /* Light text for the title */
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
-.label-podcast{
-    font-size: 30px;
-    position: relative;
-    height: 30px;
-    top: -160px;
-    text-align: center;
-    font-weight: 800;
-    left: 20px;
+
+.form-container {
+    background-color: #1a1a1a; /* Slightly lighter dark shade */
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2); /* Subtle glow */
 }
-label{
-    position: relative;
-    top: 10px;
-  }
-.choose{
+
+form {
     display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
-.labeldeb{
+
+/* Input Group Styles */
+.input-group {
     display: flex;
-    width: 300px;
+    flex-direction: column;
+    gap: 8px;
+}
+
+h4.form-label {
+    font-size: 18px;
+    font-weight: 600;
+    color: #e0e0e0;
+}
+
+input[type="file"],
+#title,
+#description {
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #333;
+    border-radius: 8px;
+    background-color: #262626;
+    color: #ffffff;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+input[type="file"]:hover,
+#title:focus,
+#description:focus {
+    border-color: #ff4500; /* ClarTalk brand accent color */
+}
+
+textarea#description {
+    resize: none;
+    height: 80px;
+}
+
+/* Radio Buttons */
+p.instruction {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f2f2f2;
+    margin-bottom: 10px;
+}
+
+.radio-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.radio-container label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    color: #cccccc;
+}
+
+input[type="radio"] {
+    accent-color: #ff4500; /* ClarTalk orange for radio buttons */
+    transform: scale(2);
+}
+
+/* Submit Button */
+button#submit-button {
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    background-color: #ff4500; /* Brand orange for button */
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%;
+    text-transform: uppercase;
+}
+
+button#submit-button:hover {
+    background-color: #e03d00; /* Darker shade on hover */
+    transform: scale(1.02); /* Subtle scaling */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    h1.main-heading {
+        font-size: 26px;
+    }
+
+    form {
+        gap: 15px;
+    }
+
+    button#submit-button {
+        font-size: 16px;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1.main-heading {
+        font-size: 22px;
+    }
+
+    input[type="file"],
+    #title,
+    #description {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    button#submit-button {
+        font-size: 14px;
+        padding: 10px;
+    }
 }

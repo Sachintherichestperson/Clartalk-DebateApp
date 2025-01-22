@@ -1,3 +1,4 @@
+@media screen {
 body {
     background-color: #121212;
     font-family: 'Roboto', sans-serif;
@@ -113,7 +114,59 @@ input[type="text"]:focus, input[type="file"]:focus {
     transform: translateY(-2px);
 }
 
-/* Responsive design */
+#Private{
+    width: 170px;
+    height: 50px;
+    padding: 5px 10px 5px 15px;
+    font-size: 20px;
+    display: flex;
+    margin-top: 60px;
+    margin-left: 0px;
+    position: relative;
+    top: -30px;
+    left: -40px;
+}
+#Public{
+    padding: 5px 10px 5px 15px;
+    font-size: 20px;
+    display: flex;
+    position: relative;
+    transform: scale(2.5);
+}
+.choose{
+    display: flex;
+}
+.label-Private{
+    text-align: center;
+    position: relative;
+    top: -20px;
+    left: -40px;
+}
+.label-Public{
+    text-align: center;
+    position: relative;
+}
+#Special{
+    width: 170px;
+    height: 50px;
+    padding: 5px 10px 5px 15px;
+    font-size: 20px;
+    display: flex;
+    margin-top: 60px;
+    margin-left: 60px;
+    position: relative;
+    top: -30px;
+    left: -110px;
+}
+.label-Special{
+    text-align: center;
+    position: relative;
+    left: -80px;
+    top: -20px;
+}
+
+}
+
 @media (max-width: 600px) {
     #creator-community {
         width: 100%;
@@ -134,60 +187,27 @@ input[type="text"]:focus, input[type="file"]:focus {
         padding: 10px;
     }
 }
-#Private{
-    width: 170px;
-    height: 50px;
-    padding: 5px 10px 5px 15px;
-    font-size: 20px;
-    display: flex;
-    margin-top: 60px;
-    margin-left: 0px;
-    position: relative;
-    top: -30px;
-    left: -40px;
-}
-#Public{
-    width: 170px;
-    height: 50px;
-    padding: 5px 10px 5px 15px;
-    font-size: 20px;
-    display: flex;
-    margin-top: 60px;
-    margin-left: 60px;
-    position: relative;
-    top: -30px;
-    left: -40px;
-}
-.choose{
-    display: flex;
-}
-.label-Private{
-    text-align: center;
-    position: relative;
-    top: -20px;
-    left: -40px;
-}
-.label-Public{
-    text-align: center;
-    position: relative;
-    left: -10px;
-    top: -20px;
-}
-#Special{
-    width: 170px;
-    height: 50px;
-    padding: 5px 10px 5px 15px;
-    font-size: 20px;
-    display: flex;
-    margin-top: 60px;
-    margin-left: 60px;
-    position: relative;
-    top: -30px;
-    left: -110px;
-}
-.label-Special{
-    text-align: center;
-    position: relative;
-    left: -80px;
-    top: -20px;
+
+@media (max-width: 480px){
+    #creator-community {
+        background: linear-gradient(145deg, #1f1f1f, #2c2c2c);
+        width: 80%;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    input[type="text"], input[type="file"] {
+        max-width: unset;
+        width: 100%;
+        padding: 10px 8px;
+        margin-top: 8px;
+        border: 1px solid #444;
+        background-color: #333;
+        color: white;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border 0.3s ease, background-color 0.3s ease;
+    }
 }
