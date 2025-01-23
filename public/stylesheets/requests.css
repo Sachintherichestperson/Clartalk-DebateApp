@@ -27,11 +27,14 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 100%;
-    max-width: 1200px;
+    width: 70%;
     height: 100px;
     position: relative;
     left: 200px;
+}
+
+.search-bar .Search-icon {
+    display: none;
 }
 
 .branding img {
@@ -48,12 +51,11 @@ header {
 }
 
 .search-bar input {
-    width: 100%;
-    max-width: 500px;
+    width: 50%;
     background-color: #333;
     border: none;
     border-radius: 25px;
-    padding: 12px 20px;
+    padding: 12px 20px 12px 20px;
     font-size: 16px;
     color: #ffffff;
     outline: none;
@@ -263,6 +265,7 @@ header h1 i {
         font-size: 35px;
         position: absolute;
         right: 20px;
+        display: unset;
     }
 }
 
@@ -297,6 +300,7 @@ header h1 i {
         font-size: 30px;
         position: absolute;
         right: 20px;
+        display: unset;
     }
 
     header {
@@ -433,6 +437,7 @@ header h1 i {
                 font-size: 30px;
                 position: absolute;
                 right: 20px;
+                display: unset;
             }
         
             header {

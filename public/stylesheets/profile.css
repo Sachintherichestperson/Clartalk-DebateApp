@@ -34,14 +34,20 @@ header {
     gap: 15px;
 }
 .branding {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 1200px;
-    height: 100px;
-    position: relative;
-    left: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 55%;
+        height: 100px;
+        position: relative;
+        left: 100px;
+}
+
+.Points{
+    font-size: 30px;
+    position: absolute;
+    right: 120px;
+    color:#ff9800;
 }
 
 .branding img {
@@ -49,34 +55,7 @@ header {
     width: 200px;
     object-fit: contain;
 }
-.search-bar {
-    flex: 1;
-    margin-left: 20px;
-    display: flex;
-    align-items: center;
-}
-.search-bar input {
-    width: 100%;
-    max-width: 500px;
-    background-color: #333;
-    border: none;
-    border-radius: 25px;
-    padding: 12px 20px;
-    font-size: 16px;
-    color: #ffffff;
-    outline: none;
-    transition: all 0.3s ease;
-}
 
-.search-bar input:hover {
-    background-color: #444;
-}
-
-.search-bar input:focus {
-    background-color: #444;
-    transform: scale(1.05);
-}
-/* Navigation Bar */
 .navigation {
     display: flex;
     justify-content: center;
@@ -85,6 +64,7 @@ header {
     max-width: 1200px;
     margin-top: 10px;
 }
+
 .nav-link {
     color: #ffffff;
     text-decoration: none;
