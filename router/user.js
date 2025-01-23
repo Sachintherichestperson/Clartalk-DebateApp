@@ -224,10 +224,11 @@ router.get("/SentRequests",isloggedin, async function (req, res) {              
   res.render("Sentrequests", { contents });
 });
 
-router.get("/update-route/:id",isloggedin, async function(req, res){                                      // update-route/:id  Page
+router.get("/update-route",isloggedin, async function(req, res){                                      // update-route/:id  Page
   const profileupdate = await User.findOne({ email: req.user.email }).populate("profile");
-  console.log(profileupdate)
-  res.render("update-profile", { profileupdate })
+  let err = req.flash("key")
+  console.log(err);
+  res.render("update-profile", { profileupdate, err })
 });
 
 router.post("/update-profile", isloggedin, upload.single("profile"), async function (req, res) {          // update-profile   Page
@@ -239,9 +240,15 @@ router.post("/update-profile", isloggedin, upload.single("profile"), async funct
     if (profileImageBuffer) {
       user.profile = profileImageBuffer;  // Save the buffer data
     }
-    user.username = username;
 
+    if (username === user.username) {
+      req.flash("key", "username already exist");
+      return res.redirect("/update-route")
+    } 
+    
+    user.username = username;
     await user.save();
+
     res.redirect("/profile");
   } catch (err) {
     res.status(404).send(err);
