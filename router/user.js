@@ -226,8 +226,7 @@ router.get("/SentRequests",isloggedin, async function (req, res) {              
 
 router.get("/update-route",isloggedin, async function(req, res){                                      // update-route/:id  Page
   const profileupdate = await User.findOne({ email: req.user.email }).populate("profile");
-  let err = req.flash("key")
-  console.log(err);
+  let err = req.flash("key");
   res.render("update-profile", { profileupdate, err })
 });
 

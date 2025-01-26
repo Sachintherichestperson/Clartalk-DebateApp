@@ -23,14 +23,14 @@
                 <div class="request-card">
                     <p><strong>Title:</strong> <%= live.title %></p>
                     <p><strong>Description:</strong> <%= live.description %></p>
-                    <p><strong>Opponent:</strong> <!--problem here to access opponent--><%= live.opponent %></p>      
+                    <p><strong>Opponent:</strong> <%= live.opponent %></p>      
                     <p><strong>Time:</strong> <%= live.hoursLeft %> hours left</p>
                     <div class="request-actions">
-                        <form action="/Livedebate/<%= live._id %>" method="get" class="request-form">
+                        <a href="/Livedebate/<%= live._id %>?source=button" class="request-form">
                             <input type="hidden" name="requestId" value="<%= live._id %>">
                             <input type="hidden" name="source" value="button">
                             <button type="submit" name="action" value="accept" class="action-btn">Start The Debate</button>
-                        </form>
+                    </a>
                     </div>
                 </div>
             <% }); %>
