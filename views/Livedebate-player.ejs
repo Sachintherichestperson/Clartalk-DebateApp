@@ -20,7 +20,7 @@
                     <img src="data:image/jpeg;base64,<%= Live.Thumbnail.toString('base64') %>" alt="" class="video-player">
                     <p class="video-title"><%= Live.title %></p>
                     <% if(Booking || Live.Type === "regular") { %>
-                        <a href="/Livedebate/<%= Live._id %>?source=link" class="link">
+                        <a href="/Livedebate/<%= Live._id %>" class="link">
                             <div class="Watch">
                             <p class="amount">Watch The Debate</p>
                             </div>

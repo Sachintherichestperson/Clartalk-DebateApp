@@ -19,13 +19,13 @@
                         <i class="fas fa-comment comment-i"></i> 
                     </label>
                     <video id="remoteVideo" autoplay muted playsinline></video>
-                    <% if(source === "button"){ %>
+                    <% if(isCreator || ){ %>
                     <!-- End Call Button inside the remote-video div -->
                     <button class="end-call-btn">End Call</button>
                     <% } %>
                 </div>
             </div>
-            <% if(source === "link"){ %>
+            <% if(isViewer){ %>
             <div class="about-video">
                 <p class="title"><%= Live.title %></p>
                 <div class="description">
@@ -33,7 +33,7 @@
                 </div>
             <% } %>
             </div>
-            <% if(source === "link"){ %>
+            <% if(isViewer){ %>
             <div class="video-user-info">
                 <img src="/images/Default.png" alt="Default Avatar" class="user-avatar">
                 <div class="creator-details">
@@ -43,7 +43,7 @@
                     <p class="followers-count"><%= follower %> Followers</p>
                 </div>
             <% } %>
-                <% if(source === "link"){ %>
+                <% if(isViewer){ %>
                 <% if (isFollowing) { %>
                     <button class="unfollow" data-creator-id="<%= Live.creator[0]._id %>" id="follow-btn">Unfollow</button>
                 <% } else { %>
@@ -52,11 +52,11 @@
                 <% } %>
             </div> 
         </div>
-        <% if(source === "button"){ %>
+        <% if(isCreator || isOpponent){ %>
             <button class="start-stream-btn">Start Stream</button>
             <% } %>
         </div>
-        <% if(source === "link"){ %>
+        <% if(isViewer){ %>
         <input type="checkbox" id="commentsToggle" class="comments-toggle" hidden>
         <div class="comments">
             <div class="comment-list">

@@ -456,25 +456,39 @@ router.post("/Booking-Done-for-community/:id",isloggedin, async function (req, r
   }
 });
 
-router.get("/Livedebate/:id",isloggedin, async function (req, res) {
-  const Live = await liveMongo.findById(req.params.id).populate({
-    path: "creator",
-    select: "followers username"
-  });
+router.get("/Livedebate/:id", isloggedin, async function (req, res) { 
+  try {
+      const Live = await liveMongo.findById(req.params.id)
+          .populate({ path: "creator", select: "followers username" })
+          .populate({ path: "opponent", select: "username" });
 
-  const user = await User.findOne({email: req.user.email});
+      if (!Live) {
+          return res.status(404).send("Live debate not found");
+      }
 
-  const followerscount = Live.creator[0].followers;
-    const follower = followerscount.length;
-    const isFollowing = followerscount.includes(req.user._id);
+      const creator = Live.creator.username;
+      const opponent = Live.opponent.username;
+      const user = await User.findOne({ email: req.user.email });
 
-    const source = req.query.source || "link";
+      const followerscount = Live.creator[0].followers;
+      const follower = followerscount.length;
+      const isFollowing = followerscount.includes(req.user._id);
 
-    const RoomId = `${req.params.id}`;
+      // Check if user is a viewer
+      const isCreator = Live.creator[0]._id.equals(req.user._id);
+      console.log(isCreator)
+      const isOpponent = Live.opponent[0]._id.equals(req.user._id);
+      const isViewer = !isCreator && !isOpponent;
 
+      const RoomId = req.params.id;
 
-  res.render("live-player", { Live, user, isFollowing,follower, source, RoomId });
+      res.render("live-player", { Live, user, isFollowing, follower,  RoomId, isCreator, isOpponent, isViewer });
+  } catch (error) {
+      console.error(error);
+      res.status(500).send("Server Error");
+  }
 });
+
 
 router.get("/start-debate", isloggedin, async function (req, res) {
   try {
