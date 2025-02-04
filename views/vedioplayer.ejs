@@ -8,11 +8,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-    <section>
+    <section class="main-page">
         <div class="vediopage">
             <nav>
                 <img src="/images/nav.png" alt="Logo" class="logo">
-                <i class="fa fa-search search-icon"></i>
                 <input type="text" placeholder="Search for debates, podcasts, or live streams..." class="search-bar">
             </nav>
             <div class="video-and-suggestions">
@@ -49,6 +48,48 @@
                         </p>
                         <div class="description-container">
                             <p class="video-description"><%= vedios.description %></p>
+                        </div>
+                    </div>
+                    <div class="comments">
+                        <h2 class="comment-data">Comments 12980</h2>
+                        <div class="msg-box">
+                            <img src="/images/default.png" alt="" class="comment-image">
+                            <div class="txtmsg">Kis Kis ko Ye Best App Lagta he Like kare</div>
+                        </div>
+                        <div class="allcomments">
+                            <div class="input-cmt">
+                                <img src="/images/default.png" alt="" class="input-img">
+                                <input type="text" placeholder="Write a comment..." class="comment-input">
+                                <input type="button" value="Post" class="post-btn">
+                            </div>
+                            <div class="single-comment">
+                                <img src="/images/default.png" alt="" class="comment-image">
+                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
+                            </div>
+                            <div class="single-comment">
+                                <img src="/images/default.png" alt="" class="comment-image">
+                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
+                            </div>
+                            <div class="single-comment">
+                                <img src="/images/default.png" alt="" class="comment-image">
+                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
+                            </div>
+                            <div class="single-comment">
+                                <img src="/images/default.png" alt="" class="comment-image">
+                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
+                            </div>
+                            <div class="single-comment">
+                                <img src="/images/default.png" alt="" class="comment-image">
+                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
+                            </div>
+                            <div class="single-comment">
+                                <img src="/images/default.png" alt="" class="comment-image">
+                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
+                            </div>
+                            <div class="single-comment">
+                                <img src="/images/default.png" alt="" class="comment-image">
+                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -152,5 +193,28 @@
      window.addEventListener("beforeunload", () => {
          sendWatchTime();
      });
+</script>
+<script>
+    const commentbtn = document.querySelector(".comments");
+const allcomments = document.querySelector(".allcomments");
+const msgbox = document.querySelector(".msg-box");
+
+commentbtn.addEventListener("click", (event) => {
+    // Prevent click on the comment button itself from closing it
+    event.stopPropagation();
+    allcomments.classList.add("active");
+    msgbox.classList.add("active");
+    commentbtn.classList.add("active");
+});
+
+document.addEventListener("click", (event) => {
+    // Check if the click is outside the comments and msgbox
+    if (!allcomments.contains(event.target) && !msgbox.contains(event.target) && !commentbtn.contains(event.target)) {
+        allcomments.classList.remove("active");
+        msgbox.classList.remove("active");
+        commentbtn.classList.remove("active");
+    }
+});
+
 </script>
 </html>

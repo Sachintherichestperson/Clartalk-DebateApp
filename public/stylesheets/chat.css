@@ -12,6 +12,8 @@
 .community-chat-section {
     margin: 0 auto;
     padding: 20px;
+    width: 80%;
+    background-color: #1c1c1c;
 }
 
 /* Navigation styles */
@@ -90,11 +92,10 @@
     background-color: #1f1f1f;  /* Dark background for chat panel */
     border-radius: 10px;
     padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    max-height: 500px;
+    box-shadow: 0 8px 15px rgba(0 0 0 / 73%);
+    height: 350px;
     overflow-y: auto;
     scrollbar-width: none;
-    min-height: 500px;
 }
 
 .chat-msg, .self-msg {
@@ -114,6 +115,7 @@
     border-radius: 5px;
     max-width: 70%;
     word-wrap: break-word;
+    color: white;
 }
 
 .chat-msg {
@@ -126,10 +128,15 @@
 
 /* Input section styles */
 .input-section {
-    margin-top: 20px;
+    margin-top: 10px;
     display: flex;
     align-items: center;
-    padding: 20px 10px;
+    padding: 10px 10px;
+    background-color: #2a2a2a;
+}
+
+.clip-icon{
+    color: white;
 }
 
 .file-options {
@@ -158,6 +165,7 @@
     font-size: 1rem;
     background-color: #2a2a2a;  /* Dark input field */
     color: white;
+    width: 80%;
 }
 
 .message-input:hover{
@@ -328,5 +336,8 @@ form .Add-input{
     font-weight: bold;
     margin-right: 10px;
     color: aliceblue;
+}
+.message-input::placeholder{
+    font-size: 16px;
 }
 }

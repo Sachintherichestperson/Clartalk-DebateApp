@@ -170,6 +170,8 @@ router.get("/profile",isloggedin,async function(req, res){                      
   const totalContent = videoCount + debateCount;
 
   const profile = user.profile;
+  const Rank = user.Rank;
+  console.log(Rank);
   
   const followerCount = user.followers ? user.followers.length : 0;
 
@@ -480,7 +482,7 @@ router.get("/Livedebate/:id", isloggedin, async function (req, res) {
       const isOpponent = Live.opponent[0]._id.equals(req.user._id);
       const isViewer = !isCreator && !isOpponent;
 
-      const RoomId = req.params.id;
+      const RoomId = `${req.params.id}`;
 
       res.render("live-player", { Live, user, isFollowing, follower,  RoomId, isCreator, isOpponent, isViewer });
   } catch (error) {
@@ -576,7 +578,9 @@ router.get("/Delete-Account", isloggedin, async (req, res) => {
   }
 });
 
-
+router.get("/Chat-Notifications", function(req, res){
+  res.render("chat-notification");
+})
 
 
 

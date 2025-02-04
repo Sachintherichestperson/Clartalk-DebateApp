@@ -1,0 +1,81 @@
+/* General Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #0a0a0a;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+/* Gradient Header */
+header {
+    text-align: center;
+    padding: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    box-shadow: 0px 4px 10px rgb(0 0 0 / 90%);
+}
+
+/* Container */
+.container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 10px;
+}
+
+/* Notification Cards */
+.notification {
+    display: flex;
+    align-items: center;
+    background: rgba(30, 30, 30, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 12px;
+    box-shadow: 0px 4px 8px rgba(255, 255, 255, 0.1);
+    transition: 0.3s;
+}
+
+.notification:hover {
+    background: rgba(50, 50, 50, 0.9);
+    transform: scale(1.02);
+}
+
+/* Icon Styling */
+.icon {
+    font-size: 22px;
+    margin-right: 15px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+/* Different Colors for Icons */
+.comment {
+    background-color: rgba(0, 150, 255, 0.2);
+    color: #0096ff;
+}
+
+.like {
+    background-color: rgba(255, 0, 93, 0.2);
+    color: #ff005d;
+}
+
+.follow {
+    background-color: rgba(50, 205, 50, 0.2);
+    color: #32cd32;
+}
+
+/* Content */
+.content p {
+    margin: 0;
+    font-size: 16px;
+}
+
+.time {
+    font-size: 12px;
+    color: #aaaaaa;
+}

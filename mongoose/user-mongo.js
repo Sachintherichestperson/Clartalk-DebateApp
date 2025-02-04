@@ -53,10 +53,10 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'live'
     }],
-    Rank: [{
+    Rank: {
         type: Number,
         default: 0
-    }],
+    },
     Rankpoints: {
         type: Number,
         default: 0
