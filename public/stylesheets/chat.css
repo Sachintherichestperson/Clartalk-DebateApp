@@ -34,6 +34,7 @@
     object-fit: cover;
     position: relative;
     left: 30px;
+    border: 1px solid white;
 }
 
 .community-nav .community-name {
@@ -241,6 +242,20 @@
     z-index: 10;
     width: 200px;
 }
+
+.pay-section {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    height: 70px;
+    padding: 5px 5px;
+    background-color: #2a2a2a;
+}
+
+form{
+    width: 100%;
+    height: 90%;
+}
 form .Add-input{
     padding: 10px;
     border-radius: 5px;
@@ -250,7 +265,8 @@ form .Add-input{
     background-color: green; 
     color: white;
     cursor: pointer;
-    width: 1100px;
+    width: 100%;
+    height: 90%;
 }
 }
 
@@ -268,13 +284,14 @@ form .Add-input{
     }
     .community-nav .community-name {
         font-weight: bold;
+        font-size: 1.3rem;
     }
     .icon {
-        font-size: 40px;
+        font-size: 30px;
     }
     .community-nav .community-logo img {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     object-fit: cover;
     position: relative;

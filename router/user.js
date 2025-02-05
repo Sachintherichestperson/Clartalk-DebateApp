@@ -39,7 +39,6 @@ router.get("/",isloggedin,async function(req, res){                             
   }catch(err){
     res.status(404).send(err);
   }
-  
 });
 
 router.get("/debate",isloggedin,async function(req, res){                                                  //debate page
@@ -155,7 +154,12 @@ router.get("/community-chat/:id",isloggedin ,async function(req, res){          
   try{
     const community = await communityMongo.findById(req.params.id);
     const user = await User.findOne({email: req.user.email});
-    res.render("chat", {community, user});
+    
+    const member = community.members.some(memberId => memberId.toString() === req.user._id.toString());
+    
+    const type = community.CommunityType;
+
+    res.render("chat", {community, user, member, type });
   }catch(err){
     res.send(err)
     console.log(err.message)
@@ -581,8 +585,6 @@ router.get("/Delete-Account", isloggedin, async (req, res) => {
 router.get("/Chat-Notifications", function(req, res){
   res.render("chat-notification");
 })
-
-
 
 
 

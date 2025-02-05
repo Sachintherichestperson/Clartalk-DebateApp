@@ -20,7 +20,7 @@
     .player{
         display: flex;
         flex-direction: row;
-        background: #8a8a1f;
+        background: black;
         height: 99vh;
         gap: 1px;
         align-items: unset;
@@ -108,6 +108,12 @@
         background-color: rgba(32, 32, 171, 0.668);
         border: none;
         border-radius: 20px;
+    }
+    #remoteVideos{
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+        gap: 20px;
     }
 }
 

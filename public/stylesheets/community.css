@@ -123,6 +123,7 @@ header {
 
 .chat {
     text-align: center;
+    overflow: hidden;
 }
 
 .community-name {
@@ -130,6 +131,8 @@ header {
     font-weight: bold;
     margin-bottom: 10px;
     color: #ff9800;
+    overflow: hidden;
+    width: 100%;
 }
 
 .msg span {

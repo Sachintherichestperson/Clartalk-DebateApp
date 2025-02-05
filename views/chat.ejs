@@ -29,6 +29,7 @@
         </nav>
         <div class="chat-container">
             <div class="chat-panel"></div>
+            <% if(member || type === "Public") { %>
             <div class="input-section">
                 <div class="file-options">
                     <i class="fas fa-paperclip clip-icon"></i>
@@ -43,6 +44,14 @@
                 </div>
                 <input type="text" placeholder="Type your message" class="message-input">
                 <button class="send-btn">Send</button>
+                <% }else { %>
+                    <div class="pay-section">
+                    <form action="/Join-community/<%= community._id %>" method="post">
+                        <button class="Add-input">Join-community</button>
+                    </form>
+                </div>
+                </a>
+                <% } %>
             </div>
         </div>
     </section>

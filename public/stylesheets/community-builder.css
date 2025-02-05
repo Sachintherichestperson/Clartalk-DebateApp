@@ -115,16 +115,11 @@ input[type="text"]:focus, input[type="file"]:focus {
 }
 
 #Private{
-    width: 170px;
-    height: 50px;
-    padding: 5px 10px 5px 15px;
-    font-size: 20px;
-    display: flex;
-    margin-top: 60px;
-    margin-left: 0px;
-    position: relative;
-    top: -30px;
-    left: -40px;
+        padding: 5px 10px 5px 15px;
+        font-size: 20px;
+        display: flex;
+        position: relative;
+        transform: scale(2.5);
 }
 #Public{
     padding: 5px 10px 5px 15px;
@@ -135,12 +130,12 @@ input[type="text"]:focus, input[type="file"]:focus {
 }
 .choose{
     display: flex;
+    position: relative;
+    gap: 120px;
 }
 .label-Private{
     text-align: center;
     position: relative;
-    top: -20px;
-    left: -40px;
 }
 .label-Public{
     text-align: center;

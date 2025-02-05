@@ -291,6 +291,7 @@ router.get("/Building-The-Community", function(req, res){
   res.render("community-builder")
 });
 
+
 router.post("/community/builder",upload.single("CommunityDP"), isloggedin, async function (req, res) {
   try{
        let{ CommunityName, CommunityisAbout, CommunityDP, CommunityType } = req.body;
@@ -419,10 +420,68 @@ router.get("/creator/MUN/:Id", isloggedin, async function(req, res){
   res.render("creator-MUN", { competitions, communities, user });
 });
 
+router.get("/Delete-content", isloggedin, async function (req, res) {                                   //uploaded-content Page
+  try {
+    const user = await User.findOne({ email: req.user.email })
+              .populate({
+                  path: "vedio",
+                  select: "title description createdAt Thumbnail Views"
+              })
+              .populate({
+                  path: "podcast",
+                  select: "title description createdAt Thumbnail Views"
+              });
+    
+          if (!user) {
+              return res.status(404).send("User not found");
+          }
+    
+    
+          // Add a `type` property to distinguish between videos and podcasts
+          const vedios = [
+              ...user.vedio.map(v => ({ ...v.toObject(), type: "debate" })),
+              ...user.podcast.map(p => ({ ...p.toObject(), type: "podcast" }))
+          ];
 
+    res.render("delete-content", { vedios, user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while fetching data.");
+  }
+});
 
+router.get("/delete-content/:type/:id", isloggedin, async function (req, res) {
+  try {
+    const { type, id } = req.params;
+    let deletedVideo;
 
+    // Check which collection to delete from
+    if (type === "debate") {
+      deletedVideo = await videomongoose.findByIdAndDelete(id);
+    } else if (type === "podcast") {
+      deletedVideo = await podcastsmongoose.findByIdAndDelete(id);
+    } else {
+      return res.status(400).send("Invalid content type");
+    }
 
+    if (!deletedVideo) {
+      return res.status(404).send("Content not found");
+    }
+
+    // Remove video reference from the user model
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $pull: { vedio: id, podcast: id } }, // Make sure the field name matches your schema
+      { new: true }
+    );
+
+    console.log("Updated User:", user);
+    res.redirect("/creator/Delete-content");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 
 
