@@ -39,6 +39,9 @@
                 <a href="/MUN-competetion" class="nav-link">
                     <i class="fas fa-trophy"></i> MUN
                 </a>
+                <a href="/Chat-Notifications" class="nav-link">
+                    <i class="fas fa-bell"></i> Notifications
+                </a>
                 <a href="/profile" class="nav-link">
                     <i class="fas fa-user"></i> Profile
                 </a>
@@ -61,7 +64,7 @@
                     <% LeaderBoards.forEach(function(LeaderBoard){ %> 
                     <tr>
                         <td><%= LeaderBoard.Rank %></td>
-                        <td><%= LeaderBoard.username %></td>
+                        <td><a href="/creator/content/<%= user._id %>" class="username"><%= LeaderBoard.username %></a></td>
                         <td><%= LeaderBoard.Rankpoints %></td>
                     </tr>
                     <% }) %>

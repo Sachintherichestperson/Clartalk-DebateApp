@@ -582,9 +582,10 @@ router.get("/Delete-Account", isloggedin, async (req, res) => {
   }
 });
 
-router.get("/Chat-Notifications", function(req, res){
-  res.render("chat-notification");
-})
+router.get("/Chat-Notifications",isloggedin, async function(req, res){
+  const user = await User.findOne({ email: req.user.email });
+  res.render("chat-notification", { user });
+});
 
 
 

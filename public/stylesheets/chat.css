@@ -40,6 +40,7 @@
 .community-nav .community-name {
     font-size: 1.5rem;
     font-weight: bold;
+    width: 150px;
 }
 
 .icon-container {

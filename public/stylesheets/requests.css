@@ -77,7 +77,6 @@ header {
     justify-content: center;
     gap: 20px;
     width: 100%;
-    max-width: 1200px;
     margin-top: 10px;
 }
 
@@ -95,18 +94,6 @@ header {
 .nav-link:hover {
     background: linear-gradient(135deg, #ff5722, #ff9800);
     transform: scale(1.1);
-}
-/* Container for the leaderboard */
-.leaderboard-container {
-    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-    width: 80%;
-    max-width: 1200px;
-    text-align: center;
-    position: relative;
-    left: 100px;
 }
 
 header {
@@ -337,18 +324,6 @@ header h1 i {
     .page {
         padding: 20px 10px;
         gap: 20px;
-    }
-
-    .video-card {
-        max-width: 280px;
-    }
-
-    .video-card img {
-        height: 150px;
-    }
-
-    .video-title {
-        font-size: 16px;
     }
 
     .instruction {

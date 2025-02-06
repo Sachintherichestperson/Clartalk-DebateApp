@@ -72,7 +72,6 @@ header {
     justify-content: center;
     gap: 20px;
     width: 100%;
-    max-width: 1200px;
     margin-top: 10px;
 }
 .nav-link {
@@ -102,8 +101,7 @@ header {
     flex-wrap: wrap;
     gap: 30px;
     justify-content: center;
-    padding: 40px 20px;
-    max-width: 1200px;
+    padding: 40px 20px; 
     margin: auto;
 }
 

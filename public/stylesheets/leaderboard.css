@@ -76,7 +76,6 @@ header {
     justify-content: center;
     gap: 20px;
     width: 100%;
-    max-width: 1200px;
     margin-top: 10px;
 }
 
@@ -102,7 +101,7 @@ header {
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
     width: 80%;
-    max-width: 1200px;
+    
     text-align: center;
     position: relative;
     left: 150px;
@@ -159,6 +158,13 @@ table td {
     background-color: #555;
 }
 
+.username{
+    font-weight: 800;
+    cursor: pointer;
+    color: white;
+    text-decoration: none;
+}
+
 table tr:nth-child(even) {
     background-color: #444;
 }
@@ -188,7 +194,7 @@ table tr:last-child {
         align-items: center;
         justify-content: space-between;
         width: 100%;
-        max-width: 1200px;
+        
         height: 100px;
         position: relative;
         left: 0px;
@@ -221,7 +227,7 @@ table tr:last-child {
         border-radius: 15px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
         width: 80%;
-        max-width: 1200px;
+        
         text-align: center;
         position: relative;
         left: 8%;
