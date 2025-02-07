@@ -49,9 +49,13 @@ const userSchema = new mongoose.Schema({
             status: { type: String, default: 'pending' }
         }
     ],
-    Booked: [{
+    LiveBooked: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'live'
+    }],
+    MunCompetition: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Competition'
     }],
     Rank: {
         type: Number,

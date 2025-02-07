@@ -35,11 +35,46 @@
                     <p><span>Entry Fees:</span> ₹<%= competition.fees %></p>
                     <% } %>
                 </div>
+                <% if (Booking){ %>
+                    <div class="Registration">
+                        <div>Registration Done</div>
+                    </div>
+                <% }else{ %>
                 <div id="btn">
-                    <a href="#">Pay Now</a>
+                    <button id="rzp-button1">Pay Now</button>
                 </div>
+                <% } %>
             </div>
         </div>
     </section>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        const CompetitionId = "<%= competition._id %>"; // Dynamically set the live._id from your backend
+        const options = {
+            key: "rzp_test_HPAKSJHzTmYhop", 
+            amount: "<%= competition.fees * 100%>", 
+            currency: "INR",
+            name: "Your Company Name",
+            description: "Test Transaction",
+            handler: function (response) {
+                
+                window.location.href = `/Mun-member-entry/${CompetitionId}`;
+            },
+            prefill: {
+                name: "<%= user.username %>",
+                email: "<%= user.email %>",
+            },
+            theme: {
+                color: "#3399cc"
+            }
+        };
+
+        const rzp = new Razorpay(options);
+
+        document.getElementById("rzp-button1").onclick = function (e) {
+            rzp.open();
+            e.preventDefault();
+        };
+    </script>
 </body>
 </html>

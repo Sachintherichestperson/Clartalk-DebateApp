@@ -15,7 +15,7 @@
             </div>
         </nav>
             <div class="ticket-box">
-                <% tickets.Booked.forEach(function(ticket){ %>
+                <% tickets.LiveBooked.forEach(function(ticket){ %>
                 <div class="ticket-debate">
                     <div class="top">
                         <h1>Ticket Pass</h1>
@@ -37,6 +37,64 @@
                             <div class="row row-3">
                                 <p><span>Viewer</span><%= tickets.username %></p>
                                 <p class="row--center"><span>Seat</span><%= ticket.Booking %>E</p>
+                            </div>
+                        </div>
+                        <div class="bar--code"></div>
+                    </div>
+                </div>
+                <% }) %>
+                <% tickets.LiveBooked.forEach(function(ticket){ %>
+                <div class="ticket-debate">
+                    <div class="top">
+                        <h1>Ticket Pass</h1>
+                        <div class="big">
+                            <p class="from">CLARTALK</p>
+                            <p class="to"><i class="fas fa-arrow-right"></i>Ticket</p>
+                        </div>
+                    </div>
+                    <div class="bottom">
+                        <div class="column">
+                            <div class="row row-1">
+                                <p><span>Title</span><%= ticket.title %></p>
+                                <p class="row--right"><span>Between</span><%= ticket.creator[0].username %> vs <%= ticket.opponent[0].username %></p>
+                            </div>
+                            <div class="row row-2">
+                                <p><span>Starting Time</span><%= new Date(ticket.Time).toLocaleDateString('en-GB') %></p>
+                                <p class="row--center"><span>Departs</span><%= new Date(ticket.Time).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Kolkata' }) %></p>
+                            </div>
+                            <div class="row row-3">
+                                <p><span>Viewer</span><%= tickets.username %></p>
+                                <p class="row--center"><span>Seat</span><%= ticket.Booking %>E</p>
+                            </div>
+                        </div>
+                        <div class="bar--code"></div>
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+            <div class="ticket-box">
+                
+                <% tickets.MunCompetition.forEach(function(ticket){ %>
+                <div class="ticket-debate">
+                    <div class="top">
+                        <h1>Ticket Pass</h1>
+                        <div class="big">
+                            <p class="from" style="font-size: 80px;"><%= ticket.createdBy.username %></p>
+                            <p class="to"><i class="fas fa-arrow-right"></i>Ticket</p>
+                        </div>
+                    </div>
+                    <div class="bottom">
+                        <div class="column">
+                            <div class="row row-1">
+                                <p><span>Title</span><%= ticket.CompetitionName %></p>
+                                <p class="row--right"><span>Location</span>Here Location</p>
+                            </div>
+                            <div class="row row-2">
+                                <p><span>Starting Time</span>Date</p>
+                            </div>
+                            <div class="row row-3">
+                                <p><span>Viewer</span><%= user.username %></p>
+                                <p class="row--center"><span>Seat</span>5 E</p>
                             </div>
                         </div>
                         <div class="bar--code"></div>

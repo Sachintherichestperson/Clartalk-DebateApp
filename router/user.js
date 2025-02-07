@@ -429,8 +429,8 @@ router.get("/Booking-Done/:id",isloggedin, async function (req, res) {
     }else{
       console.log("Booking Done")
     }
-    if (!user.Booked.includes(Live._id)){
-      user.Booked.push(Live._id)
+    if (!user.LiveBooked.includes(Live._id)){
+      user.LiveBooked.push(Live._id)
       await user.save();
       console.log("Booked not recieved the Live Id");
     }else{
@@ -482,7 +482,6 @@ router.get("/Livedebate/:id", isloggedin, async function (req, res) {
 
       // Check if user is a viewer
       const isCreator = Live.creator[0]._id.equals(req.user._id);
-      console.log(isCreator)
       const isOpponent = Live.opponent[0]._id.equals(req.user._id);
       const isViewer = !isCreator && !isOpponent;
 
@@ -539,15 +538,53 @@ router.get("/MUN-competetion",isloggedin, async function(req, res){
 });
 
 router.get("/Discover-Page-of-MUN/:id",isloggedin, async function(req, res){
-  const competition = await competitionMongo.findById(req.params.id); 
-  
-  res.render("MUN-competition-page", { competition });
+  const competition = await competitionMongo.findById(req.params.id);
+  const user = await User.findOne({ email: req.user.email });
 
+  const Booking = competition.members.some(id => id.equals(req.user.id));
+
+  
+  res.render("MUN-competition-page", { competition, user, Booking });
 });
+
+router.get("/Mun-member-entry/:id",isloggedin, async function(req, res){
+  try{
+    const Competition = await competitionMongo.findById(req.params.id).populate({
+      path: "members",
+      select: "username"
+    });
+
+    const user = await User.findOne({ email: req.user.email });
+  
+    const userId = req.user._id;
+      
+    if (!Competition.members.includes(user._id)) {
+      Competition.members.push(user._id);
+      await Competition.save();
+      console.log("Booking not done");
+    }else{
+      console.log("Booking Done")
+    }
+    if (!user.MunCompetition.includes(Competition._id)){
+      user.MunCompetition.push(Competition._id)
+      await user.save();
+    }else{
+      console.log("Booked recieved the Live Id")
+    }
+
+
+   res.redirect(`/Discover-Page-of-MUN/${req.params.id}`);
+  }catch(err){
+     res.redirect("/")
+  }
+});
+
+
+
 
 router.get("/My-ticket",isloggedin,async function(req, res){
   const tickets = await User.findOne({ email: req.user.email }).populate({
-    path: "Booked",
+    path: "LiveBooked",
     select: "title Thumbnail Booking Time creator",
     populate: [
     {
@@ -559,10 +596,29 @@ router.get("/My-ticket",isloggedin,async function(req, res){
       select: "username"
     }
   ]
-  });
-
-  res.render("tickets", { tickets });
+  })
+  .populate({
+    path: "MunCompetition",
+    select: "CompetitionName Date createdBy",
+    populate: { path: "createdBy", select: "username" }
 });
+
+const user = await User.findOne({ email: req.user.email });
+
+
+  res.render("tickets", { tickets, user });
+});
+
+
+
+
+
+
+
+
+
+
+
 
 router.get("/Delete-Account", isloggedin, async (req, res) => {
   try {

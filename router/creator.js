@@ -378,6 +378,8 @@ router.get("/Create-The-Competition",isloggedin, function(req, res){
 router.post("/competition/builded",upload.single("CompetitionDP"), isloggedin, async function (req, res) {
   let { CompetitionName, CompetitionisAbout, CompetitionDP, location, Date, fees, createdBy } = req.body;
 
+  const user = await User.findOne({ email: req.user.email });
+
   const competition = await competitionmongo.create({
     CompetitionName,
     CompetitionisAbout,
@@ -385,11 +387,12 @@ router.post("/competition/builded",upload.single("CompetitionDP"), isloggedin, a
     location,
     Date,
     fees, 
-    createdBy
+    createdBy: user._id
   });
 
-  res.redirect("/MUN-competetion");
+  await competition.save();
 
+  res.redirect("/MUN-competetion");
 });
 
 router.get("/creator/Debates/:id", isloggedin, async function (req, res) {  
