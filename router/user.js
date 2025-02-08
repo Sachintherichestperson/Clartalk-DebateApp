@@ -579,9 +579,6 @@ router.get("/Mun-member-entry/:id",isloggedin, async function(req, res){
   }
 });
 
-
-
-
 router.get("/My-ticket",isloggedin,async function(req, res){
   const tickets = await User.findOne({ email: req.user.email }).populate({
     path: "LiveBooked",
@@ -609,44 +606,65 @@ const user = await User.findOne({ email: req.user.email });
   res.render("tickets", { tickets, user });
 });
 
-
-
-
-
-
-
-
-
-
-
-
 router.get("/Delete-Account", isloggedin, async (req, res) => {
   try {
-    const userId = req.user._id;
+    const user = await User.findById(req.user.id)
+    .populate("podcast")
+    .populate("vedio")
+    .populate("communities")
+    .populate("MunCompetition")
+    .populate("requests")
+    .populate("Sender");
 
-        // Delete the user
-        await User.findByIdAndDelete(userId);
+    if (!user) {
+      return res.status(404).send("User not found.");
+    }
 
-        // Clear the JWT cookie
-        res.clearCookie("user");
+    // Delete all associated podcasts from the 'podcasts' collection
+    await podcastsmongoose.deleteMany({ _id: { $in: user.podcast } });
+    await videomongoose.deleteMany({ _id: { $in: user.vedio } });
+    await communityMongo.deleteMany({ _id: { $in: user.communities } });
+    await competitionMongo.deleteMany({ _id: { $in: user.MunCompetition } });
 
-        // Redirect to a farewell or goodbye page
-        res.render("goodbye");
+    if (user.requests.length > 0 || user.Sender.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "You have pending live sessions. Complete them before deleting your account."
+      });
+    }
+
+    await User.findByIdAndDelete(user._id);
+
+    res.clearCookie("user");
+
+    res.render("goodbye");
   } catch (err) {
     console.error(err);
     res.status(500).send("An error occurred while deleting the user.");
   }
 });
 
+
 router.get("/Chat-Notifications",isloggedin, async function(req, res){
   const user = await User.findOne({ email: req.user.email });
   res.render("chat-notification", { user });
 });
 
+router.get("/Terms-&-condition",isloggedin, async function(req, res) {
+  res.render("termsandcondition");
+});
 
+router.get("/Privacy-Policy",isloggedin, async function (req, res) {
+  res.render("Privacy-Policy");
+});
 
+router.get("/Contact-Us", isloggedin, async function (req, res) {
+  res.render("Contact-Us");
+});
 
-
+router.get("/About-Us", isloggedin, async function (req, res) {
+  res.render("About-us");
+});
 
 
 

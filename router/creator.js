@@ -390,6 +390,10 @@ router.post("/competition/builded",upload.single("CompetitionDP"), isloggedin, a
     createdBy: user._id
   });
 
+    user.MunCompetition.push(competition._id);
+    await user.save();
+
+
   await competition.save();
 
   res.redirect("/MUN-competetion");

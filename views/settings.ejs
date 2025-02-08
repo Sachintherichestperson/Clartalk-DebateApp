@@ -5,6 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings</title>
     <link rel="stylesheet" href="./stylesheets/settings.css">
+    <style>
+        .company-values{
+            border-top: 1px solid #333333;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            gap: 15px;
+            height: 80px;
+            padding-top: 10px;
+        }
+        .section{
+            height: 100%;
+            width: 30%;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .section a{
+            color: #707070;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: rgb(44, 44, 44);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .modal button {
+            margin: 10px;
+            padding: 12px 35px;
+            cursor: pointer;
+            border-radius: 25px;
+            border: none;
+        }
+        .Yes{
+            background-color: #bc0000;
+        }
+        .Yes:hover {
+            box-shadow: 0 8px 30px rgb(255 0 0 / 61%);
+        }
+        .No{
+            background-color: #0000ba;
+        }
+        .No:hover {
+            box-shadow: 0 8px 30px rgba(30, 1, 175, 0.61);
+        }
+    </style>
 </head>
 <body>
     <section>
@@ -28,14 +85,51 @@
                 <a href="/creator/Delete-community"><p>Delete Community</p></a>
             </div>
             <div class="content">
-                <a href="/creator//Delete-content"><p>Delete Content</p></a>
+                <a href="/creator/Delete-content"><p>Delete Content</p></a>
             </div>
             <div class="content">
-                <a href="/Delete-Account" onclick="return confirm('Are you sure you want to delete your account? This action is irreversible!');">
-                    <p>Delete Profile</p>
+                <a href="/Delete-Account" onclick="openModal(event)">
+                    <p>Delete Account</p>
                 </a>
-            </div>    
+            </div>
+            <div id="myModal" class="modal">
+                <div class="modal-content">
+                    <p>Are you sure you want to delete your account?</p>
+                    <button onclick="confirmDelete()" class="Yes">Yes</button>
+                    <button onclick="closeModal()" class="No">No</button>
+                </div>
+            </div>
+        </div>
+        <div class="company-values">
+            <div class="section">
+                <a href="/Terms-&-condition">Terms & conditions</a>
+                <a href="/Privacy-Policy">Privacy Policy</a>
+                <a href="/Contact-Us">Contact Us</a>
+                <a href="/About-Us">About Us</a>
+            </div>
         </div>
     </section>
+    <script>
+        let deleteUrl = "/Delete-Account"; // Set the delete route URL
+    
+        function openModal(event) {
+            event.preventDefault(); // Prevent immediate navigation
+            document.getElementById("myModal").style.display = "flex";
+        }
+    
+        function closeModal() {
+            document.getElementById("myModal").style.display = "none";
+        }
+    
+        function confirmDelete() {
+            // Hide modal
+            document.getElementById("myModal").style.display = "none";
+    
+            // Redirect after 1 second (optional delay)
+            setTimeout(() => {
+                window.location.href = deleteUrl;
+            }, 500);
+        }
+    </script>
 </body>
 </html>

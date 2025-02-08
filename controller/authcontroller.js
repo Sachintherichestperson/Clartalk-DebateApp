@@ -55,8 +55,9 @@ module.exports.loginuser = async (req, res) => {
                 let token = jwt.sign({ email: email}, process.env.JWT_KEY);
                 res.cookie("user", token);
                 return res.redirect("/")
-            }else{
-                res.send(err)
+            }else {
+                req.flash("usernot", "Incorrect password");
+                return res.redirect("/login");
             }
         })
 }
