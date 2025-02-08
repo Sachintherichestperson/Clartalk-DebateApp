@@ -478,7 +478,6 @@ router.get("/delete-content/:type/:id", isloggedin, async function (req, res) {
       { new: true }
     );
 
-    console.log("Updated User:", user);
     res.redirect("/creator/Delete-content");
   } catch (err) {
     console.error(err);
@@ -486,33 +485,43 @@ router.get("/delete-content/:type/:id", isloggedin, async function (req, res) {
   }
 });
 
+router.get("/Delete-community", isloggedin, async function (req, res) {                                   //uploaded-content Page
+  try {
+    const communities = await User.findOne({ email: req.user.email })
+              .populate({
+                  path: "communities",
+                  select: "CommunityName CommunityisAbout"
+              });
+              console.log(communities);
+          if (!communities) {
+              return res.status(404).send("Community not found");
+          }
 
+    res.render("delete-community", { communities });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while fetching data.");
+  }
+});
 
+router.get("/delete-community/:id", isloggedin, async function (req, res) {
+  try {
+    const { type, id } = req.params;
+    let communities = await communitymongo.findByIdAndDelete(id);
 
+    // Remove video reference from the user model
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $pull: { communities: id } }, 
+      { new: true }
+    );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    res.redirect("/creator/Delete-community");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 
 module.exports = router;
