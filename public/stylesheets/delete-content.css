@@ -113,12 +113,12 @@ a{
     color: #aaaaaa;
 }
 .Delete{
-    padding: 10px;
+    padding: 10px 20px;
     background-color: Red;
     color: white;
-    width: 40%;
-    text-align: center;
     border-radius: 20px;
+    display: flex;
+    justify-content: center;
 }
 .Edit{
     padding: 10px;
