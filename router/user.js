@@ -650,15 +650,15 @@ router.get("/Chat-Notifications",isloggedin, async function(req, res){
   res.render("chat-notification", { user });
 });
 
-router.get("/Terms-&-condition",isloggedin, async function(req, res) {
+router.get("/Terms-&-condition", async function(req, res) {
   res.render("termsandcondition");
 });
 
-router.get("/Privacy-Policy",isloggedin, async function (req, res) {
+router.get("/Privacy-Policy", async function (req, res) {
   res.render("Privacy-Policy");
 });
 
-router.get("/Contact-Us", isloggedin, async function (req, res) {
+router.get("/Contact-Us",isloggedin, async function (req, res) {
   res.render("Contact-Us");
 });
 

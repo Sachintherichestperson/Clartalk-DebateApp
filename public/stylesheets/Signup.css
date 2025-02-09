@@ -29,7 +29,7 @@ h1 {
     margin-bottom: 20px;
 }
 
-.username, .email, .password {
+.username, .email, .password{
     font-size: 20px;
     font-weight: bold;
     text-align: left;
@@ -49,8 +49,32 @@ h1 {
     transition: border 0.3s ease;
 }
 
+.terms{
+    position: relative;
+    width: 100%;
+    display: flex;
+    gap: 5px;
+}
+
+#terms{
+    width: 10px;
+    height: 45px;
+}
+
+.aware{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
 #username:focus, #email:focus, #password:focus {
     border-color: #ff9800; /* Highlight effect on focus */
+}
+
+input[type="radio"] {
+    accent-color: #ff4500;
+    transform: scale(2);
 }
 
 button {
@@ -84,6 +108,13 @@ a {
 a:hover {
     color: #ff9800; /* Accent color on hover */
     text-decoration: underline;
+}
+
+.terms a{
+    color: #ff9800; /* Accent color */
+    margin-top: unset;
+    display: unset;
+    font-size: unset;
 }
 
 .flash-message {

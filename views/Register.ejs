@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="./stylesheets/Signup.css">
+    <style>
+        .terms label{
+            display: flex;
+        }
+    </style>
 </head>
 <body>
     <div id="container">
@@ -27,6 +32,11 @@
             <div class="password">
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" placeholder="Enter Password" required>
+        </div>
+        <br>
+        <div class="terms">
+            <input type="radio" name="Terms" id="terms" required>
+            <label for="terms"><p class="aware">By clicking this, you agree to the<a href="/Terms-&-condition"><span>Terms & conditions</span></a><a href="/Privacy-Policy">Privacy-Policy</a></p></label>
         </div>
             <br>
             <button type="submit">Register</button>
