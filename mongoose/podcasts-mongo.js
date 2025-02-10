@@ -3,7 +3,10 @@ const mongoose = require('mongoose');
 const podcastsSchema = new mongoose.Schema({
     title: String,
     description: String,            
-    vedio: Buffer,
+    vedio: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "fs.files"  
+  },
     Thumbnail: Buffer,
     creator: [{
         type: mongoose.Schema.Types.ObjectId,

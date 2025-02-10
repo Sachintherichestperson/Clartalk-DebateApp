@@ -173,7 +173,7 @@ router.get("/podcast/:id",isloggedin, async function(req, res){                 
   });
 
 
-    res.render("vedioplayer", {vedios, suggestions, currentRoute: "podcast", follower, isFollowing, user});
+    res.render("vedioplayer", {vedios, suggestions,videoFile: vedios.vedio, currentRoute: "podcast", follower, isFollowing, user});
 
     }catch(err){
       res.send(err)
