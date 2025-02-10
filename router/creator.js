@@ -29,22 +29,31 @@ router.get("/creator/upload", function(req, res){
 
 router.post("/upload-thumbnail", upload.single("Thumbnail"), isloggedin, async function(req, res) {
   try {
-      let { title, description, contentType } = req.body;
+      let { title, description, contentType, Tags } = req.body;
       let Thumbnail = req.file.buffer;
-
-      console.log(Thumbnail);
 
       if (!Thumbnail) {
           return res.send("All fields are required");
       }
       
+      let tags = req.body.Tags || '';
+      console.log(tags);
+
+      if (typeof Tags === 'string' && Tags.trim().length > 0) {
+        // Split the string into an array based on commas and trim spaces
+        const tags = Tags.split(",").map(tag => tag.trim()).filter(tag => tag.length > 0);
+
+        console.log('Processed tags:', tags);
+      }
+
 
       // Store in session (or use Redis for better persistence)
       req.session.uploadData = {
           title,
           description,
           Thumbnail,
-          contentType
+          contentType,
+          Tags
       };
 
       // Redirect user to video upload page
@@ -71,7 +80,7 @@ router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, 
           return res.redirect("/");
       }
 
-      let { title, description, Thumbnail, contentType } = req.session.uploadData;
+      let { title, description, Thumbnail, contentType, Tags } = req.session.uploadData;
       let videoFile = req.file ? req.file.id : null;
 
       if (!videoFile) {
@@ -88,7 +97,8 @@ router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, 
               Thumbnail,
               vedio: videoFile,
               createdAt: uploadDate,
-              creator: user._id
+              creator: user._id,
+              Tags
           });
 
           user.podcast.push(podcast._id);
@@ -104,7 +114,8 @@ router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, 
               Thumbnail,
               vedio: videoFile,
               createdAt: uploadDate,
-              creator: user._id
+              creator: user._id,
+              Tags
           });
 
           user.vedio.push(video._id);

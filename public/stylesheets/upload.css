@@ -122,6 +122,22 @@ button#submit-button:hover {
     transform: scale(1.02); /* Subtle scaling */
 }
 
+#tags{
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #333;
+    border-radius: 8px;
+    background-color: #262626;
+    color: #ffffff;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.tag-box { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px; }
+        .tag { display: flex; align-items: center; background: #007bff; color: white; padding: 5px 10px; border-radius: 5px; font-size: 14px; }
+        .remove-tag { background: none; border: none; color: white; margin-left: 8px; cursor: pointer; font-weight: bold; font-size: 15px; background: red; border-radius: 50%;}
+        .button { margin-top: 10px; padding: 5px 10px; background: red; color: white; border: none; cursor: pointer; }
+
 /* Responsive Design */
 @media (max-width: 768px) {
     h1.main-heading {

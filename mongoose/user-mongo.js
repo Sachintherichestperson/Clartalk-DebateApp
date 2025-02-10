@@ -68,7 +68,8 @@ const userSchema = new mongoose.Schema({
     UserWatchHours: [{
         type: Number,
         default: 0
-    }]
+    }],
+    SEOTags: [String]
 });
 
 userSchema.statics.updateRanks = async function () {

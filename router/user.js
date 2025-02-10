@@ -47,7 +47,6 @@ router.get("/",isloggedin,async function(req, res){                             
 router.get("/debate",isloggedin,async function(req, res){                                                  //debate page
   const user = await User.findOne({email: req.user.email}).populate("requests");
   let vedios = await videomongoose.find({}).populate("Thumbnail");
-  console.log(vedios);
   res.render("debate", { vedios,user });
 });
 
@@ -106,11 +105,9 @@ router.get("/video/stream/:id", async (req, res) => {
     const gfs = getGFS();
 
     const fileId = new mongoose.Types.ObjectId(req.params.id);
-    console.log("File ID:", fileId);
 
     // Check if the file exists in GridFS
     const file = await conn.db.collection("videos.files").findOne({ _id: fileId });
-    console.log("File:", file);
 
     if (!file) {
       return res.status(404).json({ error: "Video not found" });
@@ -368,13 +365,6 @@ router.get("/settings",isloggedin,async function (req, res) {                   
   res.render("settings");
 });
 
-router.get("/video-player/:id",isloggedin, async function (req, res) {
-  try{
-     
-  }catch(err){
-    res.status("500").send("Error Occured", err)
-  }
-});
 
 router.get('/payment-for/:id/payment/:id',isloggedin, async (req, res) => {
     try {
@@ -415,10 +405,10 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
 });
 
 router.post('/watch-time', isloggedin, async (req, res) => {
-  let { watchTime, videoId, videoType } = req.body; // Get watch time, video ID, and video type from the request body
+  let { watchTime, videoId, videoType, Tags } = req.body; // Get watch time, video ID, and video type from the request body
 
   try {
-      // Ensure watchTime is a number
+      
       watchTime = parseFloat(watchTime);
 
       if (isNaN(watchTime)) {
@@ -429,12 +419,16 @@ router.post('/watch-time', isloggedin, async (req, res) => {
 
       let video;
       if (videoType === 'debate') {
-          video = await videomongoose.findById(videoId);
+          video = await videomongoose.findById(videoId).populate("Tags");
       } else if (videoType === 'podcast') {
-          video = await podcastsmongoose.findById(videoId);
+          video = await podcastsmongoose.findById(videoId).populate("Tags");
       } else {
           return res.status(400).json({ message: 'Invalid video type.' });
       }
+
+
+      console.log(video.Tags);
+
 
       if (video) {
           // Update watch hours
@@ -443,6 +437,26 @@ router.post('/watch-time', isloggedin, async (req, res) => {
 
           video.WatchHours = (video.WatchHours[0] || 0) + watchTime;
           await video.save();
+
+          // Assuming video.Tags is an array like ['#Dhruv,#Modi,#Terror', '#Rahul Modi,#hi,#Dhruv']
+video.Tags.forEach(tagsString => {
+  // Split the tags by commas to get individual tags
+  const tags = tagsString.split(',');
+
+  tags.forEach(tag => {
+    // Check if the tag already exists in SEOTags
+    if (!user.SEOTags.includes(tag)) {
+      // If not, push the tag to the SEOTags array
+      user.SEOTags.push(tag);
+    }
+  });
+});
+
+// Save the updated user
+await user.save();
+
+          
+          console.log("seoTags", user)
 
           res.status(200).json({ message: 'Watch time updated successfully.' });
       } else {
@@ -536,7 +550,6 @@ router.get("/Livedebate/:id", isloggedin, async function (req, res) {
       res.status(500).send("Server Error");
   }
 });
-
 
 router.get("/start-debate", isloggedin, async function (req, res) {
   try {
@@ -686,7 +699,6 @@ router.get("/Delete-Account", isloggedin, async (req, res) => {
     res.status(500).send("An error occurred while deleting the user.");
   }
 });
-
 
 router.get("/Chat-Notifications",isloggedin, async function(req, res){
   const user = await User.findOne({ email: req.user.email });

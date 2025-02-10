@@ -37,7 +37,11 @@ const videoSchema = new mongoose.Schema({
           message: props => `${props.value} is not a valid watch time!`
         },
         default: 0
-      }]
+      }],
+      Tags: {
+        type: [String],
+        default: []
+      }
 });
 
 module.exports = mongoose.model('vedio', videoSchema);
