@@ -15,6 +15,9 @@ const schedule = require("node-schedule");
 const Socket  = require("socket.io");
 const Razorpay = require("razorpay");
 const userMongo = require("../mongoose/user-mongo");
+const mongoose = require("mongoose");
+
+const { conn, getGFS } = require("../config/gridfs");
 
 router.get("/register", (req, res) => {                                                                      //register page
     let err = req.flash("key")
@@ -43,7 +46,8 @@ router.get("/",isloggedin,async function(req, res){                             
 
 router.get("/debate",isloggedin,async function(req, res){                                                  //debate page
   const user = await User.findOne({email: req.user.email}).populate("requests");
-  let vedios = await videomongoose.find({});
+  let vedios = await videomongoose.find({}).populate("Thumbnail");
+  console.log(vedios);
   res.render("debate", { vedios,user });
 });
 
@@ -82,12 +86,51 @@ router.get("/debate/:id",isloggedin, async function(req, res){                  
         select: "username"
     })
     
-    res.render("vedioplayer", {vedios, suggestions, currentRoute: "debate", follower, isFollowing, user });
+    res.render("vedioplayer", {
+      vedios, 
+      videoFile: vedios.vedio,
+      suggestions, 
+      currentRoute: "debate", 
+      follower, 
+      isFollowing, 
+      user });
   }catch(err){
     res.send(err)
     console.log(err)
   }
 });
+
+router.get("/video/stream/:id", async (req, res) => {
+  try {
+    // Ensure GridFSBucket is initialized
+    const gfs = getGFS();
+
+    const fileId = new mongoose.Types.ObjectId(req.params.id);
+    console.log("File ID:", fileId);
+
+    // Check if the file exists in GridFS
+    const file = await conn.db.collection("videos.files").findOne({ _id: fileId });
+    console.log("File:", file);
+
+    if (!file) {
+      return res.status(404).json({ error: "Video not found" });
+    }
+
+    // Set response headers for video streaming
+    res.set({
+      "Content-Type": "video/mp4",
+      "Accept-Ranges": "bytes",
+    });
+
+    // Stream the video
+    const readStream = gfs.openDownloadStream(fileId);
+    readStream.pipe(res);
+  } catch (err) {
+    console.error("Error streaming video:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 
 router.get("/podcast", isloggedin, async function(req, res){                                               //podcast section Page
   const user = await User.findOne({email: req.user.email}).populate("requests")

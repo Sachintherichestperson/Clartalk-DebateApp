@@ -17,7 +17,7 @@
             <div class="video-and-suggestions">
                 <div class="video-section">
                     <video controls autoplay class="video-player" id="videoPlayer">
-                        <source src="data:video/mp4;base64,<%= vedios.vedio.toString('base64') %>" type="video/mp4">
+                        <source src="/video/stream/<%= videoFile._id %>" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
                     <h1 class="video-title"><%= vedios.title %></h1>

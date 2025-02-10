@@ -4,6 +4,7 @@ const User = require("../mongoose/user-mongo");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const upload = require("../config/multer");
+const videoUpload= require("../config/multer-live");
 const podcastsmongoose = require("../mongoose/podcasts-mongo");
 const isloggedin = require("../middleware/isloggedin");
 const videomongoose = require("../mongoose/video-mongo");
@@ -26,55 +27,118 @@ router.get("/creator/upload", function(req, res){
     res.render("upload")
 });
 
-router.post("/upload",upload.fields([{ name: 'vedio', maxCount: 1 }, { name: 'Thumbnail', maxCount: 1 }]),isloggedin,async function(req, res){
-    try{
-      let {title, description, contentType} = req.body;
- 
-      let videodata = req.files.vedio[0].buffer;
-      let Thumbnail = req.files.Thumbnail[0].buffer;
-      let uploadDate = new Date();
- 
-      if(contentType === "podcast"){
-         let podcast = await podcastsmongoose.create({
-             title, 
-             description,
-             vedio: videodata, 
-             Thumbnail: Thumbnail,
-             createdAt: uploadDate
-         });
- 
-         const user = await User.findOne({email: req.user.email});
-         podcast.creator.push(user._id)
-         await podcast.save();
- 
-         user.podcast.push(podcast._id);
-         await user.save();
-         res.redirect("/podcast")
+router.post("/upload-thumbnail", upload.single("Thumbnail"), isloggedin, async function(req, res) {
+  try {
+      let { title, description, contentType } = req.body;
+      let Thumbnail = req.file.buffer;
 
-      }else if (contentType === "video") {
-     let video = await videomongoose.create({
-         title, 
-         description,
-         vedio: videodata, 
-         Thumbnail: Thumbnail,
-         createdAt: uploadDate
-     });
- 
-         const user = await User.findOne({email: req.user.email});
-         video.creator.push(user._id)
-         await video.save();
- 
-         user.vedio.push(video._id);
-         await user.save();
-         res.redirect("/debate")
-  }else{
-     res.render("/")
+      console.log(Thumbnail);
+
+      if (!Thumbnail) {
+          return res.send("All fields are required");
+      }
+      
+
+      // Store in session (or use Redis for better persistence)
+      req.session.uploadData = {
+          title,
+          description,
+          Thumbnail,
+          contentType
+      };
+
+      // Redirect user to video upload page
+      res.redirect("/creator/video-content/upload");
+
+  } catch (err) {
+      console.log("Error:", err);
+      res.status(500).send("Server Error");
   }
-    }catch(err){
-     res.send(err)
-     console.log("error", err)
-    }
 });
+
+
+router.get("/video-content/upload", isloggedin, function(req, res) {
+  if (!req.session.uploadData) {
+      return res.redirect("/"); // Redirect if no session data
+  }
+  res.render("video-uploader"); 
+});
+
+
+router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, async function(req, res) {
+  try {
+      if (!req.session.uploadData) {
+          return res.redirect("/");
+      }
+
+      let { title, description, Thumbnail, contentType } = req.session.uploadData;
+      let videoFile = req.file ? req.file.id : null;
+
+      if (!videoFile) {
+          return res.send("Video upload is required");
+      }
+
+      let uploadDate = new Date();
+      const user = await User.findOne({ email: req.user.email });
+
+      if (contentType === "podcast") {
+          let podcast = await podcastsmongoose.create({
+              title,
+              description,
+              Thumbnail,
+              vedio: videoFile,
+              createdAt: uploadDate,
+              creator: user._id
+          });
+
+          user.podcast.push(podcast._id);
+          await user.save();
+
+          req.session.uploadData = null; // Clear session
+          res.redirect("/podcast");
+
+      } else if (contentType === "video") {
+          let video = await videomongoose.create({
+              title,
+              description,
+              Thumbnail,
+              vedio: videoFile,
+              createdAt: uploadDate,
+              creator: user._id
+          });
+
+          user.vedio.push(video._id);
+          await user.save();
+
+          req.session.uploadData = null; // Clear session
+          res.redirect("/creator/video-content/upload");
+      } else {
+          res.redirect("/");
+      }
+
+  } catch (err) {
+      console.log("Error:", err);
+      res.status(500).send("Server Error");
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 router.get("/creator/live",isloggedin ,async function(req, res){
   const live = await User.findOne({email: req.user.email});
