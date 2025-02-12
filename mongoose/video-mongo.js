@@ -38,10 +38,10 @@ const videoSchema = new mongoose.Schema({
         },
         default: 0
       }],
-      Tags: {
-        type: [String],
+      Tags: [{
+        type: String,
         default: []
-      }
+      }]
 });
 
 module.exports = mongoose.model('vedio', videoSchema);

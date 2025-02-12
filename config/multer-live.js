@@ -8,7 +8,6 @@ const mongoURI = config.get("MONGODB_URI") + "/debateapp";
 const storage = new GridFsStorage({
   url: mongoURI,
   file: (req, file) => {
-    console.log("Uploading file:", file.originalname, file.mimetype);
 
     // Only allow video files
     if (file.mimetype.startsWith("video/")) {
@@ -24,7 +23,6 @@ const storage = new GridFsStorage({
 
 // Handle storage events
 storage.on("connection", (db) => {
-  console.log("Connected to GridFS!");
 });
 
 storage.on("error", (err) => {

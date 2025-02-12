@@ -44,10 +44,36 @@ router.get("/",isloggedin,async function(req, res){                             
   }
 });
 
-router.get("/debate",isloggedin,async function(req, res){                                                  //debate page
-  const user = await User.findOne({email: req.user.email}).populate("requests");
-  let vedios = await videomongoose.find({}).populate("Thumbnail");
-  res.render("debate", { vedios,user });
+router.get("/debate", isloggedin, async function (req, res) { 
+  try {
+      const user = await User.findOne({ email: req.user.email }).populate("requests");
+      let userTags = user.SEOTags || [];
+      
+      let vedios = await videomongoose.find({}).populate("Thumbnail");
+
+      
+      // Sort videos: those matching SEOTags should come first
+      vedios.sort((a, b) => {
+          let aTags = Array.isArray(a.Tags)
+              ? a.Tags.flatMap(tagString => tagString.split(',').map(tag => tag.trim()))
+              : [];
+          let bTags = Array.isArray(b.Tags)
+              ? b.Tags.flatMap(tagString => tagString.split(',').map(tag => tag.trim()))
+              : [];
+
+
+          let aMatches = aTags.filter(tag => userTags.includes(tag)).length;
+          let bMatches = bTags.filter(tag => userTags.includes(tag)).length;
+
+
+          return bMatches - aMatches; // Higher matches come first
+      });
+
+      res.render("debate", { vedios, user });
+  } catch (error) {
+      console.error("Error fetching debate page:", error);
+      res.status(500).send("Server error");
+  }
 });
 
 router.get("/debate/:id",isloggedin, async function(req, res){                                             //debate video-player
@@ -128,10 +154,27 @@ router.get("/video/stream/:id", async (req, res) => {
   }
 });
 
-
 router.get("/podcast", isloggedin, async function(req, res){                                               //podcast section Page
   const user = await User.findOne({email: req.user.email}).populate("requests")
   let vedios = await podcastsmongoose.find({});
+
+  vedios.sort((a, b) => {
+    let aTags = Array.isArray(a.Tags)
+        ? a.Tags.flatMap(tagString => tagString.split(',').map(tag => tag.trim()))
+        : [];
+    let bTags = Array.isArray(b.Tags)
+        ? b.Tags.flatMap(tagString => tagString.split(',').map(tag => tag.trim()))
+        : [];
+
+
+    let aMatches = aTags.filter(tag => userTags.includes(tag)).length;
+    let bMatches = bTags.filter(tag => userTags.includes(tag)).length;
+
+
+    return bMatches - aMatches; // Higher matches come first
+});
+
+
   res.render("podcast", { vedios, user });
 });
  
@@ -365,7 +408,6 @@ router.get("/settings",isloggedin,async function (req, res) {                   
   res.render("settings");
 });
 
-
 router.get('/payment-for/:id/payment/:id',isloggedin, async (req, res) => {
     try {
       const Live = await liveMongo.findById(req.params.id)
@@ -405,17 +447,20 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
 });
 
 router.post('/watch-time', isloggedin, async (req, res) => {
-  let { watchTime, videoId, videoType, Tags } = req.body; // Get watch time, video ID, and video type from the request body
+  let { watchTime, videoId, videoType } = req.body;
 
   try {
-      
       watchTime = parseFloat(watchTime);
 
-      if (isNaN(watchTime)) {
+      if (isNaN(watchTime) || watchTime <= 0) {
           return res.status(400).json({ message: 'Invalid watch time value.' });
       }
 
       const user = await User.findOne({ email: req.user.email });
+
+      if (!user) {
+          return res.status(404).json({ message: 'User not found.' });
+      }
 
       let video;
       if (videoType === 'debate') {
@@ -426,44 +471,50 @@ router.post('/watch-time', isloggedin, async (req, res) => {
           return res.status(400).json({ message: 'Invalid video type.' });
       }
 
-
-      console.log(video.Tags);
-
-
-      if (video) {
-          // Update watch hours
-          user.UserWatchHours = (user.UserWatchHours[0] || 0) + watchTime; // Update the total watch time
-          await user.save();
-
-          video.WatchHours = (video.WatchHours[0] || 0) + watchTime;
-          await video.save();
-
-          // Assuming video.Tags is an array like ['#Dhruv,#Modi,#Terror', '#Rahul Modi,#hi,#Dhruv']
-video.Tags.forEach(tagsString => {
-  // Split the tags by commas to get individual tags
-  const tags = tagsString.split(',');
-
-  tags.forEach(tag => {
-    // Check if the tag already exists in SEOTags
-    if (!user.SEOTags.includes(tag)) {
-      // If not, push the tag to the SEOTags array
-      user.SEOTags.push(tag);
-    }
-  });
-});
-
-// Save the updated user
-await user.save();
-
-          
-          console.log("seoTags", user)
-
-          res.status(200).json({ message: 'Watch time updated successfully.' });
-      } else {
-          res.status(404).json({ message: 'Video not found.' });
+      if (!video) {
+          return res.status(404).json({ message: 'Video not found.' });
       }
+
+      if (!Array.isArray(user.UserWatchHours) || user.UserWatchHours.length === 0) {
+          user.UserWatchHours = [0];
+      }
+
+      let currentWatchTime = parseFloat(user.UserWatchHours[0]) || 0;
+      user.UserWatchHours[0] = Math.round((currentWatchTime + watchTime) * 100) / 100;
+      await user.save();
+
+      if (!Array.isArray(video.WatchHours) || video.WatchHours.length === 0) {
+          video.WatchHours = [0];
+      }
+
+      video.WatchHours[0] = Math.round(((video.WatchHours[0] || 0) + watchTime) * 100) / 100;
+      await video.save();
+
+      // ✅ Process and insert only first 2 **new** unique SEO tags
+      if (video.Tags && Array.isArray(video.Tags)) {
+          const videoTags = [...new Set(video.Tags.flatMap(tagStr => tagStr.split(',').map(tag => tag.trim())))];
+
+          // Filter only tags that are **not already in SEO Tags**
+          const newTags = videoTags.filter(tag => !user.SEOTags.includes(tag)).slice(0, 2);
+
+          if (newTags.length > 0) {
+              // If SEO tags exceed 15, remove the oldest ones before inserting new ones
+              if (user.SEOTags.length + newTags.length > 15) {
+                  const tagsToRemove = user.SEOTags.length + newTags.length - 15;
+                  user.SEOTags.splice(0, tagsToRemove); // Remove the oldest tags
+              }
+
+              user.SEOTags.push(...newTags); // Insert new tags
+              await user.save();
+          }
+      }
+
+      console.log(user);
+
+      res.status(200).json({ message: 'Watch time updated successfully.' });
+
   } catch (error) {
-      console.error(error);
+      console.error("Error updating watch time:", error);
       res.status(500).json({ message: 'Server error.' });
   }
 });
@@ -720,45 +771,6 @@ router.get("/Contact-Us",isloggedin, async function (req, res) {
 router.get("/About-Us", isloggedin, async function (req, res) {
   res.render("About-us");
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
