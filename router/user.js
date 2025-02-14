@@ -82,10 +82,16 @@ router.get("/debate/:id",isloggedin, async function(req, res){                  
     .populate({
         path: "creator",
         select: "username followers Rankpoints"
+    }).populate({
+      path: "comment",
+      select: "text userId",
+      populate: {
+        path: "userId",
+        select: "username profile"
+      }
     });
-    const creator = await User.findById(vedios.creator[0]._id).populate("Rankpoints")
-    
 
+    const creator = await User.findById(vedios.creator[0]._id).populate("Rankpoints")
 
     let user = await User.findOne({email: req.user.email });
     
@@ -109,7 +115,9 @@ router.get("/debate/:id",isloggedin, async function(req, res){                  
     const suggestions = await videomongoose.find({ _id: { $ne: vedios._id } }).limit(5).populate({
         path: "creator",
         select: "username"
-    })
+    });
+
+    const comments = vedios.comment;
     
     res.render("vedioplayer", {
       vedios, 
@@ -118,7 +126,9 @@ router.get("/debate/:id",isloggedin, async function(req, res){                  
       currentRoute: "debate", 
       follower, 
       isFollowing, 
-      user });
+      user,
+      comments
+    });
   }catch(err){
     res.send(err)
     console.log(err)
@@ -509,7 +519,6 @@ router.post('/watch-time', isloggedin, async (req, res) => {
           }
       }
 
-      console.log(user);
 
       res.status(200).json({ message: 'Watch time updated successfully.' });
 

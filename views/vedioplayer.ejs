@@ -59,37 +59,23 @@
                         <div class="allcomments">
                             <div class="input-cmt">
                                 <img src="/images/default.png" alt="" class="input-img">
-                                <input type="text" placeholder="Write a comment..." class="comment-input">
-                                <input type="button" value="Post" class="post-btn">
+                                <input type="text" placeholder="Write a comment..." class="comment-input" id="comment-input">
+                                <input type="button" value="Post" class="post-btn" id="post-btn">
                             </div>
-                            <div class="single-comment">
-                                <img src="/images/default.png" alt="" class="comment-image">
-                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
+                            <div class="allsinglecomment" id="comment-section">
+                                <% comments.forEach(function(comment) { %>
+                                    <div class="single-comment">
+                                        <% if (comment.userId && comment.userId.profile) { %>
+                                            <img src="data:image/jpeg;base64,<%= comment.userId.profile.toString('base64') %>" 
+                                                 alt="" class="comment-image">
+                                        <% } else { %>
+                                            <img src="/images/default.png" alt="Default Profile" class="comment-image">
+                                        <% } %>
+                                        <p><strong><%= comment.userId.username %>:</strong> <%= comment.text %></p>
+                                    </div>
+                                <% }) %>
                             </div>
-                            <div class="single-comment">
-                                <img src="/images/default.png" alt="" class="comment-image">
-                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
-                            </div>
-                            <div class="single-comment">
-                                <img src="/images/default.png" alt="" class="comment-image">
-                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
-                            </div>
-                            <div class="single-comment">
-                                <img src="/images/default.png" alt="" class="comment-image">
-                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
-                            </div>
-                            <div class="single-comment">
-                                <img src="/images/default.png" alt="" class="comment-image">
-                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
-                            </div>
-                            <div class="single-comment">
-                                <img src="/images/default.png" alt="" class="comment-image">
-                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
-                            </div>
-                            <div class="single-comment">
-                                <img src="/images/default.png" alt="" class="comment-image">
-                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -193,9 +179,57 @@
      window.addEventListener("beforeunload", () => {
          sendWatchTime();
      });
+
+
+const postBtn = document.getElementById("post-btn");
+const commentInput = document.getElementById("comment-input");
+const commentSection = document.getElementById("comment-section");
+const commentCount = document.getElementById("comment-count");
+const vedioId = "<%= vedios._id %>"
+console.log("hello",vedioId);
+
+postBtn.addEventListener("click", () => {
+    const commentText = commentInput.value.trim();
+    if (commentText) {
+        const commentData = {
+            text: commentText,
+            userId: "<%= user._id %>",
+            videoType: currentRoute,
+            vedioId: vedioId
+        };
+        console.log(commentData);
+        socket.emit("newComment", commentData);
+        commentInput.value = ""; // Clear input
+    }
+});
+
+socket.on("addComment", (data) => {
+    const commentElement = document.createElement("div");
+    commentElement.classList.add("single-comment");
+    commentElement.innerHTML = `
+        <img src="${data.image}" alt="" class="comment-image">
+        <p><strong>${data.username}:</strong> ${data.text}</p>
+    `;
+    commentSection.prepend(commentElement);
+
+    // Update comment count
+    commentCount.textContent = parseInt(commentCount.textContent) + 1;
+});
+
 </script>
+
+
+
+
+
+
+
+
+
+
+
 <script>
-    const commentbtn = document.querySelector(".comments");
+const commentbtn = document.querySelector(".comments");
 const allcomments = document.querySelector(".allcomments");
 const msgbox = document.querySelector(".msg-box");
 
