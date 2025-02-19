@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const admin = require("firebase-admin")
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const expressSession = require("express-session");
@@ -31,6 +32,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.set("view engine", "ejs");
+
+const cors = require('cors');
+app.use(cors({ origin: '*' }));  // Allow all origins (for testing)
+
+
+const serviceAccount = require("./notification.json"); // Replace with your JSON file
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 app.use(
   expressSession({
@@ -182,4 +193,6 @@ io.on("connection", (socket) => {
     });
 });
 
-server.listen(3000);
+server.listen(3000, "0.0.0.0", () => {
+    console.log("Server running on port 3000 and accessible on network");
+});

@@ -72,81 +72,91 @@
         <button class="close-button"><i class="fas fa-times"></i></button>
     </div>
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const socket = io();
-    
-        // Listen for alerts from the server
-        socket.on("alert", (message) => {
-            alert(message.message);
-        });
-    
-        // Function to calculate and update the "Time Left"
-        function updateTimeLeft() {
-            const now = new Date();
-    
-            document.querySelectorAll('.video-time').forEach((timeElement) => {
-                const videoTime = new Date(timeElement.dataset.time); // Parse video time
-                const timeLeft = videoTime - now; // Calculate remaining time in milliseconds
-    
-                if (timeLeft > 0) {
-                    // Calculate days, hours, and minutes
-                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-    
-                    // Display time left in days, hours, and minutes, or just hours and minutes
-                    if (days > 0) {
-                        timeElement.textContent = `Time Left: ${days}d ${hours}h ${minutes}m`;
-                    } else {
-                        timeElement.textContent = `Time Left: ${hours}h ${minutes}m`;
-                    }
+    <script src="./javascript/home.js"></script>
+    <script type="module">
+        // Import Firebase SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-messaging.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAt9ZJs2CBEKFOK_T72QIQjVlidoBgiY-Q",
+            authDomain: "clartalk-94a92.firebaseapp.com",
+            projectId: "clartalk-94a92",
+            storageBucket: "clartalk-94a92.appspot.com",
+            messagingSenderId: "220220136589",
+            appId: "1:220220136589:web:80ce8c1c77fb718c4bd6c4",
+            measurementId: "G-SXR988HK5W"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const messaging = getMessaging(app);
+
+        // Register Service Worker
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./firebase-messaging-sw.js")
+                .then((registration) => {
+                    console.log("Service Worker registered with scope:", registration.scope);
+                })
+                .catch((error) => {
+                    console.error("Service Worker registration failed:", error);
+                });
+        }
+
+        // Request Permission for Notifications
+        function requestPermission() {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    console.log("Notification permission granted.");
+                    getToken(messaging, { vapidKey: "BDhQxlMBmyq4wfmcEu3QXV3k_b7rhPdyoE9C0q3ftnNe_bC9tRnBZpmwBAzj72-9UJcevR9GuYjCXfpd3Y13uiU" })
+                        .then((currentToken) => {
+                            if (currentToken) {
+                                console.log("FCM Token:", currentToken);
+                                sendTokenToServer(currentToken);
+                            } else {
+                                console.log("No registration token available.");
+                            }
+                        })
+                        .catch(err => {
+                            console.error("An error occurred while retrieving token.", err);
+                        });
                 } else {
-                    timeElement.textContent = "Event Ended";
+                    console.log("Notification permission denied.");
                 }
             });
         }
-    
-        // Update time every 1 second
-        setInterval(updateTimeLeft, 1000);
-        updateTimeLeft(); // Run the function on page load
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const banner = document.querySelector('.banner');
-            const closeButton = document.querySelector('.close-button');
-            const body = document.body;
-            const container = document.querySelector('.container');
-    
-            // Get the unique user ID or username from a data attribute or server-rendered value
-            const userId = "<%= user._id %>"; // Replace this with the correct variable holding the user ID
-    
-            // Unique key for the user
-            const bannerKey = `bannerShown_${userId}`;
-    
-            // Show Banner Functionality
-            function showBanner() {
-                banner.style.display = 'block';
-                container.classList.add('blur');
-                body.classList.add('no-scroll');
-            }
-    
-            // Hide Banner Functionality
-            closeButton.addEventListener('click', () => {
-                banner.style.display = 'none';
-                container.classList.remove('blur');
-                body.classList.remove('no-scroll');
-    
-                // Store in sessionStorage that the banner was shown for this user
-                sessionStorage.setItem(bannerKey, 'true');
+
+        // Expose function globally
+        window.requestPermission = requestPermission;
+
+        // Send Token to Server
+        function sendTokenToServer(token) {
+            fetch("http://localhost:3000/send-notification", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    token: token,
+                    title: "Test Notification",
+                    body: "This is a test message from Firebase Cloud Messaging!"
+                })
+            })
+            .then(response => response.json())
+            .then(data => console.log("Server Response:", data))
+            .catch(error => console.error("Error:", error));
+        }
+
+        // Handle Foreground Messages
+        onMessage(messaging, (payload) => {
+            console.log("Message received:", payload);
+            new Notification(payload.notification.title, {
+                body: payload.notification.body
             });
-    
-            // Check if the banner has been shown for this user
-            if (!sessionStorage.getItem(bannerKey)) {
-                showBanner();
-            }
         });
-    </script>
-    
-       
+
+        window.onload = () => {
+            requestPermission();
+        };
+</script>
 </body>
 </html>

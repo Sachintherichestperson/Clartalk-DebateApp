@@ -34,6 +34,20 @@ router.get("/login", function(req, res){                                        
 
 router.post("/login", loginuser)                                                                           //Login Page-Uploader
 
+router.post("/send-notification",isloggedin, async (req, res) => {
+  const { token } = req.body;
+  console.log(token)
+
+  const user = await User.findById(req.user._id);
+
+  user.fcmToken = token;
+  console.log(user);
+
+  await user.save();
+    console.log("Received notification request:", req.body);
+    res.json({ success: true, message: "Notification sent!" });
+});
+
 router.get("/",isloggedin,async function(req, res){                                                        // front page
   try{
     const user = await User.findOne({email: req.user.email}).populate("requests").populate( "Sender" );
