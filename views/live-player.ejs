@@ -15,12 +15,13 @@
                     <video id="localVideo" autoplay muted playsinline></video>
                 </div>
                 <div class="remote-video">
-                    <label class="comment-btn" for="commentsToggle">
+                    <label class="comment-btn" for="commentsToggle" id="icon">
                         <i class="fas fa-comment comment-i"></i> 
                     </label>
                     <div id="remoteVideos"></div> <!-- Container for multiple remote videos -->
                     <% if(isCreator || isOpponent){ %>
-                    <button class="end-call-btn">End Call</button>
+                        <button class="start-stream-btn">Start Stream</button>
+                        <button class="end-call-btn">End Call</button>
                     <% } %>
                 </div>
             </div>
@@ -50,26 +51,40 @@
                 <% } %>
                 <% } %>
             </div> 
-        </div>
-        <% if(isCreator || isOpponent){ %>
-            <button class="start-stream-btn">Start Stream</button>
-            <% } %>
-        </div>
         <% if(isViewer){ %>
         <input type="checkbox" id="commentsToggle" class="comments-toggle" hidden>
-        <div class="comments">
-            <div class="comment-list">
+        <div class="panel">
+            <div id="buttons">
+                <div>Comments</div>
+                <div>Questions</div>
+            </div>
+            <div class="comments">
+                <div class="comment-list">
                     <li class="single-comment">
                         <strong>Krishna tera Shaka : </strong>
                         <p>Me hu Daro Mat Sachin, Tum Bus Mehnat Karte Raho aur mere Priyata ka nam lete Raho, Aur Jo Tum Kar Rahe Ho Wo Karte Raho</p>
                     </li>
+                </div>
+                <div class="comment-input">
+                    <input type="text" placeholder="Add a comment" id="commentInputComments">
+                    <button id="commentButtonComments">Comment</button>
+                </div>
+            </div> 
+            <div id="questions">
+                <div class="comment-list">
+                    <li class="single-question">
+                        Me hu Daro Mat Sachin, Tum Bus Mehnat Karte Raho aur mere Priyata ka nam lete Raho, Aur Jo Tum Kar Rahe Ho Wo Karte Raho
+                    </li>
+                </div>
+                <div class="comment-input">
+                    <input type="text" placeholder="Ask a question" id="commentInputQuestions">
+                    <button id="commentButtonQuestions">Submit</button>
+                </div>
             </div>
-            <div class="comment-input">
-                <input type="text" placeholder="Add a comment" id="commentInput">
-                <button id="commentButton">Comment</button>
-            </div>
-            <% } %>
-            </div>
+        </div>
+        <% } %>
+    </div>
+</div>
     </section>
     <script src="/javascript/socket.io.js"></script>
     <script>
@@ -252,6 +267,34 @@ peerConnection.ontrack = (event) => {
         if (isViewer) {
             initializeViewer();
         }
+    </script>
+     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const commentsSection = document.querySelector(".comments");
+            const questionsSection = document.querySelector("#questions");
+            const commentsButton = document.querySelector("#buttons div:nth-child(1)");
+            const questionsButton = document.querySelector("#buttons div:nth-child(2)");
+            const icon = document.getElementById("icon");
+        
+            commentsButton.addEventListener("click", function () {
+                commentsSection.classList.toggle("active");
+                questionsSection.classList.remove("active");
+            });
+        
+            questionsButton.addEventListener("click", function () {
+                questionsSection.classList.toggle("active");
+                commentsSection.classList.remove("active");
+            });
+
+            let open = "open"
+            icon.addEventListener("click", function () {
+                if(open){
+                    commentsSection.classList.toggle("accent");
+                }else{
+                    commentsSection.classList.remove("accent");
+                }
+            });
+        });
     </script>
 </body>
 </html>
