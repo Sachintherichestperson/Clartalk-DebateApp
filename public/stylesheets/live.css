@@ -1,111 +1,146 @@
 /* General body styles */
-body {
-    background-color: #121212;
-    font-family: 'Roboto', sans-serif;
-    color: white;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    overflow: hidden;
-}
+@media screen {
+    body {
+        background-color: #121212;
+        font-family: 'Roboto', sans-serif;
+        color: white;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+    }
+    
+    /* Section Style */
+    section {
+        padding: 20px 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    /* Heading Styles */
+    h1 {
+        color: #ff9800;
+        margin-bottom: 20px;
+        font-size: 38px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+    
+    /* Form Container */
+    .form {
+        background: linear-gradient(145deg, #1f1f1f, #2c2c2c);
+        width: 100%;
+        max-width: 600px; /* Reduced the maximum width */
+        margin: 0 auto;
+        padding: 30px; /* Reduced padding */
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .form:hover {
+        transform: scale(1.02);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.8);
+    }
+    
+    /* Input Fields and Textarea */
+    input[type="text"], input[type="datetime-local"], input[type="file"] {
+        width: 500px;
+        padding: 10px 12px; /* Reduced padding for shorter input fields */
+        margin: 8px 0; /* Reduced margin */
+        border: 1px solid #444;
+        background-color: #333;
+        color: white;
+        border-radius: 8px;
+        font-size: 14px; /* Reduced font size for compactness */
+        transition: border 0.3s ease, background-color 0.3s ease;
+    }
+    
+    input[type="file"]::-webkit-file-upload-button {
+        background-color: #ff9800; /* Accent Color */
+        border: none;
+        color: #fff;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    input[type="text"]:focus, input[type="datetime-local"]:focus, input[type="file"]:focus {
+        border-color: #ff9800;
+        background-color: #444;
+        outline: none;
+    }
+    
+    /* Heading Styles inside the form */
+    h4.image-heading, h2.time-heading {
+        font-size: 18px;
+        color: #ff9800;
+        margin-top: 20px; /* Reduced margin */
+        font-weight: bold;
+    }
+    
+    /* Opponent Debater Section */
+    .opponent p {
+        font-size: 16px; /* Reduced font size */
+        color: #ff9800;
+        margin-bottom: 10px; /* Reduced margin */
+    }
+    
+    /* Submit Button Style */
+    #button {
+        padding: 12px 25px; /* Reduced padding for button */
+        background-color: #ff5722;
+        border: none;
+        border-radius: 30px;
+        color: white;
+        font-size: 16px; /* Reduced font size for compact button */
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        margin-top: 20px;
+    }
+    
+    #button:hover {
+        background-color: #ff9800;
+        transform: translateY(-2px);
+    }  
 
-/* Section Style */
-section {
-    padding: 20px 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
-
-/* Heading Styles */
-h1 {
-    color: #ff9800;
-    margin-bottom: 20px;
-    font-size: 38px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-}
-
-/* Form Container */
-.form {
-    background: linear-gradient(145deg, #1f1f1f, #2c2c2c);
-    width: 100%;
-    max-width: 600px; /* Reduced the maximum width */
-    margin: 0 auto;
-    padding: 30px; /* Reduced padding */
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.form:hover {
-    transform: scale(1.02);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.8);
-}
-
-/* Input Fields and Textarea */
-input[type="text"], input[type="datetime-local"], input[type="file"] {
-    width: 500px;
-    padding: 10px 12px; /* Reduced padding for shorter input fields */
-    margin: 8px 0; /* Reduced margin */
-    border: 1px solid #444;
-    background-color: #333;
-    color: white;
-    border-radius: 8px;
-    font-size: 14px; /* Reduced font size for compactness */
-    transition: border 0.3s ease, background-color 0.3s ease;
-}
-
-input[type="file"]::-webkit-file-upload-button {
-    background-color: #ff9800; /* Accent Color */
-    border: none;
-    color: #fff;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-input[type="text"]:focus, input[type="datetime-local"]:focus, input[type="file"]:focus {
-    border-color: #ff9800;
-    background-color: #444;
-    outline: none;
-}
-
-/* Heading Styles inside the form */
-h4.image-heading, h2.time-heading {
-    font-size: 18px;
-    color: #ff9800;
-    margin-top: 20px; /* Reduced margin */
-    font-weight: bold;
-}
-
-/* Opponent Debater Section */
-.opponent p {
-    font-size: 16px; /* Reduced font size */
-    color: #ff9800;
-    margin-bottom: 10px; /* Reduced margin */
-}
-
-/* Submit Button Style */
-#button {
-    padding: 12px 25px; /* Reduced padding for button */
-    background-color: #ff5722;
-    border: none;
-    border-radius: 30px;
-    color: white;
-    font-size: 16px; /* Reduced font size for compact button */
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    margin-top: 20px;
-}
-
-#button:hover {
-    background-color: #ff9800;
-    transform: translateY(-2px);
+    #radio{
+        width: 500px;
+        padding: 10px 12px;
+        margin: 8px;
+        border: 1px solid #444;
+        background-color: #333;
+        color: white;
+        border-radius: 8px;
+        font-size: 14px;
+        position: relative;
+        left: 30px;
+        height: 30px;
+    }
+    .radio-topic{
+        position: relative;
+        left: -180px;
+        color: #ff9800;
+        font-weight: bold;
+        font-size: 20px;
+        top: 4px;
+    }
+    #radio input[type="radio"]{
+        width: 150px;
+        height: 30px;
+        padding: 5px 10px 5px 15px;
+        font-size: 20px;
+        display: flex;
+        margin-top: 60px;
+        margin-left: 0px;
+        position: relative;
+        top: -85px;
+        left: 150px;
+    }
+    
 }
 
 /* Responsive Design */
@@ -128,36 +163,71 @@ h4.image-heading, h2.time-heading {
         padding: 12px 25px;
     }
 }
-#radio{
-    width: 500px;
-    padding: 10px 12px;
-    margin: 8px;
-    border: 1px solid #444;
-    background-color: #333;
-    color: white;
-    border-radius: 8px;
-    font-size: 14px;
-    position: relative;
-    left: 30px;
-    height: 30px;
-}
-.radio-topic{
-    position: relative;
-    left: -180px;
-    color: #ff9800;
-    font-weight: bold;
-    font-size: 20px;
-    top: 4px;
-}
-#radio input[type="radio"]{
-    width: 150px;
-    height: 30px;
-    padding: 5px 10px 5px 15px;
-    font-size: 20px;
-    display: flex;
-    margin-top: 60px;
-    margin-left: 0px;
-    position: relative;
-    top: -85px;
-    left: 150px;
+  
+@media (max-width: 480px){
+    .form {
+        background: linear-gradient(145deg, #1f1f1f, #2c2c2c);
+        width: unset;
+        max-width: unset;
+        margin: 0 auto;
+        padding: 10px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    input[type="text"], input[type="datetime-local"], input[type="file"] {
+        width: 80%;
+        padding: 10px 12px; /* Reduced padding for shorter input fields */
+        margin: 8px 0; /* Reduced margin */
+        border: 1px solid #444;
+        background-color: #333;
+        color: white;
+        border-radius: 8px;
+        font-size: 14px; /* Reduced font size for compactness */
+        transition: border 0.3s ease, background-color 0.3s ease;
+    }
+    section{
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    #radio {
+        width: 80%;
+        padding: 10px 12px;
+        margin: 0 auto;
+        border: 1px solid #444;
+        background-color: #333;
+        color: white;
+        border-radius: 8px;
+        font-size: 14px;
+        position: relative;
+        height: 30px;
+        left: unset;
+        text-align: start;
+    }
+
+    .radio-topic {
+        position: relative;
+        left: unset;
+        color: #ff9800;
+        font-weight: bold;
+        font-size: 20px;
+        top: 4px;
+    }
+
+    #radio input[type="radio"] {
+        font-size: 20px;
+        display: flex;
+        margin-top: 60px;
+        margin-left: 0px;
+        position: relative;
+        top: -75px;
+        left: 150px;
+        transform: scale(1.9);
+        width: unset;
+        height: unset;
+    }
 }

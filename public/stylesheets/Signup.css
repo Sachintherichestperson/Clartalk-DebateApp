@@ -1,4 +1,4 @@
-/* General Body Styles */
+@media screen {
 body {
     background-color: black; /* Consistent black background */
     width: 100%;
@@ -22,15 +22,14 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     text-align: center;
 }
-/* Headline */
+
 h1 {
     font-size: 48px;
     color: #ff9800; /* Accent color for heading */
     margin-bottom: 20px;
 }
 
-/* Input Label Styles */
-.username, .email, .password {
+.username, .email, .password{
     font-size: 20px;
     font-weight: bold;
     text-align: left;
@@ -38,7 +37,6 @@ h1 {
     color: #ff9800; /* Accent color */
 }
 
-/* Input Fields */
 #username, #email, #password {
     width: 100%;
     padding: 10px;
@@ -51,11 +49,34 @@ h1 {
     transition: border 0.3s ease;
 }
 
+.terms{
+    position: relative;
+    width: 100%;
+    display: flex;
+    gap: 5px;
+}
+
+#terms{
+    width: 10px;
+    height: 45px;
+}
+
+.aware{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
 #username:focus, #email:focus, #password:focus {
     border-color: #ff9800; /* Highlight effect on focus */
 }
 
-/* Submit Button */
+input[type="radio"] {
+    accent-color: #ff4500;
+    transform: scale(2);
+}
+
 button {
     padding: 12px;
     font-size: 18px;
@@ -75,7 +96,6 @@ button:hover {
     transform: scale(1.02);
 }
 
-/* Link to Login */
 a {
     font-size: 16px;
     color: #ccc;
@@ -90,7 +110,13 @@ a:hover {
     text-decoration: underline;
 }
 
-/* Error Flash Message */
+.terms a{
+    color: #ff9800; /* Accent color */
+    margin-top: unset;
+    display: unset;
+    font-size: unset;
+}
+
 .flash-message {
     background-color: #e53935; /* Bright red for errors */
     color: white;
@@ -102,8 +128,8 @@ a:hover {
     animation: fadeOut 3s forwards;
     width: 100%;
 }
+}
 
-/* Flash Message Fade-out Animation */
 @keyframes fadeOut {
     0% {
         opacity: 1;
@@ -114,7 +140,6 @@ a:hover {
     }
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     body {
         padding: 20px;
@@ -135,5 +160,56 @@ a:hover {
 
     a {
         font-size: 14px;
+    }
+}
+
+@media (max-width: 320px) {
+    body {
+        background-color: black; /* Consistent black background */
+        color: white;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Arial', sans-serif;
+        overflow: hidden;
+    }
+    #container {
+        width: 300px;
+        padding: 10px 0px;
+        border: 2px solid white;
+        background-color: #1a1a1a; /* Slight contrast for form container */
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        text-align: center;
+    }
+
+    .username, .email, .password {
+        font-size: 15px;
+        font-weight: bold;
+        text-align: left;
+        margin-bottom: 5px;
+        color: #ff9800; /* Accent color */
+    }
+    #username, #email, #password {
+        width: 90%;
+        border: 2px solid #444;
+        border-radius: 5px;
+        background-color: #262626; /* Darker input field */
+        color: white;
+        outline: none;
+        transition: border 0.3s ease;
+    }
+    button {
+        padding: 12px;
+        font-size: 18px;
+        font-weight: bold;
+        background-color: #ff9800;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s ease;
+        width: 100%;
     }
 }

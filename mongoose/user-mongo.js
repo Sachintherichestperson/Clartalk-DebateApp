@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
     username: String,
     email: String,
     password: String,
+    fcmToken: String,
     profile: {
         type: Buffer,
     },
@@ -49,14 +50,18 @@ const userSchema = new mongoose.Schema({
             status: { type: String, default: 'pending' }
         }
     ],
-    Booked: [{
+    LiveBooked: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'live'
     }],
-    Rank: [{
+    MunCompetition: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Competition'
+    }],
+    Rank: {
         type: Number,
         default: 0
-    }],
+    },
     Rankpoints: {
         type: Number,
         default: 0
@@ -64,7 +69,8 @@ const userSchema = new mongoose.Schema({
     UserWatchHours: [{
         type: Number,
         default: 0
-    }]
+    }],
+    SEOTags: [String]
 });
 
 userSchema.statics.updateRanks = async function () {

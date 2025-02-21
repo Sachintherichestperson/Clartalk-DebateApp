@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const admin = require("firebase-admin")
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const expressSession = require("express-session");
@@ -11,11 +12,13 @@ const flash = require("connect-flash");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const Message = require("./mongoose/messages-mongo");
+const comments = require("./mongoose/comment-mongoose");
 const Community = require("./mongoose/community-mongo");
 const liveMongo = require("./mongoose/live-mongo");
-const debatemongoose = require("./mongoose/debate-mongo");
+const vediomongoose = require("./mongoose/video-mongo");
+const podcastmongoose = require("./mongoose/podcasts-mongo");
 const User = require("./mongoose/user-mongo");
-
+const bodyParser = require("body-parser");
 const server = createServer(app);
 const io = new Server(server);
 
@@ -24,10 +27,21 @@ const allusers = {};
 require("dotenv").config();
 
 app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.set("view engine", "ejs");
+
+const cors = require('cors');
+app.use(cors({ origin: '*' }));  // Allow all origins (for testing)
+
+
+const serviceAccount = require("./notification.json"); // Replace with your JSON file
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 app.use(
   expressSession({
@@ -100,6 +114,55 @@ io.on("connection", (socket) => {
         }
     });
 
+    socket.on("newComment", async (data) => {
+        try {
+            const user = await User.findById(data.userId);
+            if (!user) {
+                console.error("User not found");
+                return;
+            }
+    
+            // Save the comment to MongoDB
+            const newComment = await comments.create({
+                text: data.text,
+                userId: data.userId,
+                videoType: data.videoType,
+                vedioId: data.vedioId
+            });
+            console.log("comments",newComment);
+
+            if (data.videoType === "debate") {
+                    const vedio = await vediomongoose.findById(data.vedioId);
+                    vedio.comment.push(newComment);
+                    console.log(vedio);
+
+                    await vedio.save();
+            } else {
+                const podcast = await podcastmongoose.findById(data.vedioId);
+                podcast.comment.push(newComment);
+                await vedio.save();
+            }
+            
+            
+    
+            // Convert profile image to Base64 (if available)
+            const profileImage = user.profile
+                ? `data:image/png;base64,${user.profile.toString("base64")}`
+                : "/images/default.png"; // Default profile picture
+    
+            // Emit the saved comment to all clients
+            io.emit("addComment", {
+                text: newComment.text,
+                image: profileImage,
+                username: user.username,
+            });
+    
+        } catch (error) {
+            console.error("Error saving comment:", error);
+        }
+    });
+    
+
     socket.on('join-room', (data) => {
         socket.join(data.roomId); // Join the room
         console.log("User joined the room:", data.roomId);
@@ -130,4 +193,6 @@ io.on("connection", (socket) => {
     });
 });
 
-server.listen(3000);
+server.listen(3000, "0.0.0.0", () => {
+    console.log("Server running on port 3000 and accessible on network");
+});

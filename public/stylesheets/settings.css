@@ -1,0 +1,83 @@
+@media screen {
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #121212; /* Sleek black theme */
+    color: white;
+    font-family: 'Roboto', sans-serif;
+}
+
+section {
+    padding: 20px;
+}
+
+#Header {
+    padding: 50px 20px;
+    text-align: center;
+    background: linear-gradient(90deg, #2c2c2c, #3a3a3a);
+    border-bottom: 3px solid #ffa726;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+#Header h1 {
+    font-size: 56px;
+    color: #ffa726;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+.page {
+    background: #1a1a1a;
+    padding: 30px;
+    border-radius: 15px;
+    margin: 30px auto;
+    max-width: 900px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8);
+}
+
+.content {
+    background: linear-gradient(90deg, #292929, #333333);
+    border: 2px solid #ffa726;
+    border-radius: 10px;
+    margin: 20px 0;
+    padding: 20px 30px;
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.content:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(255, 167, 38, 0.5);
+}
+
+.content p {
+    color: #f1f1f1;
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0;
+    text-transform: capitalize;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover p {
+    color: #ffa726;
+    text-shadow: 0 0 10px #ffa726;
+}
+}
+
+@media (max-width: 768px) {
+    #Header h1 {
+        font-size: 40px;
+    }
+
+    .content p {
+        font-size: 22px;
+    }
+}

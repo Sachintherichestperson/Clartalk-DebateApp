@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Page</title>
     <link rel="stylesheet" href="/stylesheets/Livedebate-player.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <section>
@@ -17,18 +18,26 @@
                 <div class="video-section">
                     <img src="data:image/jpeg;base64,<%= Live.Thumbnail.toString('base64') %>" alt="" class="video-player">
                     <p class="video-title"><%= Live.title %></p>
-                    <% if(Booking || Live.Type === "regular") { %>
-                        <a href="/Livedebate/<%= Live._id %>?source=link" class="link">
+                    <% if(creator || opponent){ %>
+                        <a href="/start-debate" class="link">
                             <div class="Watch">
-                            <p class="amount">Watch The Debate</p>
+                            <p class="amount">Start The Debate</p>
                             </div>
                         </a>
                     <% }else{ %>
-                        <a href="/payment-for/<%= Live.creator[0]._id %>/payment/<%= Live._id %>" class="link">
-                            <div class="Pay">
-                            <p class="amount">PAY: ₹19</p>
-                            </div>
-                        </a>
+                        <% if(Booking || Live.Type === "regular") { %>
+                            <a href="/Livedebate/<%= Live._id %>" class="link">
+                                <div class="Watch">
+                                <p class="amount">Watch The Debate</p>
+                                </div>
+                            </a>
+                        <% }else{ %>
+                            <a href="/payment-for/<%= Live.creator[0]._id %>/payment/<%= Live._id %>" class="link">
+                                <div class="Pay">
+                                <p class="amount">PAY: ₹19</p>
+                                </div>
+                            </a>
+                        <% } %>
                     <% } %>
                     <div class="video-user-info">
                         <% if (Live.creator[0].image > 0) { %>
@@ -37,7 +46,7 @@
                             <img src="/images/Default.png" alt="Default Avatar" class="user-avatar">
                         <% } %>
                         <div class="creator-details">
-                            <a href="/creator/creator/<%= Live.creator[0]._id %>" class="creator-name">
+                            <a href="/creator/content/<%= Live.creator[0]._id %>" class="creator-name">
                                 <%= Live.creator[0].username %>
                             </a>
                             <p class="followers-count"><%= follower %> Followers</p>
@@ -57,6 +66,48 @@
                         </p>
                         <div class="description-container">
                             <p class="video-description"><%= Live.description %></p>
+                        </div>
+                    </div>
+                    <div class="comments">
+                        <h2 class="comment-data">Comments 12980</h2>
+                        <div class="msg-box">
+                            <img src="/images/default.png" alt="" class="comment-image">
+                            <div class="txtmsg">Kis Kis ko Ye Best App Lagta he Like kare</div>
+                        </div>
+                        <div class="allcomments">
+                            <div class="input-cmt">
+                                <img src="/images/default.png" alt="" class="input-img">
+                                <input type="text" placeholder="Write a comment..." class="comment-input">
+                                <input type="button" value="Post" class="post-btn">
+                            </div>
+                            <div class="single-comment">
+                                <img src="/images/default.png" alt="" class="comment-image">
+                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
+                            </div>
+                            <div class="single-comment">
+                                <img src="/images/default.png" alt="" class="comment-image">
+                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
+                            </div>
+                            <div class="single-comment">
+                                <img src="/images/default.png" alt="" class="comment-image">
+                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
+                            </div>
+                            <div class="single-comment">
+                                <img src="/images/default.png" alt="" class="comment-image">
+                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
+                            </div>
+                            <div class="single-comment">
+                                <img src="/images/default.png" alt="" class="comment-image">
+                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
+                            </div>
+                            <div class="single-comment">
+                                <img src="/images/default.png" alt="" class="comment-image">
+                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
+                            </div>
+                            <div class="single-comment">
+                                <img src="/images/default.png" alt="" class="comment-image">
+                                <p>Kis Kis ko Ye Best App Lagta he Like kare</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -122,5 +173,60 @@
         }
         
     });
+</script>
+<script>
+const commentbtn = document.querySelector(".comments");
+const allcomments = document.querySelector(".allcomments");
+const msgbox = document.querySelector(".msg-box");
+
+commentbtn.addEventListener("click", (event) => {
+    // Prevent click on the comment button itself from closing it
+    event.stopPropagation();
+    allcomments.classList.add("active");
+    msgbox.classList.add("active");
+    commentbtn.classList.add("active");
+});
+
+document.addEventListener("click", (event) => {
+    // Check if the click is outside the comments and msgbox
+    if (!allcomments.contains(event.target) && !msgbox.contains(event.target) && !commentbtn.contains(event.target)) {
+        allcomments.classList.remove("active");
+        msgbox.classList.remove("active");
+        commentbtn.classList.remove("active");
+    }
+});
+
+</script>
+<script>
+    const description = document.querySelector(".video-description");
+    let fullText = description.innerText;
+    
+    let wordLimit = 35; // Set word limit
+    let words = fullText.split(" ");
+    let truncatedText = words.length > wordLimit ? words.slice(0, wordLimit).join(" ") + "..." : fullText;
+
+    description.innerText = truncatedText; // Apply truncated text initially
+    let isFullTextVisible = false;
+
+    if (words.length > wordLimit) {
+        let truncatedText = words.slice(0, wordLimit).join(" ") + "...";
+        description.innerText = truncatedText; // Apply truncated text
+    }
+
+    description.addEventListener("click", function (event) {
+        description.innerText = isFullTextVisible ? truncatedText : fullText;
+        isFullTextVisible = !isFullTextVisible;
+        event.stopPropagation(); // Prevents click from bubbling to document
+    });
+
+    document.addEventListener("click", (event) => {
+    // Check if the click is outside the comments and msgbox
+    document.addEventListener("click", function (event) {
+        if (!description.contains(event.target)) {
+            description.innerText = truncatedText;
+            isFullTextVisible = false;
+        }
+    });
+});
 </script>
 </html>

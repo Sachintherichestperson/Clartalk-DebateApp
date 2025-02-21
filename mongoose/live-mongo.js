@@ -35,7 +35,12 @@ const vedioSchema = new mongoose.Schema({
         enum: ['trending', 'regular'], // 'trending' if radio selected, 'regular' otherwise
         default: 'regular',
     },
-    EndingTime: String
+    EndingTime: String,
+    LiveStatus: {
+        type: String,
+        enum: ['Processing', 'Live', 'Ended'],
+        default: 'Processing'
+    }
 });
 
 module.exports = mongoose.model('live', vedioSchema);

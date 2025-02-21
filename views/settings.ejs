@@ -3,50 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Settings</title>
+    <link rel="stylesheet" href="./stylesheets/settings.css">
     <style>
-        body{
-            margin: 0;
-            padding: 0;
-            overflow-y: auto;
-            scrollbar-width: none;
-            background-color: black;
-        }
-        section{
-            padding: 10px;
-        }
-        #Header{
-            padding: 30px;
+        .company-values{
+            border-top: 1px solid #333333;
             text-align: center;
-            align-content: center;
-            background-color: rgb(50, 50, 50);
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            gap: 15px;
+            height: 80px;
+            padding-top: 10px;
         }
-        #Header h1{
-            font-size: 50px;
-            color: white;
+        .section{
+            height: 100%;
+            width: 30%;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
         }
-        .page{
-            background-color: rgb(30, 30, 30);
-            display: block;
+        .section a{
+            color: #707070;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: rgb(44, 44, 44);
             padding: 20px;
-            border-top: 1px solid white;
-            overflow-y: auto;
-            scrollbar-width: none;
+            border-radius: 8px;
+            text-align: center;
         }
-        .content{
-            border: 1px solid white;
+        .modal button {
+            margin: 10px;
+            padding: 12px 35px;
+            cursor: pointer;
+            border-radius: 25px;
+            border: none;
+        }
+        .Yes{
+            background-color: #bc0000;
+        }
+        .Yes:hover {
+            box-shadow: 0 8px 30px rgb(255 0 0 / 61%);
+        }
+        .No{
+            background-color: #0000ba;
+        }
+        .No:hover {
+            box-shadow: 0 8px 30px rgba(30, 1, 175, 0.61);
+        }
+        .footer {
             position: relative;
-            top: 5px;
-            margin-top: 20px;
-            padding: 10px;
-            padding-left: 30px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            width: fit-content;
+            left: 38%;
+            top: 40px;
+            margin-bottom: 40px;
         }
-        .content p{
-            color: white;
-            font-size: 30px;
-        }
-        a{
+        .footer a {
+            color: #ff9800;
             text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -57,27 +86,69 @@
         </div>
         <div class="page">
             <div class="content">
-                    <a href="/creator/creator/upload"><p>Upload-content</p></a>
+                <a href="/creator/creator/upload"><p>Upload Content</p></a>
             </div>
             <div class="content">
-                    <a href="/creator/creator/Live"><p>Organise-Live</p></a>
+                <a href="/creator/creator/Live"><p>Organize Live</p></a>
             </div>
             <div class="content">
-                     <a href="/creator/Building-The-Community"><p>Create-Community</p></a>
+                <a href="/creator/Building-The-Community"><p>Create Community</p></a>
             </div>
             <div class="content">
                 <a href="/creator/Create-The-Competition"><p>Introduce the Competition</p></a>
-       </div>
+            </div>        
             <div class="content">
-                    <a href="#"><p>Delete-content</p></a>
+                <a href="/creator/Delete-community"><p>Delete Community</p></a>
             </div>
             <div class="content">
-                <a href="#"><p>Delete-Community</p></a>
+                <a href="/creator/Delete-content"><p>Delete Content</p></a>
             </div>
             <div class="content">
-                <a href="#"><p>Delete-Profile</p></a>
+                <a href="/Delete-Account" onclick="openModal(event)">
+                    <p>Delete Account</p>
+                </a>
+            </div>
+            <div id="myModal" class="modal">
+                <div class="modal-content">
+                    <p>Are you sure you want to delete your account?</p>
+                    <button onclick="confirmDelete()" class="Yes">Yes</button>
+                    <button onclick="closeModal()" class="No">No</button>
+                </div>
             </div>
         </div>
+        <div class="company-values">
+            <div class="section">
+                <a href="/Terms-&-condition">Terms & conditions</a>
+                <a href="/Privacy-Policy">Privacy Policy</a>
+                <a href="/Contact-Us">Contact Us</a>
+                <a href="/About-Us">About Us</a>
+            </div>
+        </div>
+        <div class="footer">
+            &copy; 2025 ClarTalk. Need help? <a href="/contact-us">Contact us</a>
+        </div>
     </section>
+    <script>
+        let deleteUrl = "/Delete-Account"; // Set the delete route URL
+    
+        function openModal(event) {
+            event.preventDefault(); // Prevent immediate navigation
+            document.getElementById("myModal").style.display = "flex";
+        }
+    
+        function closeModal() {
+            document.getElementById("myModal").style.display = "none";
+        }
+    
+        function confirmDelete() {
+            // Hide modal
+            document.getElementById("myModal").style.display = "none";
+    
+            // Redirect after 1 second (optional delay)
+            setTimeout(() => {
+                window.location.href = deleteUrl;
+            }, 500);
+        }
+    </script>
 </body>
 </html>

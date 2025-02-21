@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Page</title>
     <link rel="stylesheet" href="/stylesheets/vedioplayer.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-    <section>
+    <section class="main-page">
         <div class="vediopage">
             <nav>
                 <img src="/images/nav.png" alt="Logo" class="logo">
@@ -16,7 +17,7 @@
             <div class="video-and-suggestions">
                 <div class="video-section">
                     <video controls autoplay class="video-player" id="videoPlayer">
-                        <source src="data:video/mp4;base64,<%= vedios.vedio.toString('base64') %>" type="video/mp4">
+                        <source src="/video/stream/<%= videoFile._id %>" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
                     <h1 class="video-title"><%= vedios.title %></h1>
@@ -47,6 +48,34 @@
                         </p>
                         <div class="description-container">
                             <p class="video-description"><%= vedios.description %></p>
+                        </div>
+                    </div>
+                    <div class="comments">
+                        <h2 class="comment-data">Comments 12980</h2>
+                        <div class="msg-box">
+                            <img src="/images/default.png" alt="" class="comment-image">
+                            <div class="txtmsg">Kis Kis ko Ye Best App Lagta he Like kare</div>
+                        </div>
+                        <div class="allcomments">
+                            <div class="input-cmt">
+                                <img src="/images/default.png" alt="" class="input-img">
+                                <input type="text" placeholder="Write a comment..." class="comment-input" id="comment-input">
+                                <input type="button" value="Post" class="post-btn" id="post-btn">
+                            </div>
+                            <div class="allsinglecomment" id="comment-section">
+                                <% comments.forEach(function(comment) { %>
+                                    <div class="single-comment">
+                                        <% if (comment.userId && comment.userId.profile) { %>
+                                            <img src="data:image/jpeg;base64,<%= comment.userId.profile.toString('base64') %>" 
+                                                 alt="" class="comment-image">
+                                        <% } else { %>
+                                            <img src="/images/default.png" alt="Default Profile" class="comment-image">
+                                        <% } %>
+                                        <p><strong><%= comment.userId.username %>:</strong> <%= comment.text %></p>
+                                    </div>
+                                <% }) %>
+                            </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -150,5 +179,76 @@
      window.addEventListener("beforeunload", () => {
          sendWatchTime();
      });
+
+
+const postBtn = document.getElementById("post-btn");
+const commentInput = document.getElementById("comment-input");
+const commentSection = document.getElementById("comment-section");
+const commentCount = document.getElementById("comment-count");
+const vedioId = "<%= vedios._id %>"
+console.log("hello",vedioId);
+
+postBtn.addEventListener("click", () => {
+    const commentText = commentInput.value.trim();
+    if (commentText) {
+        const commentData = {
+            text: commentText,
+            userId: "<%= user._id %>",
+            videoType: currentRoute,
+            vedioId: vedioId
+        };
+        console.log(commentData);
+        socket.emit("newComment", commentData);
+        commentInput.value = ""; // Clear input
+    }
+});
+
+socket.on("addComment", (data) => {
+    const commentElement = document.createElement("div");
+    commentElement.classList.add("single-comment");
+    commentElement.innerHTML = `
+        <img src="${data.image}" alt="" class="comment-image">
+        <p><strong>${data.username}:</strong> ${data.text}</p>
+    `;
+    commentSection.prepend(commentElement);
+
+    // Update comment count
+    commentCount.textContent = parseInt(commentCount.textContent) + 1;
+});
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+const commentbtn = document.querySelector(".comments");
+const allcomments = document.querySelector(".allcomments");
+const msgbox = document.querySelector(".msg-box");
+
+commentbtn.addEventListener("click", (event) => {
+    // Prevent click on the comment button itself from closing it
+    event.stopPropagation();
+    allcomments.classList.add("active");
+    msgbox.classList.add("active");
+    commentbtn.classList.add("active");
+});
+
+document.addEventListener("click", (event) => {
+    // Check if the click is outside the comments and msgbox
+    if (!allcomments.contains(event.target) && !msgbox.contains(event.target) && !commentbtn.contains(event.target)) {
+        allcomments.classList.remove("active");
+        msgbox.classList.remove("active");
+        commentbtn.classList.remove("active");
+    }
+});
+
 </script>
 </html>

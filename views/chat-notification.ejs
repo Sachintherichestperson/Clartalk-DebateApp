@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClarTalk - Notifications</title>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="./stylesheets/chat-notification.css">
+</head>
+<body>
+    <section class="container">
+    <header>
+        <div class="branding">
+            <img src="/images/nav.png" alt="ClarTalk Logo">
+            <div class="search-bar">
+                <i class="fa fa-search Search-icon"></i>
+            </div>
+        </div>
+        <nav class="navigation">
+            <a href="/" class="nav-link">
+                <i class="fas fa-tv"></i> Live
+            </a>
+            <a href="debate" class="nav-link">
+                <i class="fas fa-comments"></i> Entertainment
+            </a>
+            <a href="podcast" class="nav-link">
+                <i class="fas fa-podcast"></i> Podcasts
+            </a>
+            <a href="/community" class="nav-link">
+                <i class="fas fa-users"></i> Community
+            </a>
+            <a href="/creator/opponent-requests/<%= user._id %>" class="nav-link">
+                <i class="fas fa-envelope"></i> Requests
+            </a>
+            <a href="/LeaderBoard" class="nav-link">
+                <i class="fas fa-trophy"></i> Leaderboard
+            </a>
+            <a href="/MUN-competetion" class="nav-link">
+                <i class="fas fa-globe"></i> MUN
+            </a>
+            <a href="/Chat-Notifications" class="nav-link active">
+                <i class="fas fa-bell"></i> Notifications
+            </a>
+            <a href="/profile" class="nav-link">
+                <i class="fas fa-user"></i> Profile
+            </a>
+        </nav>
+    </header>
+
+        <div class="page">
+            <!-- Notification 1 -->
+            <div class="notification">
+                <div class="icon comment"><i class="fas fa-comment-alt"></i></div>
+                <div class="content">
+                    <p><strong>John Doe</strong> commented on your debate.</p>
+                    <span class="time">5 minutes ago</span>
+                </div>
+            </div>
+
+            <!-- Notification 2 -->
+            <div class="notification">
+                <div class="icon like"><i class="fas fa-heart"></i></div>
+                <div class="content">
+                    <p><strong>Alice</strong> liked your debate on AI Ethics.</p>
+                    <span class="time">15 minutes ago</span>
+                </div>
+            </div>
+
+            <!-- Notification 3 -->
+            <div class="notification">
+                <div class="icon follow"><i class="fas fa-user-plus"></i></div>
+                <div class="content">
+                    <p><strong>Mark</strong> started following you.</p>
+                    <span class="time">30 minutes ago</span>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uploaded Content - ClarTalk</title>
+    <link rel="stylesheet" href="/stylesheets/delete-content.css">
+</head>
+<body>
+    <section class="page">
+        <nav>
+            <h1>Uploaded Content</h1>
+            <div class="Count">
+                <p class="length">Total Content: <%= vedios.length %></p>
+            </div>
+        </nav>
+
+        <section id="Content">
+            <% vedios.forEach(function(vedio) { %>
+                    <div class="videos">
+                        <img src="data:image/jpeg;base64,<%= vedio.Thumbnail.toString('base64') %>" alt="<%= vedio.type %>">
+                        <div class="video-details">
+                        <p class="video-title"><%= vedio.title %></p>
+                        <p class="video-time"><%= new Date(vedio.createdAt).toLocaleDateString() %></p>
+                        <p class="Views"><%= vedio.Views || 0 %> Views</p>
+                        <div class="buttons">
+                            <a href="/creator/delete-content/<%= vedio.type %>/<%= vedio._id %>" class="Delete">Delete</a>
+                        </div>
+                    </div>
+            </div>
+            <% }) %>
+        </section>
+        <div class="extra">
+            <h2>No More Content</h2>
+        </div>
+    </section>
+</body>
+</html>

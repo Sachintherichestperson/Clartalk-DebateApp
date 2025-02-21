@@ -13,7 +13,8 @@
             <div class="branding">
                 <img src="/images/nav.png" alt="ClarTalk Logo">
                 <div class="search-bar">
-                    <input type="text" placeholder="Search topics, debates...">
+                    <i class="fa fa-search Search-icon"></i>
+                    <input type="text" placeholder="Search topics, debates..." class="Search-input">
                 </div>
             </div>
             <nav class="navigation">
@@ -36,7 +37,10 @@
                     <i class="fas fa-trophy"></i> Leaderboard
                 </a>
                 <a href="/MUN-competetion" class="nav-link">
-                    <i class="fas fa-trophy"></i> MUN
+                    <i class="fas fa-globe"></i> MUN
+                </a>
+                <a href="/Chat-Notifications" class="nav-link">
+                    <i class="fas fa-bell"></i> Notifications
                 </a>
                 <a href="/profile" class="nav-link">
                     <i class="fas fa-user"></i> Profile
@@ -44,18 +48,18 @@
             </nav>
         </header>
             <div class="page">
-                <% vedios.forEach(function(vedio){ %>
-                <div class="videos">
-                    <a href="/debate/<%= vedio._id %>">
-                        <img src="data:image/jpeg;base64,<%= vedio.Thumbnail.toString('base64') %>" alt="debate-thumbnail">
-                        <div class="video-details">
-                            <p class="video-title"><%= vedio.title %></p>
-                            <p class="video-time"><%= vedio.createdAt.toLocaleDateString('en-GB') %></p>
-                            <p class="Views"><%= vedio.Views %> Views</p>
-                        </div>
-                    </a>
-                </div>
-                <% }) %>
+                <% vedios.forEach(function(video) { %>
+                    <div class="videos">
+                        <a href="/debate/<%= video._id %>">
+                            <img src="data:image/jpeg;base64,<%= video.Thumbnail.toString('base64') %>" alt="debates">
+                            <div class="video-details">
+                                <p class="video-title"><%= video.title %></p>
+                                <p class="video-time"><%= video.createdAt.toLocaleDateString('en-GB') %></p>
+                                <p class="Views"><%= video.Views %> Views</p>
+                            </div>
+                        </a>
+                    </div>
+                <% }) %>                
             </div>
         </div>
         <div class="instruction">
