@@ -114,7 +114,7 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("newComment", async (data) => {
+    socket.on("VideonewComment", async (data) => {
         try {
             const user = await User.findById(data.userId);
             if (!user) {
@@ -161,36 +161,51 @@ io.on("connection", (socket) => {
             console.error("Error saving comment:", error);
         }
     });
-    
 
-    socket.on('join-room', (data) => {
-        socket.join(data.roomId); // Join the room
-        console.log("User joined the room:", data.roomId);
+    socket.on("livenewComment", async (data) => {
+        try {
+            const user = await User.findById(data.userId);
+            if (!user) {
+                console.error("User not found");
+                return;
+            }
     
-        // Notify other users in the room that a new user has joined
-        socket.to(data.roomId).emit('user-joined', socket.id);
-      });
+            // Save the comment to MongoDB
+            const newComment = await comments.create({
+                text: data.text,
+                userId: data.userId,
+                videoType: "live",
+                liveId: data.liveId
+            });
+
+            console.log("comments", newComment);
+
+            
+                const live = await liveMongo.findById(data.liveId);
+                live.comment.push(newComment);
+                console.log(live);
+
+                await live.save();
+            
+            
     
-      // Handle stream start (streamer)
-      socket.on('start-stream', (data) => {
-        socket.join(data.roomId); // Streamer joins the room
-        console.log("Streamer started stream in room:", data.roomId);
+            // Convert profile image to Base64 (if available)
+            const profileImage = user.profile
+                ? `data:image/png;base64,${user.profile.toString("base64")}`
+                : "/images/default.png"; // Default profile picture
     
-        // Notify viewers to join the stream
-        socket.to(data.roomId).emit('stream-started', socket.id);
-      });
+            // Emit the saved comment to all clients
+            io.emit("liveaddComment", {
+                text: newComment.text,
+                image: profileImage,
+                username: user.username,
+            });
     
-      // Handle signaling data (SDP and ICE candidates)
-      socket.on('signal', (data) => {
-        socket.to(data.target).emit('signal', {
-          data: data.data,
-          sender: data.sender,
-        });
-      });
-      
-    socket.on("disconnect", () => {
-        socket.broadcast.emit("user-left", socket.id);
+        } catch (error) {
+            console.error("Error saving comment:", error);
+        }
     });
+    
 });
 
 server.listen(3000, "0.0.0.0", () => {

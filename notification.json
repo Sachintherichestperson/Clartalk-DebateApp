@@ -1,0 +1,14 @@
+{
+    "type": "service_account",
+    "project_id": "clartalk",
+    "private_key_id": "fa6a1bc6a0ea3b70755991373187b7941f7f02d9",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCdPOU1XIn9TSH0\nK8GAfBc0AyVlB8pJa8QhLv+nyJPI7kbu6EXhuQyC/rLjCxbe6AEKrzeOpVPV+EfX\nMWzcpC32qaV1BsT4ekNvDcr0q4PoV8N0jj3qk6ftiWQZswFUg1SS8yRg5sZzF4yY\n/qYcCQVpzAiS0SmH1NBg98GcK4DNNcp+u7HE2JnPwCyZdFItcCjdjzC+VqJFIuiM\nVTb+W7ubphEfa7bBk7dWoCbOb/s0f30/xNjWyiSgkTo0LmKAoXlEb6tW9VlWru5c\nrlUYvkWntnv1ZSFIfr4jcGggGOPerjaIAPqp+NteLlKTZZ6ZYagv4WvR7IkI/lIB\n11sWqqb1AgMBAAECggEADujMihoHepWDA/JXM43wrE2lENajg4E8tHHOq5PtEXco\nkjRDlhL0IQKyJy2wwjupB6CUKco68BXOCBVnb2eA9TviVL2q1S3QsZnS9g7CX/hc\nb/Oh4tmT6YXm0DoFRQR780ArYaXYSOcBfatdyFhBo2XFpVhAciEHjj5H5T1Jxgtu\n3PxtbO/LDtGq5a/EKGQHY8bQbjuH8R4SsWDMgXCst/6Vy9dkQ7s1UyziTgtXz70D\nAUY1Pf94YPOnFtAN1QijgN6HwoMdwFVSqVpD5HOW8Wfxlr3S9JO4dp7r/kwhICfx\nkT3vKZGPlpu8XegcRrZmHrqM9ZPO+tFlL/vxZcR8QQKBgQDR3ioPVlIq5CcjxiEg\nWsD9RWCb5Ls1itIVmf+crPzkq68sHJcZ8V9ha/TZVvCeCenRsKYdQCGN5wgJMbBb\nMI0TeFxqQICZ8TejnjCd90dXd/OGLXvoKN2rSz8zmb46rFbOZrSmaNJLoaz2E3gB\nF6pu9ljHMFvKWfUn5bImO1mHQQKBgQC/zRmFnvj1FwI6mysoq8xV5my3bo0x2mVt\n/QkJAtAxcpAMSKjhBzjqk3BnaaZSAl/roIl69FGBmtqqGG7x6xmeHx/NpT7H4n3f\niRggiptcrGdUtWhQWgbtnDSudxYK3rtmZGfh9QMLW4R2Wrq9zRNvwzPazvO0aRc7\nimkPgRKGtQKBgBE3+hlyCqHMQE3WFqex6n2dMJT5ykZVUnFFRkyTgNg+IcwruFX/\nkMTMd7VRRcKhq5ZxuN9TgK1E1Er00bRZommDiYmKK0L2IIuDEhgTzr2lcMyEdNMS\nb0V7kf7o0Uu9Eg4zLQUuOnrMFAXIiSMFzwz1l0kYdZ9/i/avCNPMMMdBAoGAGEL3\ncYGUeFw6ufMa2IAyzsLhCasATUgVAH67f9pNP5QASK2AP0bMmk+gLlSc507Jl2Kt\nQVJaZQyTkGSa1BsrGGdTfI3kjSBHT9llpegikuxz/bEcyt04dyIFP/RsY1+dUOxu\nf5Sgl/Uxok8DxDKGvOJyUsFO7olEmRF/DKkFEOkCgYEAonV5aWOTq4Bj3cwhNnPX\n8Q3Js31JN6nBltWyyt7PM/0Ix6p8CbGQADy2U63YUp82XGUfKRX19mtnxut2TOOt\naaArVMVrqDPmZkeMaiIVSTQgF1laQzID+MhSArLmXaYLmi9XCehEEljU2pUkt9Q9\ndftUhlaKL/tz3W/vxPUvbe8=\n-----END PRIVATE KEY-----\n",
+    "client_email": "firebase-adminsdk-p2ht1@clartalk.iam.gserviceaccount.com",
+    "client_id": "109781990674544140942",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-p2ht1%40clartalk.iam.gserviceaccount.com",
+    "universe_domain": "googleapis.com"
+  }
+  
