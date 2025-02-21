@@ -4,6 +4,7 @@ const User = require("../mongoose/user-mongo");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const upload = require("../config/multer");
+const videoUpload= require("../config/multer-live");
 const podcastsmongoose = require("../mongoose/podcasts-mongo");
 const isloggedin = require("../middleware/isloggedin");
 const videomongoose = require("../mongoose/video-mongo");
@@ -26,54 +27,109 @@ router.get("/creator/upload", function(req, res){
     res.render("upload")
 });
 
-router.post("/upload",upload.fields([{ name: 'vedio', maxCount: 1 }, { name: 'Thumbnail', maxCount: 1 }]),isloggedin,async function(req, res){
-    try{
-      let {title, description, contentType} = req.body;
- 
-      let videodata = req.files.vedio[0].buffer;
-      let Thumbnail = req.files.Thumbnail[0].buffer;
-      let uploadDate = new Date();
- 
-      if(contentType === "podcast"){
-         let podcast = await podcastsmongoose.create({
-             title, 
-             description,
-             vedio: videodata, 
-             Thumbnail: Thumbnail,
-             createdAt: uploadDate
-         });
- 
-         const user = await User.findOne({email: req.user.email});
-         podcast.creator.push(user._id)
-         await podcast.save();
- 
-         user.podcast.push(podcast._id);
-         await user.save();
-         res.redirect("/podcast")
+router.post("/upload-thumbnail", upload.single("Thumbnail"), isloggedin, async function(req, res) {
+  try {
+      let { title, description, contentType, Tags } = req.body;
+      let Thumbnail = req.file.buffer;
 
-      }else if (contentType === "video") {
-     let video = await videomongoose.create({
-         title, 
-         description,
-         vedio: videodata, 
-         Thumbnail: Thumbnail,
-         createdAt: uploadDate
-     });
- 
-         const user = await User.findOne({email: req.user.email});
-         video.creator.push(user._id)
-         await video.save();
- 
-         user.vedio.push(video._id);
-         await user.save();
-         res.redirect("/debate")
-  }else{
-     res.render("/")
+      if (!Thumbnail) {
+          return res.send("All fields are required");
+      }
+      
+      let tags = req.body.Tags || '';
+      console.log(tags);
+
+      if (typeof Tags === 'string' && Tags.trim().length > 0) {
+        // Split the string into an array based on commas and trim spaces
+        const tags = Tags.split(",").map(tag => tag.trim()).filter(tag => tag.length > 0);
+
+        console.log('Processed tags:', tags);
+      }
+
+
+      // Store in session (or use Redis for better persistence)
+      req.session.uploadData = {
+          title,
+          description,
+          Thumbnail,
+          contentType,
+          Tags
+      };
+
+      // Redirect user to video upload page
+      res.redirect("/creator/video-content/upload");
+
+  } catch (err) {
+      console.log("Error:", err);
+      res.status(500).send("Server Error");
   }
-    }catch(err){
-     res.send(err)
-     console.log("error", err)
-    }
+});
+
+
+router.get("/video-content/upload", isloggedin, function(req, res) {
+  if (!req.session.uploadData) {
+      return res.redirect("/"); // Redirect if no session data
+  }
+  res.render("video-uploader"); 
+});
+
+router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, async function(req, res) {
+  try {
+      if (!req.session.uploadData) {
+          return res.redirect("/");
+      }
+
+      let { title, description, Thumbnail, contentType, Tags } = req.session.uploadData;
+      let videoFile = req.file ? req.file.id : null;
+
+      if (!videoFile) {
+          return res.send("Video upload is required");
+      }
+
+      let uploadDate = new Date();
+      const user = await User.findOne({ email: req.user.email });
+
+      if (contentType === "podcast") {
+          let podcast = await podcastsmongoose.create({
+              title,
+              description,
+              Thumbnail,
+              vedio: videoFile,
+              createdAt: uploadDate,
+              creator: user._id,
+              Tags
+          });
+
+          user.podcast.push(podcast._id);
+          await user.save();
+
+          req.session.uploadData = null; // Clear session
+          res.redirect("/podcast");
+
+      } else if (contentType === "video") {
+          let video = await videomongoose.create({
+              title,
+              description,
+              Thumbnail,
+              vedio: videoFile,
+              createdAt: uploadDate,
+              creator: user._id,
+              Tags
+          });
+
+          user.vedio.push(video._id);
+          await user.save();
+
+          req.session.uploadData = null; // Clear session
+          res.redirect("/creator/video-content/upload");
+      } else {
+          res.redirect("/");
+      }
+
+  } catch (err) {
+      console.log("Error:", err);
+      res.status(500).send("Server Error");
+  }
 });
 
 router.get("/creator/live",isloggedin ,async function(req, res){
@@ -142,7 +198,7 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
     user.Live.push(content._id);
     await user.save();
 
-    content.creator.push(user._id);
+    // content.creator.push(user._id);
     await content.save();
 
     const opponentName = opponentUser.username;
@@ -168,6 +224,7 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
 
     content.opponent.push(opponentId._id);
     await user.save();
+
     
     res.redirect("/")
   } catch (err) {
@@ -291,6 +348,7 @@ router.get("/Building-The-Community", function(req, res){
   res.render("community-builder")
 });
 
+
 router.post("/community/builder",upload.single("CommunityDP"), isloggedin, async function (req, res) {
   try{
        let{ CommunityName, CommunityisAbout, CommunityDP, CommunityType } = req.body;
@@ -375,16 +433,27 @@ router.get("/Create-The-Competition",isloggedin, function(req, res){
 });
 
 router.post("/competition/builded",upload.single("CompetitionDP"), isloggedin, async function (req, res) {
-  let { CompetitionName, CompetitionisAbout, CompetitionDP } = req.body;
+  let { CompetitionName, CompetitionisAbout, CompetitionDP, location, Date, fees, createdBy } = req.body;
+
+  const user = await User.findOne({ email: req.user.email });
 
   const competition = await competitionmongo.create({
     CompetitionName,
     CompetitionisAbout,
-    CompetitionDP: req.file.buffer
+    CompetitionDP: req.file.buffer,
+    location,
+    Date,
+    fees, 
+    createdBy: user._id
   });
 
-  res.redirect("/MUN-competetion");
+    user.MunCompetition.push(competition._id);
+    await user.save();
 
+
+  await competition.save();
+
+  res.redirect("/MUN-competetion");
 });
 
 router.get("/creator/Debates/:id", isloggedin, async function (req, res) {  
@@ -414,5 +483,108 @@ router.get("/creator/MUN/:Id", isloggedin, async function(req, res){
   const user = await User.findById(req.user._id);
   res.render("creator-MUN", { competitions, communities, user });
 });
+
+router.get("/Delete-content", isloggedin, async function (req, res) {                                   //uploaded-content Page
+  try {
+    const user = await User.findOne({ email: req.user.email })
+              .populate({
+                  path: "vedio",
+                  select: "title description createdAt Thumbnail Views"
+              })
+              .populate({
+                  path: "podcast",
+                  select: "title description createdAt Thumbnail Views"
+              });
+    
+          if (!user) {
+              return res.status(404).send("User not found");
+          }
+    
+    
+          // Add a `type` property to distinguish between videos and podcasts
+          const vedios = [
+              ...user.vedio.map(v => ({ ...v.toObject(), type: "debate" })),
+              ...user.podcast.map(p => ({ ...p.toObject(), type: "podcast" }))
+          ];
+
+    res.render("delete-content", { vedios, user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while fetching data.");
+  }
+});
+
+router.get("/delete-content/:type/:id", isloggedin, async function (req, res) {
+  try {
+    const { type, id } = req.params;
+    let deletedVideo;
+
+    // Check which collection to delete from
+    if (type === "debate") {
+      deletedVideo = await videomongoose.findByIdAndDelete(id);
+    } else if (type === "podcast") {
+      deletedVideo = await podcastsmongoose.findByIdAndDelete(id);
+    } else {
+      return res.status(400).send("Invalid content type");
+    }
+
+    if (!deletedVideo) {
+      return res.status(404).send("Content not found");
+    }
+
+    // Remove video reference from the user model
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $pull: { vedio: id, podcast: id } }, // Make sure the field name matches your schema
+      { new: true }
+    );
+
+    res.redirect("/creator/Delete-content");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+router.get("/Delete-community", isloggedin, async function (req, res) {                                   //uploaded-content Page
+  try {
+    const communities = await User.findOne({ email: req.user.email })
+              .populate({
+                  path: "communities",
+                  select: "CommunityName CommunityisAbout"
+              });
+              console.log(communities);
+          if (!communities) {
+              return res.status(404).send("Community not found");
+          }
+
+    res.render("delete-community", { communities });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while fetching data.");
+  }
+});
+
+router.get("/delete-community/:id", isloggedin, async function (req, res) {
+  try {
+    const { type, id } = req.params;
+    let communities = await communitymongo.findByIdAndDelete(id);
+
+    // Remove video reference from the user model
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $pull: { communities: id } }, 
+      { new: true }
+    );
+
+    res.redirect("/creator/Delete-community");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+
+
 
 module.exports = router;

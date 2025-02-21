@@ -11,6 +11,28 @@ body {
     color: #fff; /* White Text */
 }
 
+.flash-message {
+    background-color: #e53935; /* Bright red for errors */
+    color: white;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 20px;
+    animation: fadeOut 5s forwards;
+    width: 94%;
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
 /* Container for the Update Profile Form */
 .update-profile-container {
     background-color: #1f1f1f; /* Darker Card Background */
@@ -44,15 +66,25 @@ body {
 }
 
 /* Input Fields */
-.form-group input[type="file"],
-.form-group input[type="text"] {
-    width: 100%;
+.form-group input[type="file"]{
+    width: 90%;
     padding: 10px;
     background-color: #2b2b2b; /* Dark Input Background */
     border: 1px solid #555; /* Subtle Border */
     border-radius: 5px;
     font-size: 16px;
     color: #fff; /* White Text */
+    outline: none;
+    max-width: 370px;
+}
+
+.form-group input[type="text"] {
+    width: 90%;
+    background-color: #2b2b2b;
+    border: 1px solid #555;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #fff;
     outline: none;
     max-width: 370px;
 }
@@ -103,7 +135,7 @@ body {
 /* Responsive Design */
 @media (max-width: 768px) {
     .update-profile-container {
-        width: 95%;
+        width: 80%;
         padding: 15px;
     }
 

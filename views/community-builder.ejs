@@ -14,11 +14,11 @@
         <form id="creator-community" method="post" enctype="multipart/form-data" action="/creator/community/builder">
             <div class="input">
             <label for="creator-community">Community-Name</label>
-            <input type="text" name="CommunityName" placeholder="Input Your Community-Name" required>
+            <input type="text" name="CommunityName" placeholder="Input Your Community-Name" maxlength="30" required>
         </div>
         <div class="input">
             <label for="creator-community">About-Community</label>
-            <input type="text" name="CommunityisAbout" placeholder="Input Your Community-Description" required>
+            <input type="text" name="CommunityisAbout" placeholder="Input Your Community-Description" maxlength="160" required>
         </div>
         <div class="input">
             <label for="creator-community">Community-Thumbnail</label>
@@ -34,10 +34,10 @@
                 <input type="radio" id="Private" name="CommunityType" value="Private" class="class" required>
                 <p class="label-Private">Private</p>
             </label>
-            <label for="Special">
+            <!-- <label for="Special">
                 <input type="radio" id="Special" name="CommunityType" value="Special" class="class" required>
                 <p class="label-Special">Special</p>
-            </label>
+            </label>  -->
         </div>
             <input type="submit" value="Submit" class="submit">
         </form>

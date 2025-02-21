@@ -9,6 +9,12 @@ module.exports.userregister = async (req, res) => {
              req.flash("key", "user already registered")
             return res.redirect("/register")
         }
+
+        const usernameId = await User.findOne({ username: req.body.username });
+        if(usernameId){
+            req.flash("key", "username not available");
+           return res.redirect("/register")
+       }
     let {username, email, password } = req.body;
     bcrypt.genSalt(10, function(err, salt) {
         bcrypt.hash(password, salt, async function(err, hash) {
@@ -49,8 +55,9 @@ module.exports.loginuser = async (req, res) => {
                 let token = jwt.sign({ email: email}, process.env.JWT_KEY);
                 res.cookie("user", token);
                 return res.redirect("/")
-            }else{
-                res.send(err)
+            }else {
+                req.flash("usernot", "Incorrect password");
+                return res.redirect("/login");
             }
         })
 }

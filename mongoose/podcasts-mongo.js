@@ -3,7 +3,10 @@ const mongoose = require('mongoose');
 const podcastsSchema = new mongoose.Schema({
     title: String,
     description: String,            
-    vedio: Buffer,
+    vedio: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "fs.files"  
+  },
     Thumbnail: Buffer,
     creator: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -34,6 +37,14 @@ const podcastsSchema = new mongoose.Schema({
           message: props => `${props.value} is not a valid watch time!`
         },
         default: 0
+      }],
+      Tags: [{
+        type: String,
+        default: []
+      }],
+      comment: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "comments"
       }]
 });
 

@@ -15,6 +15,9 @@ const schedule = require("node-schedule");
 const Socket  = require("socket.io");
 const Razorpay = require("razorpay");
 const userMongo = require("../mongoose/user-mongo");
+const mongoose = require("mongoose");
+
+const { conn, getGFS } = require("../config/gridfs");
 
 router.get("/register", (req, res) => {                                                                      //register page
     let err = req.flash("key")
@@ -31,6 +34,17 @@ router.get("/login", function(req, res){                                        
 
 router.post("/login", loginuser)                                                                           //Login Page-Uploader
 
+router.post("/send-notification",isloggedin, async (req, res) => {
+  const { token } = req.body;
+
+  const user = await User.findById(req.user._id);
+
+  user.fcmToken = token;
+
+  await user.save();
+    res.json({ success: true, message: "Notification sent!" });
+});
+
 router.get("/",isloggedin,async function(req, res){                                                        // front page
   try{
     const user = await User.findOne({email: req.user.email}).populate("requests").populate( "Sender" );
@@ -39,13 +53,38 @@ router.get("/",isloggedin,async function(req, res){                             
   }catch(err){
     res.status(404).send(err);
   }
-  
 });
 
-router.get("/debate",isloggedin,async function(req, res){                                                  //debate page
-  const user = await User.findOne({email: req.user.email}).populate("requests");
-  let vedios = await videomongoose.find({});
-  res.render("debate", { vedios,user });
+router.get("/debate", isloggedin, async function (req, res) { 
+  try {
+      const user = await User.findOne({ email: req.user.email }).populate("requests");
+      let userTags = user.SEOTags || [];
+      
+      let vedios = await videomongoose.find({}).populate("Thumbnail");
+
+      
+      // Sort videos: those matching SEOTags should come first
+      vedios.sort((a, b) => {
+          let aTags = Array.isArray(a.Tags)
+              ? a.Tags.flatMap(tagString => tagString.split(',').map(tag => tag.trim()))
+              : [];
+          let bTags = Array.isArray(b.Tags)
+              ? b.Tags.flatMap(tagString => tagString.split(',').map(tag => tag.trim()))
+              : [];
+
+
+          let aMatches = aTags.filter(tag => userTags.includes(tag)).length;
+          let bMatches = bTags.filter(tag => userTags.includes(tag)).length;
+
+
+          return bMatches - aMatches; // Higher matches come first
+      });
+
+      res.render("debate", { vedios, user });
+  } catch (error) {
+      console.error("Error fetching debate page:", error);
+      res.status(500).send("Server error");
+  }
 });
 
 router.get("/debate/:id",isloggedin, async function(req, res){                                             //debate video-player
@@ -54,10 +93,16 @@ router.get("/debate/:id",isloggedin, async function(req, res){                  
     .populate({
         path: "creator",
         select: "username followers Rankpoints"
+    }).populate({
+      path: "comment",
+      select: "text userId",
+      populate: {
+        path: "userId",
+        select: "username profile"
+      }
     });
-    const creator = await User.findById(vedios.creator[0]._id).populate("Rankpoints")
-    
 
+    const creator = await User.findById(vedios.creator[0]._id).populate("Rankpoints")
 
     let user = await User.findOne({email: req.user.email });
     
@@ -81,18 +126,76 @@ router.get("/debate/:id",isloggedin, async function(req, res){                  
     const suggestions = await videomongoose.find({ _id: { $ne: vedios._id } }).limit(5).populate({
         path: "creator",
         select: "username"
-    })
+    });
+
+    const comments = vedios.comment;
     
-    res.render("vedioplayer", {vedios, suggestions, currentRoute: "debate", follower, isFollowing, user });
+    res.render("vedioplayer", {
+      vedios, 
+      videoFile: vedios.vedio,
+      suggestions, 
+      currentRoute: "debate", 
+      follower, 
+      isFollowing, 
+      user,
+      comments
+    });
   }catch(err){
     res.send(err)
     console.log(err)
   }
 });
 
+router.get("/video/stream/:id", async (req, res) => {
+  try {
+    // Ensure GridFSBucket is initialized
+    const gfs = getGFS();
+
+    const fileId = new mongoose.Types.ObjectId(req.params.id);
+
+    // Check if the file exists in GridFS
+    const file = await conn.db.collection("videos.files").findOne({ _id: fileId });
+
+    if (!file) {
+      return res.status(404).json({ error: "Video not found" });
+    }
+
+    // Set response headers for video streaming
+    res.set({
+      "Content-Type": "video/mp4",
+      "Accept-Ranges": "bytes",
+    });
+
+    // Stream the video
+    const readStream = gfs.openDownloadStream(fileId);
+    readStream.pipe(res);
+  } catch (err) {
+    console.error("Error streaming video:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 router.get("/podcast", isloggedin, async function(req, res){                                               //podcast section Page
   const user = await User.findOne({email: req.user.email}).populate("requests")
   let vedios = await podcastsmongoose.find({});
+
+  vedios.sort((a, b) => {
+    let aTags = Array.isArray(a.Tags)
+        ? a.Tags.flatMap(tagString => tagString.split(',').map(tag => tag.trim()))
+        : [];
+    let bTags = Array.isArray(b.Tags)
+        ? b.Tags.flatMap(tagString => tagString.split(',').map(tag => tag.trim()))
+        : [];
+
+
+    let aMatches = aTags.filter(tag => userTags.includes(tag)).length;
+    let bMatches = bTags.filter(tag => userTags.includes(tag)).length;
+
+
+    return bMatches - aMatches; // Higher matches come first
+});
+
+
   res.render("podcast", { vedios, user });
 });
  
@@ -131,7 +234,7 @@ router.get("/podcast/:id",isloggedin, async function(req, res){                 
   });
 
 
-    res.render("vedioplayer", {vedios, suggestions, currentRoute: "podcast", follower, isFollowing, user});
+    res.render("vedioplayer", {vedios, suggestions,videoFile: vedios.vedio, currentRoute: "podcast", follower, isFollowing, user});
 
     }catch(err){
       res.send(err)
@@ -155,7 +258,12 @@ router.get("/community-chat/:id",isloggedin ,async function(req, res){          
   try{
     const community = await communityMongo.findById(req.params.id);
     const user = await User.findOne({email: req.user.email});
-    res.render("chat", {community, user});
+    
+    const member = community.members.some(memberId => memberId.toString() === req.user._id.toString());
+    
+    const type = community.CommunityType;
+
+    res.render("chat", {community, user, member, type });
   }catch(err){
     res.send(err)
     console.log(err.message)
@@ -170,6 +278,8 @@ router.get("/profile",isloggedin,async function(req, res){                      
   const totalContent = videoCount + debateCount;
 
   const profile = user.profile;
+  const Rank = user.Rank;
+  console.log(Rank);
   
   const followerCount = user.followers ? user.followers.length : 0;
 
@@ -224,10 +334,10 @@ router.get("/SentRequests",isloggedin, async function (req, res) {              
   res.render("Sentrequests", { contents });
 });
 
-router.get("/update-route/:id",isloggedin, async function(req, res){                                      // update-route/:id  Page
+router.get("/update-route",isloggedin, async function(req, res){                                      // update-route/:id  Page
   const profileupdate = await User.findOne({ email: req.user.email }).populate("profile");
-  console.log(profileupdate)
-  res.render("update-profile", { profileupdate })
+  let err = req.flash("key");
+  res.render("update-profile", { profileupdate, err })
 });
 
 router.post("/update-profile", isloggedin, upload.single("profile"), async function (req, res) {          // update-profile   Page
@@ -239,9 +349,15 @@ router.post("/update-profile", isloggedin, upload.single("profile"), async funct
     if (profileImageBuffer) {
       user.profile = profileImageBuffer;  // Save the buffer data
     }
-    user.username = username;
 
+    if (username === user.username) {
+      req.flash("key", "username already exist");
+      return res.redirect("/update-route")
+    } 
+    
+    user.username = username;
     await user.save();
+
     res.redirect("/profile");
   } catch (err) {
     res.status(404).send(err);
@@ -313,14 +429,6 @@ router.get("/settings",isloggedin,async function (req, res) {                   
   res.render("settings");
 });
 
-router.get("/video-player/:id",isloggedin, async function (req, res) {
-  try{
-     
-  }catch(err){
-    res.status("500").send("Error Occured", err)
-  }
-});
-
 router.get('/payment-for/:id/payment/:id',isloggedin, async (req, res) => {
     try {
       const Live = await liveMongo.findById(req.params.id)
@@ -340,6 +448,10 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
       path: "BookingDoneBy",
       select: "username"
     });
+
+    console.log("Live creator", Live.creator[0]._id);
+
+    console.log("Live opponent", Live.opponent[0]._id);
     const Booking = viewers.BookingDoneBy.some(id => id.equals(req.user.id))
 
     const followerscount = Live.creator[0].followers;
@@ -353,48 +465,94 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
 
   let user = await User.findOne({email: req.user.email });
 
-  res.render("Livedebate-player", { Live, follower, suggestions, currentRoute: "live-content-applying-page", isFollowing, user, Booking });
+  const creator = Live.creator[0]._id.equals(user._id)
+  const opponent = Live.creator[0]._id.equals(user._id)
+
+  res.render("Livedebate-player", { Live, follower, suggestions, currentRoute: "live-content-applying-page", isFollowing, user, Booking, creator, opponent });
   }catch(err){
         res.send("404").status("Page Not Found");
   }
 });
 
+router.post('/update-status/:id', async (req, res) => {
+  try {
+      const { LiveStatus } = req.body;
+
+      await liveMongo.findByIdAndUpdate(req.params.id, { LiveStatus });
+      res.status(200).json({ message: 'Status updated successfully' });
+  } catch (error) {
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 router.post('/watch-time', isloggedin, async (req, res) => {
-  let { watchTime, videoId, videoType } = req.body; // Get watch time, video ID, and video type from the request body
+  let { watchTime, videoId, videoType } = req.body;
 
   try {
-      // Ensure watchTime is a number
       watchTime = parseFloat(watchTime);
 
-      if (isNaN(watchTime)) {
+      if (isNaN(watchTime) || watchTime <= 0) {
           return res.status(400).json({ message: 'Invalid watch time value.' });
       }
 
       const user = await User.findOne({ email: req.user.email });
 
+      if (!user) {
+          return res.status(404).json({ message: 'User not found.' });
+      }
+
       let video;
       if (videoType === 'debate') {
-          video = await videomongoose.findById(videoId);
+          video = await videomongoose.findById(videoId).populate("Tags");
       } else if (videoType === 'podcast') {
-          video = await podcastsmongoose.findById(videoId);
+          video = await podcastsmongoose.findById(videoId).populate("Tags");
       } else {
           return res.status(400).json({ message: 'Invalid video type.' });
       }
 
-      if (video) {
-          // Update watch hours
-          user.UserWatchHours = (user.UserWatchHours[0] || 0) + watchTime; // Update the total watch time
-          await user.save();
-
-          video.WatchHours = (video.WatchHours[0] || 0) + watchTime;
-          await video.save();
-
-          res.status(200).json({ message: 'Watch time updated successfully.' });
-      } else {
-          res.status(404).json({ message: 'Video not found.' });
+      if (!video) {
+          return res.status(404).json({ message: 'Video not found.' });
       }
+
+      if (!Array.isArray(user.UserWatchHours) || user.UserWatchHours.length === 0) {
+          user.UserWatchHours = [0];
+      }
+
+      let currentWatchTime = parseFloat(user.UserWatchHours[0]) || 0;
+      user.UserWatchHours[0] = Math.round((currentWatchTime + watchTime) * 100) / 100;
+      await user.save();
+
+      if (!Array.isArray(video.WatchHours) || video.WatchHours.length === 0) {
+          video.WatchHours = [0];
+      }
+
+      video.WatchHours[0] = Math.round(((video.WatchHours[0] || 0) + watchTime) * 100) / 100;
+      await video.save();
+
+      // ✅ Process and insert only first 2 **new** unique SEO tags
+      if (video.Tags && Array.isArray(video.Tags)) {
+          const videoTags = [...new Set(video.Tags.flatMap(tagStr => tagStr.split(',').map(tag => tag.trim())))];
+
+          // Filter only tags that are **not already in SEO Tags**
+          const newTags = videoTags.filter(tag => !user.SEOTags.includes(tag)).slice(0, 2);
+
+          if (newTags.length > 0) {
+              // If SEO tags exceed 15, remove the oldest ones before inserting new ones
+              if (user.SEOTags.length + newTags.length > 15) {
+                  const tagsToRemove = user.SEOTags.length + newTags.length - 15;
+                  user.SEOTags.splice(0, tagsToRemove); // Remove the oldest tags
+              }
+
+              user.SEOTags.push(...newTags); // Insert new tags
+              await user.save();
+          }
+      }
+
+
+      res.status(200).json({ message: 'Watch time updated successfully.' });
+
   } catch (error) {
-      console.error(error);
+      console.error("Error updating watch time:", error);
       res.status(500).json({ message: 'Server error.' });
   }
 });
@@ -417,8 +575,8 @@ router.get("/Booking-Done/:id",isloggedin, async function (req, res) {
     }else{
       console.log("Booking Done")
     }
-    if (!user.Booked.includes(Live._id)){
-      user.Booked.push(Live._id)
+    if (!user.LiveBooked.includes(Live._id)){
+      user.LiveBooked.push(Live._id)
       await user.save();
       console.log("Booked not recieved the Live Id");
     }else{
@@ -450,21 +608,36 @@ router.post("/Booking-Done-for-community/:id",isloggedin, async function (req, r
   }
 });
 
-router.get("/Livedebate/:id",isloggedin, async function (req, res) {
-  const Live = await liveMongo.findById(req.params.id).populate({
-    path: "creator",
-    select: "followers username"
-  });
+router.get("/Livedebate/:id", isloggedin, async function (req, res) { 
+  try {
+      const Live = await liveMongo.findById(req.params.id)
+          .populate({ path: "creator", select: "followers username" })
+          .populate({ path: "opponent", select: "username" });
 
-  const user = await User.findOne({email: req.user.email});
+      if (!Live) {
+          return res.status(404).send("Live debate not found");
+      }
 
-  const followerscount = Live.creator[0].followers;
-    const follower = followerscount.length;
-    const isFollowing = followerscount.includes(req.user._id);
+      const creator = Live.creator.username;
+      const opponent = Live.opponent.username;
+      const user = await User.findOne({ email: req.user.email });
 
-    const source = req.query.source || "link";
+      const followerscount = Live.creator[0].followers;
+      const follower = followerscount.length;
+      const isFollowing = followerscount.includes(req.user._id);
 
-  res.render("live-player", { Live, user, isFollowing,follower, source });
+      // Check if user is a viewer
+      const isCreator = Live.creator[0]._id.equals(req.user._id);
+      const isOpponent = Live.opponent[0]._id.equals(req.user._id);
+      const isViewer = !isCreator && !isOpponent;
+
+      const RoomId = `${req.params.id}`;
+
+      res.render("live-player", { Live, user, isFollowing, follower,  RoomId, isCreator, isOpponent, isViewer });
+  } catch (error) {
+      console.error(error);
+      res.status(500).send("Server Error");
+  }
 });
 
 router.get("/start-debate", isloggedin, async function (req, res) {
@@ -510,15 +683,50 @@ router.get("/MUN-competetion",isloggedin, async function(req, res){
 });
 
 router.get("/Discover-Page-of-MUN/:id",isloggedin, async function(req, res){
-  const competition = await competitionMongo.findById(req.params.id); 
-  
-  res.render("MUN-competition-page", { competition });
+  const competition = await competitionMongo.findById(req.params.id);
+  const user = await User.findOne({ email: req.user.email });
 
+  const Booking = competition.members.some(id => id.equals(req.user.id));
+
+  
+  res.render("MUN-competition-page", { competition, user, Booking });
+});
+
+router.get("/Mun-member-entry/:id",isloggedin, async function(req, res){
+  try{
+    const Competition = await competitionMongo.findById(req.params.id).populate({
+      path: "members",
+      select: "username"
+    });
+
+    const user = await User.findOne({ email: req.user.email });
+  
+    const userId = req.user._id;
+      
+    if (!Competition.members.includes(user._id)) {
+      Competition.members.push(user._id);
+      await Competition.save();
+      console.log("Booking not done");
+    }else{
+      console.log("Booking Done")
+    }
+    if (!user.MunCompetition.includes(Competition._id)){
+      user.MunCompetition.push(Competition._id)
+      await user.save();
+    }else{
+      console.log("Booked recieved the Live Id")
+    }
+
+
+   res.redirect(`/Discover-Page-of-MUN/${req.params.id}`);
+  }catch(err){
+     res.redirect("/")
+  }
 });
 
 router.get("/My-ticket",isloggedin,async function(req, res){
   const tickets = await User.findOne({ email: req.user.email }).populate({
-    path: "Booked",
+    path: "LiveBooked",
     select: "title Thumbnail Booking Time creator",
     populate: [
     {
@@ -530,9 +738,82 @@ router.get("/My-ticket",isloggedin,async function(req, res){
       select: "username"
     }
   ]
-  });
-
-  res.render("tickets", { tickets });
+  })
+  .populate({
+    path: "MunCompetition",
+    select: "CompetitionName Date createdBy",
+    populate: { path: "createdBy", select: "username" }
 });
+
+const user = await User.findOne({ email: req.user.email });
+
+
+  res.render("tickets", { tickets, user });
+});
+
+router.get("/Delete-Account", isloggedin, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id)
+    .populate("podcast")
+    .populate("vedio")
+    .populate("communities")
+    .populate("MunCompetition")
+    .populate("requests")
+    .populate("Sender");
+
+    if (!user) {
+      return res.status(404).send("User not found.");
+    }
+
+    // Delete all associated podcasts from the 'podcasts' collection
+    await podcastsmongoose.deleteMany({ _id: { $in: user.podcast } });
+    await videomongoose.deleteMany({ _id: { $in: user.vedio } });
+    await communityMongo.deleteMany({ _id: { $in: user.communities } });
+    await competitionMongo.deleteMany({ _id: { $in: user.MunCompetition } });
+
+    if (user.requests.length > 0 || user.Sender.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "You have pending live sessions. Complete them before deleting your account."
+      });
+    }
+
+    await User.findByIdAndDelete(user._id);
+
+    res.clearCookie("user");
+
+    res.render("goodbye");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while deleting the user.");
+  }
+});
+
+router.get("/Chat-Notifications",isloggedin, async function(req, res){
+  const user = await User.findOne({ email: req.user.email });
+  res.render("chat-notification", { user });
+});
+
+router.get("/Terms-&-condition", async function(req, res) {
+  res.render("termsandcondition");
+});
+
+router.get("/Privacy-Policy", async function (req, res) {
+  res.render("Privacy-Policy");
+});
+
+router.get("/Contact-Us",isloggedin, async function (req, res) {
+  res.render("Contact-Us");
+});
+
+router.get("/About-Us", isloggedin, async function (req, res) {
+  res.render("About-us");
+});
+
+
+
+
+
+
 
 module.exports = router;

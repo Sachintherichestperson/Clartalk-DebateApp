@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leaderboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="./stylesheets/leaderboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <section class="container">
@@ -13,6 +13,7 @@
             <div class="branding">
                 <img src="/images/nav.png" alt="ClarTalk Logo">
                 <div class="search-bar">
+                    <i class="fa fa-search Search-icon"></i>
                     <input type="text" placeholder="Search topics, debates...">
                 </div>
             </div>
@@ -38,6 +39,9 @@
                 <a href="/MUN-competetion" class="nav-link">
                     <i class="fas fa-trophy"></i> MUN
                 </a>
+                <a href="/Chat-Notifications" class="nav-link">
+                    <i class="fas fa-bell"></i> Notifications
+                </a>
                 <a href="/profile" class="nav-link">
                     <i class="fas fa-user"></i> Profile
                 </a>
@@ -45,7 +49,7 @@
         </header>
     <div class="leaderboard-container">
         <header>
-            <h1><i class="fas fa-trophy"></i> Top Debaters</h1>
+            <h1><i class="fas fa-trophy trophy"></i> Top Debaters</h1>
         </header>
         <div class="leaderboard-list">
             <table>
@@ -60,7 +64,7 @@
                     <% LeaderBoards.forEach(function(LeaderBoard){ %> 
                     <tr>
                         <td><%= LeaderBoard.Rank %></td>
-                        <td><%= LeaderBoard.username %></td>
+                        <td><a href="/creator/content/<%= user._id %>" class="username"><%= LeaderBoard.username %></a></td>
                         <td><%= LeaderBoard.Rankpoints %></td>
                     </tr>
                     <% }) %>

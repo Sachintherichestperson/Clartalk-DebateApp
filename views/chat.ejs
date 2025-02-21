@@ -3,70 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Community-Chat</title>
+    <title>Community Chat</title>
     <link rel="stylesheet" href="/stylesheets/chat.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <section class="community-chat-section">
-        <div class="chat-container">
-            <!-- Navigation on the left -->
-            <nav class="community-nav">
-                <span class="community-logo"><img src="data:image/jpeg;base64,<%= community.CommunityDP.toString('base64') %>" alt="Video Thumbnail"></span>
-                <h2 class="community-name"><%= community.CommunityName %></h2>
-                <div class="icon-container" tabindex="0">
-                    <span class="icon">&#9776;</span>
-                    <div class="icon-dropdown-menu">
-                        <ul>
-                            <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
-                            <li><a href="/Settings"><i class="fas fa-cogs"></i> Setting</a></li>
-                            <li><a href="/Members/<%= community._id %>"><i class="fas fa-users"></i> Members</a></li>
-                            <li><a href="/Messages"><i class="fas fa-envelope"></i> Messages</a></li>
-                            <li><a href="/Notifications"><i class="fas fa-bell"></i> Notifications</a></li>
-                            <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Log-out</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-
-            <!-- Chat and input section on the right -->
-            <div class="chat-panel">
+        <nav class="community-nav">
+            <div class="community-logo">
+                <img src="data:image/jpeg;base64,<%= community.CommunityDP.toString('base64') %>" alt="Community Logo">
             </div>
-
-            <!-- Input section -->
+            <h2 class="community-name"><%= community.CommunityName %></h2>
+            <div class="icon-container">
+                <span class="icon">&#9776;</span>
+                <div class="icon-dropdown-menu">
+                    <ul>
+                        <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
+                        <li><a href="/Settings"><i class="fas fa-cogs"></i> Settings</a></li>
+                        <li><a href="/Members/<%= community._id %>"><i class="fas fa-users"></i> Members</a></li>
+                        <li><a href="/Chat-Notifications"><i class="fas fa-bell"></i> Notifications</a></li>
+                        <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Log-out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="chat-container">
+            <div class="chat-panel">                     </div>
+            <% if(member || type === "Public") { %>
             <div class="input-section">
                 <div class="file-options">
-                    <label for="dropdown-toggle">
-                        <i class="fas fa-paperclip"></i> <!-- Paperclip icon for attachment -->
-                    </label>
-                    <input type="checkbox" id="dropdown-toggle">
+                    <i class="fas fa-paperclip clip-icon"></i>
                     <div class="dropdown-menu">
                         <ul class="dropdown-list">
-                            <li><a href="#"><i class="fas fa-camera"></i><p>Camera</p></a></li> <!-- Camera icon -->
-                            <li><a href="#"><i class="fas fa-images"></i><p>Gallery</p></a></li> <!-- Gallery icon -->
-                            <li><a href="#"><i class="fas fa-file-alt"></i><p>Document</p></a></li> <!-- Document icon -->
-                            <li><a href="#"><i class="fas fa-poll"></i><p>Poll</p></a></li> <!-- Poll icon -->
+                            <li><a href="#"><i class="fas fa-camera"></i> Camera</a></li>
+                            <li><a href="#"><i class="fas fa-images"></i> Gallery</a></li>
+                            <li><a href="#"><i class="fas fa-file-alt"></i> Document</a></li>
+                            <li><a href="#"><i class="fas fa-poll"></i> Poll</a></li>
                         </ul>
                     </div>
                 </div>
-                <% if (community.members.includes(user._id)){ %>
-                <input type="text" placeholder="Type your message" id="msg-input" class="message-input">
-                <input type="submit" id="send-btn" value="Send" class="send-btn">
-                <% }else{%>
-                    <% if (community.CommunityChat === "Public"){ %>
+                <input type="text" placeholder="Type your message" class="message-input">
+                <button class="send-btn">Send</button>
+                <% }else { %>
+                    <div class="pay-section">
                     <form action="/Join-community/<%= community._id %>" method="post">
-                    <input type="submit" value="Join The Community" id="Add-input" class="Add-input" readonly>
+                        <button class="Add-input">Join-community</button>
                     </form>
-                    <% }else if (community.CommunityType === "Public" ) { %>
-                        <form action="/Join-community/<%= community._id %>" method="post">
-                        <input type="submit" value="Request To Join" id="Add-input" class="Add-input" readonly>
-                        </form>
-                    <% }else{ %>
-                    <form  id="paymentForm">
-                        <button id="rzp-button1" id="Add-input" class="Add-input">Pay</button>
-                    </form>
-                    <%}%>
-                <%}%>
+                </div>
+                </a>
+                <% } %>
             </div>
         </div>
     </section>
@@ -78,73 +63,91 @@
             const files = document.querySelector('.file-options');
 
             if (!files.contains(e.target)) {
-                checkbox.checked = false;  // Uncheck to close the dropdown
-            }
+        dropdown.style.display = 'none';  // Hide dropdown menu
+    } else {
+        dropdown.style.display = 'block';  // Show dropdown menu (toggle logic)
+    }
         });
     </script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const btn = document.querySelector(".send-btn"); 
-        const socket = io();
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const colors = [
+    "#e6194B", "#3cb44b", "#ffe119", "#4363d8", "#f58231", 
+    "#911eb4", "#42d4f4", "#f032e6", "#bfef45", "#fabebe"
+];
 
-        const user = "<%= user.username %>"
-        const communityId = "<%= community._id %>"
-        console.log(communityId);
+function getColorForUser(username) {
+    let hash = 0;
+    for (let i = 0; i < username.length; i++) {
+        hash = username.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length]; // Pick from preset colors
+}
 
-        socket.emit("joinCommunity", communityId );
+        // Correct the references to input field and add event listeners
+const btn = document.querySelector(".send-btn"); 
+const socket = io();
+const user = "<%= user.username %>";
+const communityId = "<%= community._id %>";
 
-        socket.on('allMessages', (messages) => {
-            console.log(messages);
+socket.emit("joinCommunity", communityId);
 
+socket.on('allMessages', (messages) => {
     const panel = document.querySelector(".chat-panel");
     panel.innerHTML = ''; 
 
-
     messages.forEach(message => {
-        const messageDiv = document.createElement("div");
-        if (message.sender === user) {
-            messageDiv.classList.add("self-msg");
-            messageDiv.innerHTML = `<span>Self:</span><p>${message.Message}</p>`;
-        } else {
-            messageDiv.classList.add("chat-msg");
-            messageDiv.innerHTML = `<span>${message.sender}:</span><p>${message.Message}</p>`;
-        }
-        panel.appendChild(messageDiv);
+            const messageDiv = document.createElement("div");
+            const randomColor = getColorForUser(message.sender);
+
+            if (message.sender === user) {
+                messageDiv.classList.add("self-msg");
+                messageDiv.innerHTML = `<span style="color:${randomColor}">Self:</span><p>${message.Message}</p>`;
+            } else {
+                messageDiv.classList.add("chat-msg");
+                messageDiv.innerHTML = `<span style="color:${randomColor}">${message.sender}:</span><p>${message.Message}</p>`;
+            }
+            panel.appendChild(messageDiv);
+        });
     });
+
+btn.addEventListener("click", () => {
+    sendMessage();
 });
 
-        btn.addEventListener("click", () => {
-            sendMessage();
-        });
+document.querySelector(".message-input").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") { // Prevent the default "Enter" behavior (e.g., new line)
+        sendMessage();
+    }
+});
 
-        document.querySelector("#msg-input").addEventListener("keydown", (event) => {
-                if (event.key === "Enter") { // Prevent the default "Enter" behavior (e.g., new line)
-               sendMessage();
-             }
-         });
+function sendMessage() {
+    const panel = document.querySelector(".chat-panel");
+    const message = document.querySelector(".message-input").value; // Correct reference
+    document.querySelector(".message-input").value = ""; // Clear input field
+    if (message) {
+        socket.emit("chatMessage", { username: user, message, communityId }); // Send message to server
+    }
+}
 
 
-         function sendMessage() {
-            const panel = document.querySelector(".chat-panel");
-            const message = document.querySelector("#msg-input").value;
-            document.querySelector("#msg-input").value = "";
-            if (message) {
-                socket.emit("chatMessage", { username: user, message, communityId });
-            }
-        }
 
-        socket.on("chatMessage", (data) => {
-            const panel = document.querySelector(".chat-panel");
-            const message = document.createElement("div");
-            if(data.username === user){
-                message.classList.add("self-msg");
-                message.innerHTML = `<span>Self:</span><p>${data.message}</p>`;
-            }else{
-            message.classList.add("chat-msg");
-            message.innerHTML = `<span>${data.username}:</span><p>${data.message}</p>`;
-            }
-            panel.appendChild(message);
-        });
+// Listen for incoming messages
+socket.on("chatMessage", (data) => {
+    const panel = document.querySelector(".chat-panel");
+    const message = document.createElement("div");
+
+    const randomColor = getColorForUser(data.username)
+
+    if(data.username === user){
+        message.classList.add("self-msg");
+        message.innerHTML = `<span style="color:${randomColor}">Self:</span><p>${data.message}</p>`;
+    }else{
+        message.classList.add("chat-msg");
+        message.innerHTML = `<span style="color:${randomColor}">${data.username}:</span><p>${data.message}</p>`;
+    }
+    panel.appendChild(message);
+});
 
     </script>
      <script src="https://checkout.razorpay.com/v1/checkout.js"></script>

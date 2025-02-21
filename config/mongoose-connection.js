@@ -11,4 +11,4 @@ mongoose
     dbgr(err)
 })
 
-module.exports = mongoose.connect;
+module.exports = mongoose.connection;

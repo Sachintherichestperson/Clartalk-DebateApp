@@ -1,0 +1,173 @@
+/* uploaded.css */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #101010;
+    color: white;
+    margin: 0;
+    padding: 0;
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 0;
+    width: 100%;
+}
+
+nav {
+    width: 95%;
+    text-align: center;
+    margin-bottom: 40px;
+    background-color: #1e1e1e;;
+}
+
+h1 {
+    color: white;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.Count {
+    font-size: 1.2rem;
+    color: #ccc;
+}
+
+#Content {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.extra {
+    text-align: center;
+    font-size: 1.3rem;
+    color: #888;
+    margin-top: 30px;
+}
+
+.extra h2 {
+    margin: 0;
+}
+
+a{
+    text-decoration: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #Content {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .video {
+        width: 80%;
+        margin-bottom: 20px;
+    }
+}
+
+
+.videos {
+    width: 300px;
+    background: #1f1f1f;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.videos:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 15px rgba(255, 87, 34, 0.6);
+}
+
+.videos img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.video-details {
+    padding: 15px;
+}
+
+.video-title {
+    color: #ffffff;
+    font-size: 18px;
+    margin: 10px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.video-time {
+    font-size: 14px;
+    color: #aaaaaa;
+}
+
+.Views{
+    font-size: 14px;
+    color: #aaaaaa;
+}
+.Delete{
+    padding: 10px 20px;
+    background-color: Red;
+    color: white;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+}
+.Edit{
+    padding: 10px;
+    background-color: blue;
+    color: white;
+    width: 40%;
+    text-align: center;
+    border-radius: 20px;
+}
+
+@media (max-width: 480px){
+    .videos {
+        width: 280px;
+        background: #1f1f1f;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    h1 {
+        color: white;
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+    .videos img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+    .buttons{
+        width: 100%;
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: space-between;
+    }
+    .Delete{
+        padding: 10px;
+        background-color: Red;
+        color: white;
+        width: 40%;
+        text-align: center;
+        border-radius: 20px;
+    }
+    .Edit{
+        padding: 10px;
+        background-color: blue;
+        color: white;
+        width: 40%;
+        text-align: center;
+        border-radius: 20px;
+    }
+}

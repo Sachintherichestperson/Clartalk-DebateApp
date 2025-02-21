@@ -92,17 +92,19 @@ a {
             </nav>
         </header>
             <div class="page">
+                <% communities.forEach(function(community){ %>
                 <section class="group">
                     <div class="chat">
-                        <strong class="community-name"> community.CommunityName </strong>
+                        <strong class="community-name"><%= community.CommunityName %></strong>
                         <div class="msg">
-                            <p><span>About:</span> community.CommunityisAbout </p>
+                            <p><span>About:</span><%= community.CommunityisAbout %></p>
                         </div>
-                        <a href="/community-chat/">
+                        <a href="/community-chat/<%= community._id %>">
                             <div class="button">Join Chat</div>
                         </a>
                     </div>
                 </section>
+                <% }) %>
             </div>            
         </div>
     </section>
