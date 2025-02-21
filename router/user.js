@@ -16,7 +16,6 @@ const Socket  = require("socket.io");
 const Razorpay = require("razorpay");
 const userMongo = require("../mongoose/user-mongo");
 const mongoose = require("mongoose");
-
 const { conn, getGFS } = require("../config/gridfs");
 
 router.get("/register", (req, res) => {                                                                      //register page
@@ -206,6 +205,13 @@ router.get("/podcast/:id",isloggedin, async function(req, res){                 
     .populate({
         path: "creator",
         select: "username followers"
+    }).populate({
+      path: "comment",
+      select: "text userId",
+      populate: {
+        path: "userId",
+        select: "username profile"
+      }
     });
 
     const creator = await User.findById(vedios.creator[0]._id).populate("Rankpoints")
@@ -233,8 +239,10 @@ router.get("/podcast/:id",isloggedin, async function(req, res){                 
       select: "username"
   });
 
+  const comments = vedios.comment;
 
-    res.render("vedioplayer", {vedios, suggestions,videoFile: vedios.vedio, currentRoute: "podcast", follower, isFollowing, user});
+
+    res.render("vedioplayer", {vedios, suggestions,videoFile: vedios.vedio, currentRoute: "podcast", follower, isFollowing, user, comments});
 
     }catch(err){
       res.send(err)
@@ -447,6 +455,13 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
     const viewers = await liveMongo.findById(req.params.id).populate({
       path: "BookingDoneBy",
       select: "username"
+    }).populate({
+      path: "comment",
+      select: "text userId",
+      populate: {
+        path: "userId",
+        select: "username profile"
+      }
     });
 
     console.log("Live creator", Live.creator[0]._id);
@@ -465,10 +480,12 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
 
   let user = await User.findOne({email: req.user.email });
 
-  const creator = Live.creator[0]._id.equals(user._id)
-  const opponent = Live.creator[0]._id.equals(user._id)
+  const creator = Live.creator[0]._id.equals(user._id);
+  const opponent = Live.creator[0]._id.equals(user._id);
 
-  res.render("Livedebate-player", { Live, follower, suggestions, currentRoute: "live-content-applying-page", isFollowing, user, Booking, creator, opponent });
+  const comments = viewers.comment;
+
+  res.render("Livedebate-player", { Live, follower, suggestions, currentRoute: "live-content-applying-page", isFollowing, user, Booking, creator, opponent, comments });
   }catch(err){
         res.send("404").status("Page Not Found");
   }
@@ -611,8 +628,20 @@ router.post("/Booking-Done-for-community/:id",isloggedin, async function (req, r
 router.get("/Livedebate/:id", isloggedin, async function (req, res) { 
   try {
       const Live = await liveMongo.findById(req.params.id)
-          .populate({ path: "creator", select: "followers username" })
-          .populate({ path: "opponent", select: "username" });
+          .populate({ 
+            path: "creator", 
+            select: "followers username" })
+          .populate({ 
+            path: "opponent", 
+            select: "username" 
+          }).populate({
+            path: "comment",
+            select: "text userId",
+            populate: {
+              path: "userId",
+              select: "username profile"
+            }
+          });
 
       if (!Live) {
           return res.status(404).send("Live debate not found");
@@ -633,7 +662,19 @@ router.get("/Livedebate/:id", isloggedin, async function (req, res) {
 
       const RoomId = `${req.params.id}`;
 
-      res.render("live-player", { Live, user, isFollowing, follower,  RoomId, isCreator, isOpponent, isViewer });
+      const comments = Live.comment;
+
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+        }
+    }
+
+    // Shuffle the comments array
+    shuffleArray(comments);
+
+      res.render("live-player", { Live, user, isFollowing, follower,  RoomId, isCreator, isOpponent, isViewer, comments });
   } catch (error) {
       console.error(error);
       res.status(500).send("Server Error");

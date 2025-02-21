@@ -40,7 +40,11 @@ const vedioSchema = new mongoose.Schema({
         type: String,
         enum: ['Processing', 'Live', 'Ended'],
         default: 'Processing'
-    }
+    },
+    comment: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "comments"
+    }]
 });
 
 module.exports = mongoose.model('live', vedioSchema);
