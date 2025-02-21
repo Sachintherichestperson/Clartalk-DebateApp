@@ -50,11 +50,12 @@
         <main class="page">
             <% if (vedios.length > 0) { %>
                 <% vedios.forEach(function(vedio) { %>
-                    <a href="/live-content-applying-page/<%= vedio._id %>" class="video-card">
+                    <a href="/live-content-applying-page/<%= vedio._id %>" class="video-card" data-id="<%= vedio._id %>">
                         <img src="data:image/jpeg;base64,<%= vedio.Thumbnail.toString('base64') %>" alt="Video Thumbnail">
                         <div class="video-details">
                             <h3 class="video-title"><%= vedio.title %></h3>
                             <p class="video-time" data-time="<%= vedio.Time %>">Time Left: Calculating...</p>
+                            <p class="video-status" style="display: none;">Live</p>
                         </div>
                     </a>
                 <% }) %>

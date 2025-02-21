@@ -18,18 +18,26 @@
                 <div class="video-section">
                     <img src="data:image/jpeg;base64,<%= Live.Thumbnail.toString('base64') %>" alt="" class="video-player">
                     <p class="video-title"><%= Live.title %></p>
-                    <% if(Booking || Live.Type === "regular") { %>
-                        <a href="/Livedebate/<%= Live._id %>" class="link">
+                    <% if(creator || opponent){ %>
+                        <a href="/start-debate" class="link">
                             <div class="Watch">
-                            <p class="amount">Watch The Debate</p>
+                            <p class="amount">Start The Debate</p>
                             </div>
                         </a>
                     <% }else{ %>
-                        <a href="/payment-for/<%= Live.creator[0]._id %>/payment/<%= Live._id %>" class="link">
-                            <div class="Pay">
-                            <p class="amount">PAY: ₹19</p>
-                            </div>
-                        </a>
+                        <% if(Booking || Live.Type === "regular") { %>
+                            <a href="/Livedebate/<%= Live._id %>" class="link">
+                                <div class="Watch">
+                                <p class="amount">Watch The Debate</p>
+                                </div>
+                            </a>
+                        <% }else{ %>
+                            <a href="/payment-for/<%= Live.creator[0]._id %>/payment/<%= Live._id %>" class="link">
+                                <div class="Pay">
+                                <p class="amount">PAY: ₹19</p>
+                                </div>
+                            </a>
+                        <% } %>
                     <% } %>
                     <div class="video-user-info">
                         <% if (Live.creator[0].image > 0) { %>

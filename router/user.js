@@ -36,15 +36,12 @@ router.post("/login", loginuser)                                                
 
 router.post("/send-notification",isloggedin, async (req, res) => {
   const { token } = req.body;
-  console.log(token)
 
   const user = await User.findById(req.user._id);
 
   user.fcmToken = token;
-  console.log(user);
 
   await user.save();
-    console.log("Received notification request:", req.body);
     res.json({ success: true, message: "Notification sent!" });
 });
 
@@ -451,6 +448,10 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
       path: "BookingDoneBy",
       select: "username"
     });
+
+    console.log("Live creator", Live.creator[0]._id);
+
+    console.log("Live opponent", Live.opponent[0]._id);
     const Booking = viewers.BookingDoneBy.some(id => id.equals(req.user.id))
 
     const followerscount = Live.creator[0].followers;
@@ -464,9 +465,23 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
 
   let user = await User.findOne({email: req.user.email });
 
-  res.render("Livedebate-player", { Live, follower, suggestions, currentRoute: "live-content-applying-page", isFollowing, user, Booking });
+  const creator = Live.creator[0]._id.equals(user._id)
+  const opponent = Live.creator[0]._id.equals(user._id)
+
+  res.render("Livedebate-player", { Live, follower, suggestions, currentRoute: "live-content-applying-page", isFollowing, user, Booking, creator, opponent });
   }catch(err){
         res.send("404").status("Page Not Found");
+  }
+});
+
+router.post('/update-status/:id', async (req, res) => {
+  try {
+      const { LiveStatus } = req.body;
+
+      await liveMongo.findByIdAndUpdate(req.params.id, { LiveStatus });
+      res.status(200).json({ message: 'Status updated successfully' });
+  } catch (error) {
+      res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 

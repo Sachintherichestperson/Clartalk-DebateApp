@@ -73,7 +73,6 @@ router.get("/video-content/upload", isloggedin, function(req, res) {
   res.render("video-uploader"); 
 });
 
-
 router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, async function(req, res) {
   try {
       if (!req.session.uploadData) {
@@ -132,24 +131,6 @@ router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, 
       res.status(500).send("Server Error");
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 router.get("/creator/live",isloggedin ,async function(req, res){
   const live = await User.findOne({email: req.user.email});
@@ -217,7 +198,7 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
     user.Live.push(content._id);
     await user.save();
 
-    content.creator.push(user._id);
+    // content.creator.push(user._id);
     await content.save();
 
     const opponentName = opponentUser.username;
@@ -243,6 +224,7 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
 
     content.opponent.push(opponentId._id);
     await user.save();
+
     
     res.redirect("/")
   } catch (err) {

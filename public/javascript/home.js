@@ -6,35 +6,50 @@
             alert(message.message);
         });
     
-        // Function to calculate and update the "Time Left"
-        function updateTimeLeft() {
+        async function updateTimeLeft() {
             const now = new Date();
-    
-            document.querySelectorAll('.video-time').forEach((timeElement) => {
-                const videoTime = new Date(timeElement.dataset.time); // Parse video time
-                const timeLeft = videoTime - now; // Calculate remaining time in milliseconds
-    
+        
+            document.querySelectorAll('.video-card').forEach(async (videoCard) => {
+                const timeElement = videoCard.querySelector('.video-time');
+                const statusElement = videoCard.querySelector('.video-status');
+                const videoTime = new Date(timeElement.dataset.time);
+                const timeLeft = videoTime - now;
+        
                 if (timeLeft > 0) {
-                    // Calculate days, hours, and minutes
+                    // Time left: Show countdown, hide status
                     const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
                     const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-    
-                    // Display time left in days, hours, and minutes, or just hours and minutes
-                    if (days > 0) {
-                        timeElement.textContent = `Time Left: ${days}d ${hours}h ${minutes}m`;
-                    } else {
-                        timeElement.textContent = `Time Left: ${hours}h ${minutes}m`;
-                    }
+        
+                    timeElement.textContent = days > 0 
+                        ? `Time Left: ${days}d ${hours}h ${minutes}m` 
+                        : `Time Left: ${hours}h ${minutes}m`;
+        
+                    timeElement.style.display = "block";  // Show countdown
+                    statusElement.style.display = "none"; // Hide status
                 } else {
-                    timeElement.textContent = "Event Ended";
+                    // Time is up: Hide countdown, show status
+                    timeElement.style.display = "none";   // Hide countdown
+                    statusElement.style.display = "block"; // Show status
+        
+                    // Update status in database
+                    const videoId = videoCard.dataset.id;
+                    if (videoId) {
+                        await fetch(`/update-status/${videoId}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ LiveStatus: 'Live' })
+                        });
+                    }
                 }
             });
         }
-    
-        // Update time every 1 second
+        
+        // Run every second
         setInterval(updateTimeLeft, 1000);
-        updateTimeLeft(); // Run the function on page load
+        updateTimeLeft();
+        
+        
     
     
         document.addEventListener("DOMContentLoaded", () => {
