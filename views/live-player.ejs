@@ -19,11 +19,13 @@
                         <i class="fas fa-comment comment-i"></i> 
                     </label>
                     <div id="remoteVideos"></div> <!-- Container for multiple remote videos -->
-                    <% if(isCreator || isOpponent){ %>
-                        <button class="start-stream-btn">Start Stream</button>
-                        <button class="end-call-btn">End Call</button>
-                    <% } %>
                 </div>
+            </div>
+            <div class="main-buttons">
+                <% if(isCreator || isOpponent){ %>
+                    <button class="start-stream-btn">Start Stream</button>
+                    <button class="end-call-btn">End Call</button>
+                <% } %>
             </div>
             <% if(isViewer){ %>
             <div class="about-video">
@@ -33,25 +35,6 @@
                 </div>
             <% } %>
             </div>
-            <% if(isViewer){ %>
-            <div class="video-user-info">
-                <img src="/images/Default.png" alt="Default Avatar" class="user-avatar">
-                <div class="creator-details">
-                    <a href="/creator/creator" class="creator-name">
-                        Creator Username
-                    </a>
-                    <p class="followers-count"><%= follower %> Followers</p>
-                </div>
-            <% } %>
-                <% if(isViewer){ %>
-                <% if (isFollowing) { %>
-                    <button class="unfollow" data-creator-id="<%= Live.creator[0]._id %>" id="follow-btn">Unfollow</button>
-                <% } else { %>
-                    <button class="follow" data-creator-id="<%= Live.creator[0]._id %>" id="follow-btn">Follow</button>
-                <% } %>
-                <% } %>
-            </div> 
-        <% if(isViewer){ %>
         <input type="checkbox" id="commentsToggle" class="comments-toggle" hidden>
         <div class="panel">
             <div id="buttons">
@@ -78,60 +61,211 @@
             </div>
             </div> 
             <div id="questions">
-                <div class="comment-list">
-                    <li class="single-question">
-                        Me hu Daro Mat Sachin, Tum Bus Mehnat Karte Raho aur mere Priyata ka nam lete Raho, Aur Jo Tum Kar Rahe Ho Wo Karte Raho
-                    </li>
-                </div>
                 <div class="comment-input">
                     <input type="text" placeholder="Ask a question" id="commentInputQuestions">
                     <button id="commentButtonQuestions">Submit</button>
                 </div>
+                <div class="questions">
+                <% Questions.forEach(function(question) { %>
+                <div class="comment-list">
+                    <strong class="strong">Question:</strong><p><%= question %></p>
+                </div>
+                <% }) %>
+            </div>
             </div>
         </div>
-        <% } %>
     </div>
-</div>
     </section>
     <script src="/javascript/socket.io.js"></script>
-    <script>
-       const socket = io();
-       const postBtn = document.querySelector("#commentButtonComments");
-       const commentInput = document.querySelector("#commentInputComments");
-       const commentSection = document.querySelector(".allsinglecomment");
-       const liveId = "<%= Live._id %>";
-       console.log(liveId);
+  <script>
+    const socket = io();
+    const postBtn = document.querySelector("#commentButtonComments");
+    const commentInput = document.querySelector("#commentInputComments");
+    const commentSection = document.querySelector(".allsinglecomment");
+    const liveId = "<%= Live._id %>";
+    console.log(liveId);
 
-       postBtn.addEventListener("click", () => {
-        const commentText = commentInput.value.trim(); 
-        if (commentText) {
-            const commentData = {
-                text: commentText,
-                userId: "<%= user._id %>",
-                liveId: liveId
-            };
-            console.log(commentData);
-            socket.emit("livenewComment", commentData);
-            commentInput.value = ""; // Clear input
+    postBtn.addEventListener("click", () => {
+     const commentText = commentInput.value.trim(); 
+     if (commentText) {
+         const commentData = {
+             text: commentText,
+             userId: "<%= user._id %>",
+             liveId: liveId
+         };
+         console.log(commentData);
+         socket.emit("livenewComment", commentData);
+         commentInput.value = ""; // Clear input
+     }
+    });
+
+ socket.on("liveaddComment", (data) => {
+     const commentElement = document.createElement("div");
+     commentElement.classList.add("single-comment");
+     commentElement.innerHTML = `
+         <img src="${data.image}" alt="" class="comment-image">
+         <p><strong class="strong">${data.username}:</strong> ${data.text}</p>
+     `;
+     commentSection.prepend(commentElement);
+
+     // Update comment count
+     commentCount.textContent = parseInt(commentCount.textContent) + 1;
+ });
+
+
+     
+ </script>
+<script>
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideos = document.getElementById('remoteVideos');
+    const startStreamBtn = document.querySelector('.start-stream-btn');
+    const endCallBtn = document.querySelector('.end-call-btn');
+    const isViewer = "<%= isViewer %>";
+
+    let localStream;
+    let peerConnection;
+
+    const configuration = {
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+    };
+
+    // Clean up peer connection and streams
+    function cleanup() {
+        if (peerConnection) {
+            peerConnection.close();
+            peerConnection = null;
         }
-       });
+        if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+            localStream = null;
+        }
+        localVideo.srcObject = null;
 
-       socket.on("liveaddComment", (data) => {
-    const commentElement = document.createElement("div");
-    commentElement.classList.add("single-comment");
-    commentElement.innerHTML = `
-        <img src="${data.image}" alt="" class="comment-image">
-        <p><strong class="strong">${data.username}:</strong> ${data.text}</p>
-    `;
-    commentSection.prepend(commentElement);
+        socket.emit('user-disconnected', socket.id);
 
-    // Update comment count
-    commentCount.textContent = parseInt(commentCount.textContent) + 1;
-});
+        remoteVideos.innerHTML = ''; // Clear all remote videos
+    }
 
+    // Start local stream
+    async function startLocalStream() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            localVideo.srcObject = stream;
+            localStream = stream;
+        } catch (error) {
+            console.error('Error accessing media devices.', error);
+        }
+    }
 
-        
-    </script>
+    // Create a peer connection
+    function createPeerConnection() {
+        peerConnection = new RTCPeerConnection(configuration);
+
+        // Add local tracks to the peer connection
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+        // Handle remote stream
+        peerConnection.ontrack = event => {
+            const userId = socket.id; // Assuming you have access to the peer's ID
+            const existingVideos = Array.from(remoteVideos.getElementsByTagName('video'));
+
+            // Check if a video element for this user already exists
+            let remoteVideo = existingVideos.find(video => video.dataset.peerId === userId);
+
+            if (!remoteVideo) {
+                // Create a new video element if it doesn't exist
+                remoteVideo = document.createElement('video');
+                remoteVideo.autoplay = true;
+                remoteVideo.playsinline = true;
+                remoteVideo.dataset.peerId = userId; // Add a unique identifier
+                remoteVideos.appendChild(remoteVideo);
+            }
+
+            // Update the video stream
+            remoteVideo.srcObject = event.streams[0];
+        };
+
+        // Handle ICE candidates
+        peerConnection.onicecandidate = event => {
+            if (event.candidate) {
+                socket.emit('ice-candidate', event.candidate);
+            }
+        };
+    }
+
+    // Start the stream and initiate the call
+    async function startStream() {
+        cleanup(); // Clean up any existing connections
+
+        if (!localStream) {
+            await startLocalStream();
+        }
+
+        createPeerConnection();
+
+        // Create an offer and set it as the local description
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+
+        // Send the offer to the remote peer via Socket.IO
+        socket.emit('offer', offer);
+    }
+
+    // End the call
+    function endCall() {
+        cleanup(); // Clean up connections and streams
+    }
+
+    // Event listeners for buttons
+    startStreamBtn.addEventListener('click', startStream);
+    endCallBtn.addEventListener('click', endCall);
+
+    // Socket.IO event listeners
+    socket.on('offer', async (offer) => {
+        if (!peerConnection) {
+            createPeerConnection();
+        }
+
+        if (!localStream) {
+            await startLocalStream();
+        }
+
+        // Set the remote description
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+
+        // Create an answer and set it as the local description
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+
+        // Send the answer to the remote peer via Socket.IO
+        socket.emit('answer', answer, socket.id);
+    });
+
+    socket.on('answer', async (answer) => {
+        // Set the remote description
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+    });
+
+    socket.on('ice-candidate', async (candidate) => {
+        // Add the ICE candidate to the peer connection
+        await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+    });
+
+    // Handle user disconnection
+    socket.on('user-disconnected', (userId) => {
+        const remoteVideo = document.querySelector(`[data-peer-id="${userId}"]`);
+        if (remoteVideo) {
+            remoteVideo.remove(); // Remove the frozen video element
+        }
+    });
+
+    // Clean up on page refresh or tab close
+    window.addEventListener('beforeunload', () => {
+        cleanup();
+        socket.emit('user-disconnected', socket.id);
+    });
+
+</script>
      <script>
         document.addEventListener("DOMContentLoaded", function () {
             const commentsSection = document.querySelector(".comments");
@@ -159,6 +293,41 @@
                 }
             });
         });
+    </script>
+    <script>
+    const btn = document.querySelector("#commentButtonQuestions");
+    const input = document.querySelector("#commentInputQuestions");
+    const questions = document.querySelector(".questions");
+
+    btn.addEventListener("click", () => {
+        const Text = input.value.trim(); 
+
+        
+        if (Text) {
+            const questionData = {
+                questions: Text,
+                liveId: liveId
+            };
+
+            socket.emit("livequestions", questionData);
+            input.value = "";
+            console.log(questionData);
+        }
+       });
+
+       socket.on("liveaddquestion", (data) => {
+        console.log("Received on client:", data);
+
+    if (!data.questions || !Array.isArray(data.questions)) return;
+
+    const latestQuestion = data.questions[data.questions.length - 1];
+
+    const questionElement = document.createElement("div");
+    questionElement.classList.add("single-question");
+    questionElement.innerHTML = `<strong class="strong">Questions:</strong><p>${latestQuestion}</p>`;
+
+    questions.prepend(questionElement);
+    });
     </script>
 </body>
 </html>
