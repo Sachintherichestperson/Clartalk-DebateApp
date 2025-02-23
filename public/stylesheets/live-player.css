@@ -17,41 +17,55 @@ body {
 }
 
 @media screen {
-.container {
-    width: 90%;
-    background: #1e1e1e;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
-    margin-bottom: 50px;
-}
+    section{
+        width: 100%;
+        height: 100%;
+    }
+    .container {
+        width: 100%;
+        background: #1e1e1e;
+        padding: 20px 0 50px;
+        height: fit-content;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
+        margin-bottom: 50px;
+    }
 
 .single-comment strong{
     color: #f8c210;
 }
 
-.player {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+video{
+    transform: scaleX(-1);
 }
-
-.local-video, .remote-video {
-    width: 100%;
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-}
-
-video {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
+.remote-video{
+    height: 100%;
     background-color: #00000c;
 }
+.player {
+    display: flex;
+    align-items: stretch;
+    flex-direction: row;
+    height: 180px;
+    gap: 10px
+}
 
+.local-video,
 .remote-video {
-    margin-top: 10px;
+    flex: 1; /* Both take equal width */
+    display: flex;
+    background-color: #00000c;
+}
+.remote-video video{
+    width: 150%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.local-video video {
+width: 100%;  /* Make the video take full width */
+height: 100%; /* Ensures both videos take equal height */
+object-fit: cover; /* Prevents distortion while filling container */
 }
 
 .end-call-btn {
@@ -222,7 +236,20 @@ video {
 .single-comment{
     list-style-type: none;
 }
-
+.main-buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.start-stream-btn{
+    background: Blue;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
 .comment-input {
     position: relative;
     display: flex;
@@ -401,9 +428,10 @@ video {
 
 @media (max-width: 480px) and (orientation: Portrait) {
     .container {
-        width: 90%;
+        width: 100%;
         background: #1e1e1e;
-        padding: 20px;
+        padding: 20px 0 50px;
+        height: max-content;
         border-radius: 10px;
         box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
         margin-bottom: 50px;
@@ -412,31 +440,31 @@ video {
     .strong{
         color: #f8c210;
     }
-
-    
-    .player {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .local-video, .remote-video {
-        width: 100%;
-        border-radius: 10px;
-        overflow: hidden;
-        position: relative;
-    }
-    
-    video {
-        width: 100%;
-        height: auto;
-        border-radius: 10px;
+    .remote-video{
+        height: 100%;
         background-color: #00000c;
     }
-    
-    .remote-video {
-        margin-top: 10px;
+    .player {
+        display: flex;
+        align-items: stretch;
+        flex-direction: row;
+        height: 180px;
+        gap: 10px
     }
+    
+
+    .local-video,
+    .remote-video {
+        flex: 1; /* Both take equal width */
+        display: flex;
+    }
+
+.local-video video,
+.remote-video video {
+    width: 100%;  /* Make the video take full width */
+    height: 100%; /* Ensures both videos take equal height */
+    object-fit: cover; /* Prevents distortion while filling container */
+}
     
     .end-call-btn {
         background: red;

@@ -56,6 +56,8 @@ app.use(flash());
 app.use("/", user);
 app.use("/creator", creator);
 
+const rooms = {}; 
+
 io.on("connection", (socket) => {
     socket.on("joinCommunity", async (communityId) => {
         try {
@@ -205,9 +207,41 @@ io.on("connection", (socket) => {
             console.error("Error saving comment:", error);
         }
     });
+
+    socket.on("livequestions", async (data) => {
+        try {
+
+            const question = await liveMongo.findById(data.liveId);
+            question.Questions.push(data.questions);
+            await question.save();
+
+
+            io.emit("liveaddquestion", {
+                questions: question.Questions,
+            });
+
+        }catch(err){
+            console.log(err);
+            }
+        });
+
+        socket.on('offer', (offer) => {
+            socket.broadcast.emit('offer', offer);
+        });
     
-});
+        socket.on('answer', (answer) => {
+            socket.broadcast.emit('answer', answer);
+        });
+    
+        socket.on('ice-candidate', (candidate) => {
+            socket.broadcast.emit('ice-candidate', candidate);
+        });
+    
+        socket.on('disconnect', () => {
+            socket.broadcast.emit('user-disconnected', socket.id);
+        });
+    });
 
 server.listen(3000, "0.0.0.0", () => {
     console.log("Server running on port 3000 and accessible on network");
-});
+})

@@ -194,8 +194,9 @@ router.get("/podcast", isloggedin, async function(req, res){                    
     return bMatches - aMatches; // Higher matches come first
 });
 
+const comments = vedios.comment;
 
-  res.render("podcast", { vedios, user });
+  res.render("podcast", { vedios, user, comments });
 });
  
 router.get("/podcast/:id",isloggedin, async function(req, res){                                            //podcast video-player
@@ -464,9 +465,6 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
       }
     });
 
-    console.log("Live creator", Live.creator[0]._id);
-
-    console.log("Live opponent", Live.opponent[0]._id);
     const Booking = viewers.BookingDoneBy.some(id => id.equals(req.user.id))
 
     const followerscount = Live.creator[0].followers;
@@ -481,7 +479,7 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
   let user = await User.findOne({email: req.user.email });
 
   const creator = Live.creator[0]._id.equals(user._id);
-  const opponent = Live.creator[0]._id.equals(user._id);
+  const opponent = Live.opponent[0]._id.equals(user._id);
 
   const comments = viewers.comment;
 
@@ -670,11 +668,12 @@ router.get("/Livedebate/:id", isloggedin, async function (req, res) {
             [array[i], array[j]] = [array[j], array[i]]; // Swap elements
         }
     }
+    const Questions = Live.Questions;
 
     // Shuffle the comments array
     shuffleArray(comments);
 
-      res.render("live-player", { Live, user, isFollowing, follower,  RoomId, isCreator, isOpponent, isViewer, comments });
+      res.render("live-player", { Live, user, isFollowing, follower,  RoomId, isCreator, isOpponent, isViewer, comments, Questions });
   } catch (error) {
       console.error(error);
       res.status(500).send("Server Error");

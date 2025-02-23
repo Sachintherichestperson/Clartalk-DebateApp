@@ -44,7 +44,8 @@ const vedioSchema = new mongoose.Schema({
     comment: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "comments"
-    }]
+    }],
+    Questions: { type: [String]}
 });
 
 module.exports = mongoose.model('live', vedioSchema);
