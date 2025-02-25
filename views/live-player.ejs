@@ -5,27 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Video</title>
     <link rel="stylesheet" href="/stylesheets/live-player.css">
+    <style>
+        #remoteVideos{
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+        }
+        #remoteVideos video{
+            height: 100%
+        }
+    </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <section>
         <div class="container">
             <div class="player">
+                <input type="text" id="roomId" placeholder="Enter Debate Room ID" value="<%= Live._id %>" hidden>
+                <% if(isCreator || isOpponent){ %>
                 <div class="local-video">
                     <video id="localVideo" autoplay muted playsinline></video>
                 </div>
+                <% } %>
                 <div class="remote-video">
                     <label class="comment-btn" for="commentsToggle" id="icon">
                         <i class="fas fa-comment comment-i"></i> 
                     </label>
-                    <div id="remoteVideos"></div> <!-- Container for multiple remote videos -->
-                </div>
+                    <div id="remoteVideos"></div> <!-- Multiple debaters will be shown here -->
+                </div>            
             </div>
             <div class="main-buttons">
                 <% if(isCreator || isOpponent){ %>
-                    <button class="start-stream-btn">Start Stream</button>
-                    <button class="end-call-btn">End Call</button>
+                    <button class="start-stream-btn" onclick="joinRoom('debater')">Start Stream</button>
                 <% } %>
+                <button class="end-call-btn" onclick="joinRoom('viewer')">End Call</button>
             </div>
             <% if(isViewer){ %>
             <div class="about-video">
@@ -116,156 +129,134 @@
      
  </script>
 <script>
-    const localVideo = document.getElementById('localVideo');
-    const remoteVideos = document.getElementById('remoteVideos');
-    const startStreamBtn = document.querySelector('.start-stream-btn');
-    const endCallBtn = document.querySelector('.end-call-btn');
-    const isViewer = "<%= isViewer %>";
-
     let localStream;
-    let peerConnection;
+    let peerConnections = {};
+    let roomId;
+    let userType;
+    
+    const configuration = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+    
+    async function joinRoom(type) {
+        roomId = document.getElementById("roomId").value.trim();
+        if (!roomId) return alert("Enter a Room ID!");
+    
+        userType = type; // "debater" or "viewer"
+        socket.emit("join-room", roomId, userType);
+    
+        if (userType === "debater") {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            document.getElementById("localVideo").srcObject = localStream;
 
-    const configuration = {
-        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-    };
-
-    // Clean up peer connection and streams
-    function cleanup() {
-        if (peerConnection) {
-            peerConnection.close();
-            peerConnection = null;
-        }
-        if (localStream) {
-            localStream.getTracks().forEach(track => track.stop());
-            localStream = null;
-        }
-        localVideo.srcObject = null;
-
-        socket.emit('user-disconnected', socket.id);
-
-        remoteVideos.innerHTML = ''; // Clear all remote videos
-    }
-
-    // Start local stream
-    async function startLocalStream() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            localVideo.srcObject = stream;
-            localStream = stream;
-        } catch (error) {
-            console.error('Error accessing media devices.', error);
+            const remoteVideos = document.querySelectorAll("#remoteVideos video");
+                remoteVideos.forEach((video, index) => {
+                    if (index > 0) { // Hide all videos except the first one
+                video.style.display = "none";
+                }
+            });
         }
     }
-
-    // Create a peer connection
-    function createPeerConnection() {
-        peerConnection = new RTCPeerConnection(configuration);
-
-        // Add local tracks to the peer connection
-        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-
-        // Handle remote stream
-        peerConnection.ontrack = event => {
-            const userId = socket.id; // Assuming you have access to the peer's ID
-            const existingVideos = Array.from(remoteVideos.getElementsByTagName('video'));
-
-            // Check if a video element for this user already exists
-            let remoteVideo = existingVideos.find(video => video.dataset.peerId === userId);
-
-            if (!remoteVideo) {
-                // Create a new video element if it doesn't exist
-                remoteVideo = document.createElement('video');
-                remoteVideo.autoplay = true;
-                remoteVideo.playsinline = true;
-                remoteVideo.dataset.peerId = userId; // Add a unique identifier
-                remoteVideos.appendChild(remoteVideo);
-            }
-
-            // Update the video stream
-            remoteVideo.srcObject = event.streams[0];
+    
+    socket.on("new-user", async (userId, type) => {
+        console.log(`New ${type} joined: ${userId}`);
+    
+        createPeerConnection(userId);
+    
+        if (userType === "debater") {
+            sendOffer(userId);
+        }
+    });
+    
+    function createPeerConnection(userId) {
+        if (peerConnections[userId]) return; // Prevent duplicate connections
+    
+        const peerConnection = new RTCPeerConnection(configuration);
+    
+        peerConnection.ontrack = (event) => {
+            addRemoteStream(event.streams[0], userId);
         };
-
-        // Handle ICE candidates
-        peerConnection.onicecandidate = event => {
+    
+        peerConnection.onicecandidate = (event) => {
             if (event.candidate) {
-                socket.emit('ice-candidate', event.candidate);
+                socket.emit("ice-candidate", event.candidate, userId);
             }
         };
-    }
-
-    // Start the stream and initiate the call
-    async function startStream() {
-        cleanup(); // Clean up any existing connections
-
-        if (!localStream) {
-            await startLocalStream();
+    
+        peerConnections[userId] = peerConnection;
+    
+        if (userType === "debater" && localStream) {
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
         }
-
-        createPeerConnection();
-
-        // Create an offer and set it as the local description
+    }
+    
+    async function sendOffer(userId) {
+        if (!peerConnections[userId]) return;
+    
+        const peerConnection = peerConnections[userId];
+    
         const offer = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offer);
-
-        // Send the offer to the remote peer via Socket.IO
-        socket.emit('offer', offer);
+        
+        socket.emit("offer", offer, userId);
     }
-
-    // End the call
-    function endCall() {
-        cleanup(); // Clean up connections and streams
-    }
-
-    // Event listeners for buttons
-    startStreamBtn.addEventListener('click', startStream);
-    endCallBtn.addEventListener('click', endCall);
-
-    // Socket.IO event listeners
-    socket.on('offer', async (offer) => {
-        if (!peerConnection) {
-            createPeerConnection();
+    
+    socket.on("offer", async (offer, senderId) => {
+        if (!peerConnections[senderId]) {
+            createPeerConnection(senderId);
         }
-
-        if (!localStream) {
-            await startLocalStream();
+    
+        const peerConnection = peerConnections[senderId];
+    
+        if (peerConnection.signalingState !== "stable") {
+            console.warn("Waiting for stable signaling state...");
+            await new Promise(resolve => setTimeout(resolve, 100)); // Small delay for stable state
         }
-
-        // Set the remote description
+    
         await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-
-        // Create an answer and set it as the local description
+    
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
-
-        // Send the answer to the remote peer via Socket.IO
-        socket.emit('answer', answer, socket.id);
+        
+        socket.emit("answer", answer, senderId);
     });
-
-    socket.on('answer', async (answer) => {
-        // Set the remote description
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-    });
-
-    socket.on('ice-candidate', async (candidate) => {
-        // Add the ICE candidate to the peer connection
-        await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-    });
-
-    // Handle user disconnection
-    socket.on('user-disconnected', (userId) => {
-        const remoteVideo = document.querySelector(`[data-peer-id="${userId}"]`);
-        if (remoteVideo) {
-            remoteVideo.remove(); // Remove the frozen video element
+    
+    socket.on("answer", async (answer, senderId) => {
+        if (peerConnections[senderId]) {
+            await peerConnections[senderId].setRemoteDescription(new RTCSessionDescription(answer));
         }
     });
-
-    // Clean up on page refresh or tab close
-    window.addEventListener('beforeunload', () => {
-        cleanup();
-        socket.emit('user-disconnected', socket.id);
+    
+    socket.on("ice-candidate", async (candidate, senderId) => {
+        if (peerConnections[senderId]) {
+            await peerConnections[senderId].addIceCandidate(new RTCIceCandidate(candidate));
+        }
     });
-
-</script>
+    
+    socket.on("user-disconnected", (userId) => {
+        if (peerConnections[userId]) {
+            peerConnections[userId].close();
+            delete peerConnections[userId];
+            removeRemoteStream(userId);
+        }
+    });
+    
+    function addRemoteStream(stream, userId) {
+        if (!document.getElementById(`video-${userId}`)) {
+            const videoElement = document.createElement("video");
+            videoElement.id = `video-${userId}`;
+            videoElement.className = "remote-Videos";
+            videoElement.autoplay = true;
+            videoElement.playsInline = true;
+            videoElement.srcObject = stream;
+            document.getElementById("remoteVideos").appendChild(videoElement);
+        }
+    }
+    
+    function removeRemoteStream(userId) {
+        const videoElement = document.getElementById(`video-${userId}`);
+        if (videoElement) videoElement.remove();
+    }
+    </script>
+    
      <script>
         document.addEventListener("DOMContentLoaded", function () {
             const commentsSection = document.querySelector(".comments");
@@ -324,10 +315,11 @@
 
     const questionElement = document.createElement("div");
     questionElement.classList.add("single-question");
-    questionElement.innerHTML = `<strong class="strong">Questions:</strong><p>${latestQuestion}</p>`;
+    questioznElement.innerHTML = `<strong class="strong">Questions:</strong><p>${latestQuestion}</p>`;
 
     questions.prepend(questionElement);
     });
     </script>
+     <script type="module" src="./firebase-notification.js"></script>
 </body>
 </html>

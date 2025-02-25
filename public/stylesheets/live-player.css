@@ -57,7 +57,6 @@ video{
     background-color: #00000c;
 }
 .remote-video video{
-    width: 150%;
     height: 100%;
     object-fit: cover;
 }
@@ -459,13 +458,16 @@ object-fit: cover; /* Prevents distortion while filling container */
         display: flex;
     }
 
-.local-video video,
-.remote-video video {
+.local-video video {
     width: 100%;  /* Make the video take full width */
     height: 100%; /* Ensures both videos take equal height */
     object-fit: cover; /* Prevents distortion while filling container */
 }
-    
+.remote-video video{
+    height: 100%;
+    object-fit: cover;
+}    
+
     .end-call-btn {
         background: red;
         color: white;
