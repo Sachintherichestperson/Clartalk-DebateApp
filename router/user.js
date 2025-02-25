@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../mongoose/user-mongo");
 const bcrypt = require("bcrypt");
+const { sendPushNotification } = require("../services/firebase");
 const jwt = require("jsonwebtoken");
 const {userregister, loginuser, logout} = require("../controller/authcontroller");
 const isloggedin = require("../middleware/isloggedin");
@@ -33,21 +34,11 @@ router.get("/login", function(req, res){                                        
 
 router.post("/login", loginuser)                                                                           //Login Page-Uploader
 
-router.post("/send-notification",isloggedin, async (req, res) => {
-  const { token } = req.body;
-
-  const user = await User.findById(req.user._id);
-
-  user.fcmToken = token;
-
-  await user.save();
-    res.json({ success: true, message: "Notification sent!" });
-});
-
 router.get("/",isloggedin,async function(req, res){                                                        // front page
   try{
     const user = await User.findOne({email: req.user.email}).populate("requests").populate( "Sender" );
     const vedios = await liveMongo.find({ status: "accept"})
+
     res.render("front-page", {vedios, user})
   }catch(err){
     res.status(404).send(err);
@@ -483,6 +474,8 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
 
   const comments = viewers.comment;
 
+  
+
   res.render("Livedebate-player", { Live, follower, suggestions, currentRoute: "live-content-applying-page", isFollowing, user, Booking, creator, opponent, comments });
   }catch(err){
         res.send("404").status("Page Not Found");
@@ -586,19 +579,27 @@ router.get("/Booking-Done/:id",isloggedin, async function (req, res) {
       Live.BookingDoneBy.push(user._id);
       Live.Booking += 1
       await Live.save();
-      console.log("Booking not done");
     }else{
       console.log("Booking Done")
     }
     if (!user.LiveBooked.includes(Live._id)){
       user.LiveBooked.push(Live._id)
       await user.save();
-      console.log("Booked not recieved the Live Id");
     }else{
       console.log("Booked recieved the Live Id")
     }
 
-    console.log("Payement Done", Live.BookingDoneBy);
+    const fcmToken = user.fcmToken;
+
+    if (fcmToken) {
+        try {
+            console.log("📤 Sending notification...");  
+            await sendPushNotification(fcmToken, Live.title, "Your booking is confirmed");
+            console.log("✅ Notification sent successfully");
+        } catch (error) {
+            console.error("🔥 Error sending notification:", error);
+        }
+    }
 
    res.redirect(`/live-content-applying-page/${req.params.id}`);
   }catch(err){

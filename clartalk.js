@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const admin = require("firebase-admin")
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const expressSession = require("express-session");
@@ -35,13 +34,6 @@ app.set("view engine", "ejs");
 
 const cors = require('cors');
 app.use(cors({ origin: '*' }));  // Allow all origins (for testing)
-
-
-const serviceAccount = require("./notification.json"); // Replace with your JSON file
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
 
 app.use(
   expressSession({
@@ -225,22 +217,36 @@ io.on("connection", (socket) => {
             }
         });
 
-        socket.on('offer', (offer) => {
-            socket.broadcast.emit('offer', offer);
+        socket.on("join-room", (roomId, userType) => {
+            socket.join(roomId);
+            if (!rooms[roomId]) rooms[roomId] = [];
+            rooms[roomId].push({ id: socket.id, type: userType });
+    
+            socket.to(roomId).emit("new-user", socket.id, userType);
+            console.log(`User ${socket.id} joined room ${roomId} as ${userType}`);
         });
     
-        socket.on('answer', (answer) => {
-            socket.broadcast.emit('answer', answer);
+        
+        socket.on("offer", (offer, receiverId) => {
+            io.to(receiverId).emit("offer", offer, socket.id);
         });
     
-        socket.on('ice-candidate', (candidate) => {
-            socket.broadcast.emit('ice-candidate', candidate);
+        socket.on("answer", (answer, senderId) => {
+            io.to(senderId).emit("answer", answer, socket.id);
         });
     
-        socket.on('disconnect', () => {
-            socket.broadcast.emit('user-disconnected', socket.id);
+        socket.on("ice-candidate", (candidate, receiverId) => {
+            io.to(receiverId).emit("ice-candidate", candidate, socket.id);
         });
-    });
+    
+        socket.on("disconnect", () => {
+            for (const roomId in rooms) {
+                rooms[roomId] = rooms[roomId].filter(user => user.id !== socket.id);
+                io.to(roomId).emit("user-disconnected", socket.id);
+            }
+            console.log("User disconnected: ", socket.id);
+        });
+});
 
 server.listen(3000, "0.0.0.0", () => {
     console.log("Server running on port 3000 and accessible on network");
