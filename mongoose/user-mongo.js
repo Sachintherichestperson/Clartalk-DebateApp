@@ -70,7 +70,11 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 0
     }],
-    SEOTags: [String]
+    SEOTags: [String],
+    notification: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'notification'
+    }]
 });
 
 userSchema.statics.updateRanks = async function () {

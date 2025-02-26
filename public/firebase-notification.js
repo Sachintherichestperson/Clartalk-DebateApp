@@ -20,7 +20,7 @@
 
         // Register Service Worker
         if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("./firebase-messaging-sw.js")
+            navigator.serviceWorker.register("/firebase-messaging-sw.js")
                 .then((registration) => {
                     console.log("Service Worker registered with scope:", registration.scope);
                 })
@@ -73,7 +73,6 @@
 
         // Handle Foreground Messages
         onMessage(messaging, (payload) => {
-    console.log("Foreground message received:", payload);
     navigator.serviceWorker.getRegistration().then(registration => {
         registration.showNotification(payload.notification.title, {
             body: payload.notification.body,
