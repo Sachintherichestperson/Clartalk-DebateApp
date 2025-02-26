@@ -21,7 +21,7 @@
                         <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
                         <li><a href="/Settings"><i class="fas fa-cogs"></i> Settings</a></li>
                         <li><a href="/Members/<%= community._id %>"><i class="fas fa-users"></i> Members</a></li>
-                        <li><a href="/Chat-Notifications"><i class="fas fa-bell"></i> Notifications</a></li>
+                        <li><a href="/Notification"><i class="fas fa-bell"></i> Notifications</a></li>
                         <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Log-out</a></li>
                     </ul>
                 </div>
@@ -181,6 +181,6 @@ socket.on("chatMessage", (data) => {
              e.preventDefault();
          };
      </script>
-      <script type="module" src="./firebase-notification.js"></script>
+      <script type="module" src="/firebase-notification.js"></script>
 </body>
 </html>

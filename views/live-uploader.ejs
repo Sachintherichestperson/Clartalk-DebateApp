@@ -18,7 +18,7 @@
                 <input type="text" name="title" id="title" placeholder="Give Title">
                 <input type="text" name="description" id="description" placeholder="Give description">
                 <div id="radio">
-                    <% if (live.Rank < 20) { %>
+                    <% if (live.Rank < 2) { %>
                       <label for="trending-radio" class="radio-topic">Trending Topic</label>
                       <input type="radio" name="Type" id="trending-radio" value="trending" class="radio">
                     <% } %>
@@ -55,5 +55,5 @@
     });
 });
 </script>
-<script type="module" src="./firebase-notification.js"></script>
+<script type="module" src="/firebase-notification.js"></script>
 </html>

@@ -39,7 +39,7 @@
             <a href="/MUN-competetion" class="nav-link">
                 <i class="fas fa-globe"></i> MUN
             </a>
-            <a href="/Chat-Notifications" class="nav-link active">
+            <a href="/Notification" class="nav-link active">
                 <i class="fas fa-bell"></i> Notifications
             </a>
             <a href="/profile" class="nav-link">
@@ -50,31 +50,32 @@
 
         <div class="page">
             <!-- Notification 1 -->
+             <% user.notification.forEach(function(notification){ %>
             <div class="notification">
                 <div class="icon comment"><i class="fas fa-comment-alt"></i></div>
                 <div class="content">
-                    <p><strong>John Doe</strong> commented on your debate.</p>
+                    <p><strong><%= notification.title %></strong><%= notification.body %></p>
                     <span class="time">5 minutes ago</span>
                 </div>
             </div>
-
+            <% }) %>
             <!-- Notification 2 -->
-            <div class="notification">
+            <!-- <div class="notification">
                 <div class="icon like"><i class="fas fa-heart"></i></div>
                 <div class="content">
                     <p><strong>Alice</strong> liked your debate on AI Ethics.</p>
                     <span class="time">15 minutes ago</span>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Notification 3 -->
-            <div class="notification">
+            <!-- <div class="notification">
                 <div class="icon follow"><i class="fas fa-user-plus"></i></div>
                 <div class="content">
                     <p><strong>Mark</strong> started following you.</p>
                     <span class="time">30 minutes ago</span>
                 </div>
-            </div>
+            </div> -->
         </div>
     </section>
 </body>

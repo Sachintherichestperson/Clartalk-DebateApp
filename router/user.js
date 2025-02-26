@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../mongoose/user-mongo");
 const bcrypt = require("bcrypt");
-const { sendPushNotification } = require("../services/firebase");
+const { sendPushNotificationAll, sendPushNotification } = require("../services/firebase");
 const jwt = require("jsonwebtoken");
 const {userregister, loginuser, logout} = require("../controller/authcontroller");
 const isloggedin = require("../middleware/isloggedin");
@@ -16,6 +16,7 @@ const schedule = require("node-schedule");
 const Socket  = require("socket.io");
 const Razorpay = require("razorpay");
 const userMongo = require("../mongoose/user-mongo");
+const notificationmongoose = require("../mongoose/notification-mongoose");
 const mongoose = require("mongoose");
 const { conn, getGFS } = require("../config/gridfs");
 
@@ -386,13 +387,28 @@ router.get("/LeaderBoard", isloggedin, async function (req, res) { // LeaderBoar
 
 router.post("/Join-community/:id",isloggedin,async (req, res) => {                                 // Join-community/:id Page
   try{
-      const community = await communityMongo.findById(req.params.id);
+      const community = await communityMongo.findById(req.params.id).populate({
+        path: "createdBy",
+        select: "fcmToken"
+      });
 
       if(!community.members.includes(req.user._id)){
         community.members.push(req.user._id);
         await community.save();
       }else{
        res.send("Already a member");
+      }
+      const fcmToken = community.createdBy.fcmToken;
+
+      const user = await User.findById(req.user._id);
+      const fcm = user.fcmToken;
+
+      if(fcmToken){
+        await sendPushNotification(fcmToken, `Notification For ${ community.CommunityName }`, `${user.username} Joined ${ community.CommunityName }`, "join-community");  
+      }
+
+      if(fcm){
+        await sendPushNotification(fcmToken, `Congrats You Joined ${ community.CommunityName }`, `Now We Give you An Opportunity To Change The World`, "join-community");  
       }
 
       const redirectUrl = req.get("Referrer") || "/";
@@ -592,10 +608,8 @@ router.get("/Booking-Done/:id",isloggedin, async function (req, res) {
     const fcmToken = user.fcmToken;
 
     if (fcmToken) {
-        try {
-            console.log("📤 Sending notification...");  
-            await sendPushNotification(fcmToken, Live.title, "Your booking is confirmed");
-            console.log("✅ Notification sent successfully");
+        try { 
+            await sendPushNotificationAll(fcmToken, Live.title, "Your booking is confirmed");
         } catch (error) {
             console.error("🔥 Error sending notification:", error);
         }
@@ -830,9 +844,14 @@ router.get("/Delete-Account", isloggedin, async (req, res) => {
   }
 });
 
-router.get("/Chat-Notifications",isloggedin, async function(req, res){
-  const user = await User.findOne({ email: req.user.email });
-  res.render("chat-notification", { user });
+router.get("/Notification",isloggedin, async function(req, res){
+  const user = await User.findOne({ email: req.user.email }).populate({
+    path: 'notification',
+    select: 'title body notificationTime',
+    options: { sort: { notificationTime: -1 } }
+  });
+
+  res.render("notification", { user });
 });
 
 router.get("/Terms-&-condition", async function(req, res) {

@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../mongoose/user-mongo");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { sendPushNotificationAll, sendPushNotification } = require("../services/firebase");
 const upload = require("../config/multer");
 const videoUpload= require("../config/multer-live");
 const podcastsmongoose = require("../mongoose/podcasts-mongo");
@@ -225,7 +226,14 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
     content.opponent.push(opponentId._id);
     await user.save();
 
-    
+    console.log("229", opponentUser);
+
+    const opponentfcm = opponentUser.fcmToken;
+
+    if (opponentfcm) {
+    await sendPushNotification(opponentfcm, "New Request", `You have a new request from ${req.user.username} on ${title}`);
+    }
+
     res.redirect("/")
   } catch (err) {
     console.log("error for router.post catch part ==== ", err);
@@ -300,6 +308,20 @@ router.post("/accept/:id",isloggedin,async function (req, res) {
 
     opponent.Live.push(updateVideo);
     await opponent.save();
+
+    const allUsers = await User.find({ fcmToken: { $ne: null } }, "fcmToken");
+    const fcmTokens = allUsers.map(user => user.fcmToken).filter(Boolean);
+
+    if (fcmTokens.length > 0) {
+        await sendPushNotificationAll(fcmTokens, `${updateVideo.title}`, `Creator ${updateVideo.creator.username} vs ${updateVideo.opponent.username} is now live!`);
+    }
+
+    const fcmToken = updateVideo.creator.fcmToken;
+
+    if(fcmToken){
+      await sendPushNotification(fcmToken, `${updateVideo.title}`, `Request accepted By ${updateVideo.opponent[0].username} for ${updateVideo.title}`);
+    }
+
     res.redirect("/");
   }catch(err){
       res.send(err)
@@ -333,10 +355,16 @@ router.post("/reject/:id",isloggedin,async function (req, res) {
     );
 
     const updateVideo = await livemongo.findOneAndUpdate(
-      { "status": "pending" }, // Assuming requestId corresponds to the video ID in liveMongo
-      { $set: { status: "reject" } }, // Update the video status to "accept"
-      { new: true } // Return the updated document
+      { "status": "pending" },
+      { $set: { status: "reject" } },
+      { new: true }
     );
+
+    const fcmToken = updateVideo.creator.fcmToken;
+
+    if(fcmToken){
+      await sendPushNotification(fcmToken, `${updateVideo.title}`, `Request Accepted By ${updateVideo.opponent[0].username} for ${updateVideo.title}`);
+    }
 
     res.redirect("/");
   }catch(err){
@@ -351,7 +379,7 @@ router.get("/Building-The-Community", function(req, res){
 
 router.post("/community/builder",upload.single("CommunityDP"), isloggedin, async function (req, res) {
   try{
-       let{ CommunityName, CommunityisAbout, CommunityDP, CommunityType } = req.body;
+       let{ CommunityName, CommunityisAbout, CommunityDP, CommunityType, createdBy } = req.body;
        const user = await User.findOne({email: req.user.email});
 
 
@@ -360,7 +388,7 @@ router.post("/community/builder",upload.single("CommunityDP"), isloggedin, async
          CommunityisAbout,
          CommunityType,
          CommunityDP: req.file.buffer,
-         creator: user._id
+         createdBy: user._id
        });
 
        user.communities.push(community._id);
@@ -432,26 +460,37 @@ router.get("/Create-The-Competition",isloggedin, function(req, res){
   res.render("competition-creator");
 });
 
-router.post("/competition/builded",upload.single("CompetitionDP"), isloggedin, async function (req, res) {
-  let { CompetitionName, CompetitionisAbout, CompetitionDP, location, Date, fees, createdBy } = req.body;
+router.post("/competition/builded", upload.single("CompetitionDP"), isloggedin, async function (req, res) {
+  let { CompetitionName, CompetitionisAbout, location, Date, fees } = req.body;
 
   const user = await User.findOne({ email: req.user.email });
 
   const competition = await competitionmongo.create({
-    CompetitionName,
-    CompetitionisAbout,
-    CompetitionDP: req.file.buffer,
-    location,
-    Date,
-    fees, 
-    createdBy: user._id
+      CompetitionName,
+      CompetitionisAbout,
+      CompetitionDP: req.file.buffer,
+      location,
+      Date,
+      fees,
+      createdBy: user._id
   });
 
-    user.MunCompetition.push(competition._id);
-    await user.save();
-
-
+  user.MunCompetition.push(competition._id);
+  await user.save();
   await competition.save();
+
+  const allUsers = await User.find({ fcmToken: { $ne: null } }, "fcmToken");
+  const fcmTokens = allUsers.map(user => user.fcmToken).filter(Boolean);
+
+  if (fcmTokens.length > 0) {
+      await sendPushNotificationAll(fcmTokens, "New Competition", `New competition [ ${CompetitionName}]  has been created!`);
+  }
+
+  const fcmToken = user.fcmToken;
+
+  if(fcmToken){
+    await sendPushNotification(fcmToken, `${CompetitionName} Created `, `Share The Competition And Get Participate`);
+  }
 
   res.redirect("/MUN-competetion");
 });
