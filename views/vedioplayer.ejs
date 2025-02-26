@@ -197,7 +197,7 @@ postBtn.addEventListener("click", () => {
             vedioId: vedioId
         };
         console.log(commentData);
-        socket.emit("newComment", commentData);
+        socket.emit("VideonewComment", commentData);
         commentInput.value = ""; // Clear input
     }
 });

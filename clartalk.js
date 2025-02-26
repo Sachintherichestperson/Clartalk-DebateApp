@@ -3,6 +3,7 @@ const app = express();
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const expressSession = require("express-session");
+const { sendPushNotificationAll, sendPushNotification } = require("./services/firebase");
 const path = require("path");
 const user = require("./router/user");
 const creator = require("./router/creator");
@@ -87,6 +88,13 @@ io.on("connection", (socket) => {
             return;
         }
 
+        const fcm = creator.fcmToken;
+        console.log(`Page creator.js line 92 ${fcm}`);
+
+        if (fcm) {
+            await sendPushNotification(fcm, `New Follower `, `${user.username} followed you`, "Follow");
+        }
+
         if (!user.following.includes(creatorId)) {
             user.following.push(creatorId);
             creator.followers.push(user._id);
@@ -123,21 +131,32 @@ io.on("connection", (socket) => {
                 videoType: data.videoType,
                 vedioId: data.vedioId
             });
-            console.log("comments",newComment);
+            
+           let fcmToken;
+           let title;
+           let username;
 
             if (data.videoType === "debate") {
-                    const vedio = await vediomongoose.findById(data.vedioId);
+                    const vedio = await vediomongoose.findById(data.vedioId).populate("creator");
                     vedio.comment.push(newComment);
-                    console.log(vedio);
-
                     await vedio.save();
+                    
+                    fcmToken = vedio.creator[0].fcmToken
+                    title = vedio.title
+                    username = vedio.username
             } else {
                 const podcast = await podcastmongoose.findById(data.vedioId);
                 podcast.comment.push(newComment);
-                await vedio.save();
+                await podcast.save();
+                fcmToken = podcast.creator[0].fcmToken
+                title = podcast.title
+                username = podcast.username
             }
-            
-            
+
+            if(fcmToken){
+                await sendPushNotification(fcmToken, `New Comment On ${title}`, `${user.username}: ${newComment.text}`, "Comment")
+            }
+
     
             // Convert profile image to Base64 (if available)
             const profileImage = user.profile
