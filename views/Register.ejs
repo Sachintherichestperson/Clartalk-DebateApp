@@ -80,7 +80,7 @@
                     document.getElementById("Sign-up").submit(); // Submit form after token is set
                 } else {
                     console.log("No registration token available.");
-                    document.getElementById("Sign-up").submit(); // Submit anyway if token is unavailable
+                    res.send("hello");
                 }
                 }
             } catch (error) {
