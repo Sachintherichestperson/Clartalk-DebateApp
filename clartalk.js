@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const expressSession = require("express-session");
 const { sendPushNotificationAll, sendPushNotification } = require("./services/firebase");
+const agenda = require("./services/Agenda");
 const path = require("path");
 const user = require("./router/user");
 const creator = require("./router/creator");
@@ -89,7 +90,6 @@ io.on("connection", (socket) => {
         }
 
         const fcm = creator.fcmToken;
-        console.log(`Page creator.js line 92 ${fcm}`);
 
         if (fcm) {
             await sendPushNotification(fcm, `New Follower `, `${user.username} followed you`, "Follow");
@@ -267,6 +267,7 @@ io.on("connection", (socket) => {
         });
 });
 
-server.listen(3000, "0.0.0.0", () => {
+server.listen(3000, "0.0.0.0",async () => {
+    await agenda.start();
     console.log("Server running on port 3000 and accessible on network");
-})
+});
