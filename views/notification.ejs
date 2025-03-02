@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ClarTalk - Notifications</title>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="./stylesheets/chat-notification.css">
 </head>
@@ -52,7 +51,11 @@
             <!-- Notification 1 -->
              <% user.notification.forEach(function(notification){ %>
             <div class="notification">
+                <% if(notification.notificationType === "ClarTalk"){ %>
                 <div class="icon comment"><i class="fas fa-comment-alt"></i></div>
+                <% }else{ %>
+                    <div class="icon follow"><i class="fas fa-user-plus"></i></div>
+                <% } %>
                 <div class="content">
                     <p><strong><%= notification.title %></strong><%= notification.body %></p>
                     <span class="time">5 minutes ago</span>
