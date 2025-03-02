@@ -226,12 +226,10 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
     content.opponent.push(opponentId._id);
     await user.save();
 
-    console.log("229", opponentUser);
-
     const opponentfcm = opponentUser.fcmToken;
 
     if (opponentfcm) {
-    await sendPushNotification(opponentfcm, "New Request", `You have a new request from ${req.user.username} on ${title}`);
+    await sendPushNotification(opponentfcm, "New Request", `You have a new request from ${req.user.username} on ${title}`, "Clartalk");
     }
 
     res.redirect("/")
@@ -291,7 +289,6 @@ router.post("/accept/:id",isloggedin,async function (req, res) {
       { $set: {"Sender.$.status": "accept"}},
        { new: true }
     )
-    console.log(opponent);
     
     const request = opponent.requests[0].status;
     const update = await User.findOneAndUpdate(
@@ -304,22 +301,29 @@ router.post("/accept/:id",isloggedin,async function (req, res) {
       { "status": "pending" }, 
       { $set: { status: "accept" } }, 
       { new: true }
-    );
+    ).populate({
+      path: "creator",
+      select: "username fcmToken"
+    }).populate({
+      path: "opponent",
+      select: "username fcmToken"
+    });
 
     opponent.Live.push(updateVideo);
     await opponent.save();
+
 
     const allUsers = await User.find({ fcmToken: { $ne: null } }, "fcmToken");
     const fcmTokens = allUsers.map(user => user.fcmToken).filter(Boolean);
 
     if (fcmTokens.length > 0) {
-        await sendPushNotificationAll(fcmTokens, `${updateVideo.title}`, `Creator ${updateVideo.creator.username} vs ${updateVideo.opponent.username} is now live!`);
+        await sendPushNotificationAll(fcmTokens, `${updateVideo.title}`, `Creator ${updateVideo.creator[0].username} vs ${updateVideo.opponent[0].username} is now live!`, "Clartalk");
     }
 
     const fcmToken = updateVideo.creator.fcmToken;
 
     if(fcmToken){
-      await sendPushNotification(fcmToken, `${updateVideo.title}`, `Request accepted By ${updateVideo.opponent[0].username} for ${updateVideo.title}`);
+      await sendPushNotification(fcmToken, `${updateVideo.title}`, `Request accepted By ${updateVideo.opponent[0].username} for ${updateVideo.title}`, "Request Accepted");
     }
 
     res.redirect("/");
@@ -363,7 +367,7 @@ router.post("/reject/:id",isloggedin,async function (req, res) {
     const fcmToken = updateVideo.creator.fcmToken;
 
     if(fcmToken){
-      await sendPushNotification(fcmToken, `${updateVideo.title}`, `Request Accepted By ${updateVideo.opponent[0].username} for ${updateVideo.title}`);
+      await sendPushNotification(fcmToken, `${updateVideo.title}`, `Request Accepted By ${updateVideo.opponent[0].username} for ${updateVideo.title}`, "Request Rejected");
     }
 
     res.redirect("/");
@@ -392,6 +396,20 @@ router.post("/community/builder",upload.single("CommunityDP"), isloggedin, async
        });
 
        user.communities.push(community._id);
+
+       const fcmToken = user.fcmToken;
+
+       if(fcmToken){
+        await sendPushNotification(fcmToken, `Congrats`, `Community created ${CommunityName}`, "Clartalk")
+       }
+
+       const Allusers = await User.find();
+       const fcmTokens = Allusers.fcmToken;
+
+       if(fcmToken){
+        await sendPushNotificationAll(fcmTokens, `Attention World Changers`, `New Community Created ${CommunityName}`, "Clartalk");
+       }
+
        await user.save();
        res.redirect("/community");
   }catch(err){
@@ -483,13 +501,13 @@ router.post("/competition/builded", upload.single("CompetitionDP"), isloggedin, 
   const fcmTokens = allUsers.map(user => user.fcmToken).filter(Boolean);
 
   if (fcmTokens.length > 0) {
-      await sendPushNotificationAll(fcmTokens, "New Competition", `New competition [ ${CompetitionName}]  has been created!`);
+      await sendPushNotificationAll(fcmTokens, "New Competition", `New competition [ ${CompetitionName}]  has been created!`, "Clartalk");
   }
 
   const fcmToken = user.fcmToken;
 
   if(fcmToken){
-    await sendPushNotification(fcmToken, `${CompetitionName} Created `, `Share The Competition And Get Participate`);
+    await sendPushNotification(fcmToken, `Congrats `, `New Competition ${CompetitionName} is created`, "Clartalk");
   }
 
   res.redirect("/MUN-competetion");

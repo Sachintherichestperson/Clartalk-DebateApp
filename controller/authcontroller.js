@@ -36,7 +36,7 @@ module.exports.userregister = async (req, res) => {
                     console.log("FcmToken", fcmToken);
 
                     if (notificationToken) {
-                        await sendPushNotification(fcmToken, "Welcome to Debate App!", "Get ready for exciting debates!");
+                        await sendPushNotification(fcmToken, "Welcome to Debate App!", "Get ready for exciting debates!", "Welcome");
                     }
 
                     let token = jwt.sign({ email: email }, process.env.JWT_KEY);

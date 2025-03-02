@@ -24,6 +24,10 @@
             <label for="creator-Competition">Competiton-Thumbnail</label>
             <input type="file" name="CompetitionDP" placeholder="Input Your Competition-DisplayImage" class="file" required>
         </div>
+        <div class="input">
+            <label for="creator-Competition">Competition Location</label>
+            <input id="location-input" type="text" name="location" placeholder="Enter Competition Location" required>
+        </div>        
         <div class="Price-input">
             <label for="Competition-price">Fees:</label>
             <input type="number" name="fees" id="fees" placeholder="Enter the fees (optional)">
@@ -32,5 +36,19 @@
         </form>
     </section>
     <script type="module" src="/firebase-notification.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
+<script>
+  function initAutocomplete() {
+      var input = document.getElementById("location-input");
+      var autocomplete = new google.maps.places.Autocomplete(input);
+      
+      autocomplete.addListener("place_changed", function () {
+          var place = autocomplete.getPlace();
+          console.log("Selected Place:", place);
+      });
+  }
+
+  google.maps.event.addDomListener(window, "load", initAutocomplete);
+</script>
 </body>
 </html>

@@ -3,13 +3,13 @@ importScripts("https://www.gstatic.com/firebasejs/10.4.0/firebase-messaging-comp
 
 // Initialize Firebase
 firebase.initializeApp({
-  apiKey: FIREBASE_API_KEY,
-  authDomain: FIREBASE_AUTH_DOMAIN,
-  projectId: FIREBASE_PROJECT_ID,
-  storageBucket: FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
-  appId: FIREBASE_APP_ID,
-  measurementId: FIREBASE_MEASUREMENT_ID
+  apiKey: "AIzaSyAt9ZJs2CBEKFOK_T72QIQjVlidoBgiY-Q",
+    authDomain: "clartalk-94a92.firebaseapp.com",
+    projectId: "clartalk-94a92",
+    storageBucket: "clartalk-94a92.appspot.com",
+    messagingSenderId: "220220136589",
+    appId: "1:220220136589:web:80ce8c1c77fb718c4bd6c4",
+    measurementId: "G-SXR988HK5W"
 });
 
 

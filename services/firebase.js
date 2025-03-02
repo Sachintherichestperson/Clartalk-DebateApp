@@ -3,7 +3,6 @@ const notificationmongoose = require("../mongoose/notification-mongoose")
 const serviceAccount = require("./notification.json");
 const User = require("../mongoose/user-mongo");
 
-
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
@@ -43,7 +42,7 @@ async function sendPushNotification(token, title, body, notificationType) {
     }
 }
 
-async function sendPushNotificationAll(tokens, title, body) {
+async function sendPushNotificationAll(tokens, title, body, notificationType) {
     try {
         if (!tokens || tokens.length === 0) {
             console.log("No tokens provided");
@@ -52,15 +51,18 @@ async function sendPushNotificationAll(tokens, title, body) {
 
         const messages = tokens.map(token => ({
             token: token,
-            notification: { title, body }
+            notification: { title, body },
+            data: {
+                notificationType: notificationType  || "push"
+            }
         }));
 
-        const user = await User.findOne();
+        const user = await User.find();
 
         const response = await admin.messaging().sendEach(messages);
         
         const notification = new notificationmongoose({
-            notificationType: "push",
+            notificationType: notificationType,
             title: title,
             body: body,
             notificationTo: user._id
