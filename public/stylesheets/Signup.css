@@ -10,7 +10,6 @@ body {
     justify-content: center;
     align-items: center;
     font-family: 'Arial', sans-serif;
-    overflow: hidden;
 }
 
 #container {
@@ -29,7 +28,7 @@ h1 {
     margin-bottom: 20px;
 }
 
-.username, .email, .password{
+.username, .email, .password, .otp {
     font-size: 20px;
     font-weight: bold;
     text-align: left;
@@ -70,6 +69,65 @@ h1 {
 
 #username:focus, #email:focus, #password:focus {
     border-color: #ff9800; /* Highlight effect on focus */
+}
+
+.otp-box {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.otp-input {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    text-align: center;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    background-color: #262626;
+}
+
+.otp-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+
+#sendOtp{
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 30%;
+    margin-top: unset;
+}
+#email{
+    height: 50%;
+}
+
+#verifyOtp{
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 30%;
+    margin-top: unset;
+}
+.terms label{
+    display: flex;
+}
+.buttons{
+    display: flex;
+    gap: 20px;
 }
 
 input[type="radio"] {

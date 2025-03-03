@@ -4,7 +4,7 @@ const User = require("../mongoose/user-mongo");
 const bcrypt = require("bcrypt");
 const { sendPushNotificationAll, sendPushNotification } = require("../services/firebase");
 const jwt = require("jsonwebtoken");
-const {userregister, loginuser, logout} = require("../controller/authcontroller");
+const {userregister, loginuser, logout, verifyOtp} = require("../controller/authcontroller");
 const isloggedin = require("../middleware/isloggedin");
 const podcastsmongoose = require("../mongoose/podcasts-mongo");
 const videomongoose = require("../mongoose/video-mongo");
@@ -33,7 +33,14 @@ router.get("/login", function(req, res){                                        
     res.render("login", {err})
 });
 
-router.post("/login", loginuser)                                                                           //Login Page-Uploader
+router.post("/login", loginuser)                                                                         //Login Page-Uploader
+
+router.get("/OTP", isloggedin, async function(req, res){                                                  //OTP Page
+  res.render("OTP");
+});
+
+router.post("/verify-otp", verifyOtp)                                                                     //OTP checker
+
 
 router.get("/",isloggedin,async function(req, res){                                                        // front page
   try{
