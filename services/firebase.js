@@ -57,7 +57,7 @@ async function sendPushNotificationAll(tokens, title, body, notificationType) {
             }
         }));
 
-        const user = await User.find();
+        const users = await User.find();
 
         const response = await admin.messaging().sendEach(messages);
         
@@ -65,12 +65,17 @@ async function sendPushNotificationAll(tokens, title, body, notificationType) {
             notificationType: notificationType,
             title: title,
             body: body,
-            notificationTo: user._id
+            notificationTo: users._id
         });
         await notification.save();
 
-        user.notification.push(notification);
-        await user.save();
+        for (const user of users) {
+            if (!user.notification) {
+                user.notification = []; // Ensure array exists
+            }
+            user.notification.push(notification._id); // Store only notification ID
+            await user.save(); // Save each user individually
+        }
 
         return response;
     } catch (error) {

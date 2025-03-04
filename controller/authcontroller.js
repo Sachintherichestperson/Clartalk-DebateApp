@@ -2,7 +2,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken")
 const User = require("../mongoose/user-mongo");
 const { sendPushNotification } = require("../services/firebase");
-const otpGenerator = require("otp-generator");
 const  sendOtpToEmail = require("../config/nodemailer");
 
 module.exports.userregister = async (req, res) => {
@@ -13,17 +12,19 @@ module.exports.userregister = async (req, res) => {
         const user = await User.findOne({ email });
         if (user) {
             req.flash("key", "User already registered");
+            console.log("In Email");
             return res.redirect("/register");
         }
 
         const usernameId = await User.findOne({ username });
         if (usernameId) {
             req.flash("key", "Username not available");
+            console.log("In username");
             return res.redirect("/register");
         }
 
         // Generate OTP
-        const otp = otpGenerator.generate(6, { digits: true, upperCaseAlphabets: false, specialChars: false });
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
         // Store OTP and user details temporarily in session (or use Redis for scalability)
         req.session.otp = otp;
@@ -72,19 +73,20 @@ module.exports.verifyOtp = async (req, res) => {
             expiresIn: "7d", // Token valid for 7 days
         });
 
+        if(fcmToken){
+            await sendPushNotification(fcmToken, "Welcome To Clartalk", `Welcome ${username} Get Ready To Change The World`, "Clartalk");
+        }
+
         // Set cookie with JWT Token
         res.cookie("user", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production", // Secure in production
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days expiry
+            secure: process.env.NODE_ENV === "production", 
+            maxAge: 7 * 24 * 60 * 60 * 1000,
             sameSite: "strict",
         });
 
-        console.log("JWT Token set successfully!"); // Debugging
-
-        // Fetch the user again to confirm email is saved
+        
         const updatedUser = await User.findById(newUser._id);
-        console.log("Updated User:", updatedUser); // Debugging
 
         // Clear session data
         req.session.otp = null;
