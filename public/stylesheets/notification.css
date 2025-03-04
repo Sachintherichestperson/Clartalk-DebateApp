@@ -5,6 +5,7 @@ body {
     color: #ffffff;
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
 }
 
 .container {
@@ -75,6 +76,8 @@ header {
     gap: 20px;
     width: 100%;
     margin-top: 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
 }
 
 .nav-link {
@@ -175,7 +178,6 @@ header {
             margin-top: 10px;
             background-color: #262626;
             flex-direction: column;
-            overflow-y: auto;
             scrollbar-width: none;
             flex-wrap: wrap;
             gap: 10px;
