@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Creator page</title>
     <link rel="stylesheet" href="/stylesheets/live.css">
+    <script src="/javascript/live-uploader.js"></script>
+    <script type="module" src="/firebase-notification.js"></script>
 </head>
 <body>
     <section>
@@ -32,28 +34,4 @@
         </div>
     </section>
 </body>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-    const radioButtons = document.querySelectorAll('input[type="radio"]');
-
-    radioButtons.forEach(radio => {
-        radio.addEventListener("click", function (event) {
-            if (this.dataset.checked === "true") {
-                this.checked = false; // Deselect the radio
-                this.dataset.checked = "false"; // Update the toggle state
-            } else {
-                this.dataset.checked = "true"; // Mark as selected
-            }
-
-            // Ensure all other radios in the group are updated correctly
-            radioButtons.forEach(otherRadio => {
-                if (otherRadio !== this) {
-                    otherRadio.dataset.checked = "false";
-                }
-            });
-        });
-    });
-});
-</script>
-<script type="module" src="/firebase-notification.js"></script>
 </html>
