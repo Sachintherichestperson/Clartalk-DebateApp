@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
-const sendOtpToEmail = async (email, otp) => {
+const SendEmail = async (email, subject, text, images = []) => {
     try {
         let transporter = nodemailer.createTransport({
             service: "gmail", // Use your email provider (e.g., Gmail, SMTP)
@@ -11,17 +11,30 @@ const sendOtpToEmail = async (email, otp) => {
             },
         });
 
+        let attachments = Array.isArray(images) ? images.map((image) => ({
+            filename: image.filename,
+            content: image.content,
+            cid: image.cid
+          })) : [];          
+
+        // Generate HTML content with embedded images
+        let htmlContent = `<p>${text}</p>`;
+        attachments.forEach((image) => {
+            htmlContent += `<img src="cid:${image.cid}" width="300"/>`;
+        });
+
         let mailOptions = {
             from: process.env.EMAIL_USER,
             to: email,
-            subject: "Your OTP for Debate App",
-            text: `Your OTP is: ${otp}. It is valid for 5 minutes.`,
+            subject: subject,
+            attachments: attachments,
+            html: htmlContent
         };
 
         await transporter.sendMail(mailOptions);
     } catch (error) {
-        console.error("Error sending OTP:", error);
+        console.error("Error sending email:", error);
     }
 };
 
-module.exports = sendOtpToEmail;
+module.exports = SendEmail;

@@ -406,7 +406,7 @@ router.post("/community/builder",upload.single("CommunityDP"), isloggedin, async
        const Allusers = await User.find();
        const fcmTokens = Allusers.fcmToken;
 
-       if(fcmToken){
+       if(fcmTokens){
         await sendPushNotificationAll(fcmTokens, `Attention World Changers`, `New Community Created ${CommunityName}`, "Clartalk");
        }
 

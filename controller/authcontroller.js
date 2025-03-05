@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken")
 const User = require("../mongoose/user-mongo");
 const { sendPushNotification } = require("../services/firebase");
-const  sendOtpToEmail = require("../config/nodemailer");
+const  SendEmail = require("../config/nodemailer");
 
 module.exports.userregister = async (req, res) => {
     try {
@@ -34,7 +34,7 @@ module.exports.userregister = async (req, res) => {
         console.log("Generated OTP:", otp); // Debugging purpose, remove in production
 
         // Send OTP to the user via email
-        await sendOtpToEmail(email, otp);
+        await SendEmail(email, "Your OTP for Debate App", `Your OTP is: ${otp}. It is valid for 5 minutes.`);
 
         // Redirect to OTP page
         return res.redirect("/OTP");
@@ -55,38 +55,43 @@ module.exports.verifyOtp = async (req, res) => {
 
         // Validate OTP
         if (req.session.otp !== otp) {
-            return res.status(400).json({ error: "Invalid OTP" });
+            req.session.otpAttempts = (req.session.otpAttempts || 0) + 1;
+
+            if (req.session.otpAttempts >= 3) {  // After 3 failed attempts, expire the OTP
+                req.session.otp = null;
+                req.session.otpExpires = null;
+                req.session.otpAttempts = 0;
+                return res.status(400).json({ error: "OTP expired, request a new one." });
+            }
+
+            return res.status(400).json({ error: "Invalid OTP. Try again." });
         }
 
-        // OTP is valid, save user details permanently
+        // OTP is valid, clear session attempts
+        req.session.otpAttempts = 0;
+
+        // OTP is valid, proceed with user registration
         const { username, email, password, fcmToken } = req.session.tempUser;
         const hash = await bcrypt.hash(password, 10);
-
-        // Create the user
         const newUser = new User({ username, email, password: hash, fcmToken });
         await newUser.save();
 
-        console.log("User created:", newUser); // Debugging
-
         // Generate JWT Token
         const token = jwt.sign({ email: newUser.email, id: newUser._id }, process.env.JWT_KEY, {
-            expiresIn: "7d", // Token valid for 7 days
+            expiresIn: "7d",
         });
 
-        if(fcmToken){
+        if (fcmToken) {
             await sendPushNotification(fcmToken, "Welcome To Clartalk", `Welcome ${username} Get Ready To Change The World`, "Clartalk");
         }
 
-        // Set cookie with JWT Token
+        // Set JWT Token in Cookie
         res.cookie("user", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production", 
+            secure: process.env.NODE_ENV === "production",
             maxAge: 7 * 24 * 60 * 60 * 1000,
             sameSite: "strict",
         });
-
-        
-        const updatedUser = await User.findById(newUser._id);
 
         // Clear session data
         req.session.otp = null;
@@ -100,7 +105,30 @@ module.exports.verifyOtp = async (req, res) => {
     }
 };
 
+module.exports.resendOtp = async (req, res) => {
+    try {
+        if (!req.session.tempUser) {
+            return res.status(400).json({ error: "Session expired. Please register again." });
+        }
 
+        // Generate a new OTP
+        const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Update session with new OTP
+        req.session.otp = newOtp;
+        req.session.otpExpires = Date.now() + 5 * 60 * 1000; // 5-minute expiry
+        req.session.otpAttempts = 0; // Reset attempts
+
+        console.log("New OTP:", newOtp); // Debugging, remove in production
+
+        await SendEmail(req.session.tempUser.email, "Your OTP for Debate App", `Your New OTP is: ${newOtp}.`);
+
+        return res.json({ success: true, message: "New OTP sent successfully." });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to resend OTP. Try again later." });
+    }
+};
 
 module.exports.loginuser = async (req, res) => {
         let {email, password} = req.body;
