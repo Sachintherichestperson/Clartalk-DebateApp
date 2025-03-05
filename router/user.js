@@ -4,7 +4,7 @@ const User = require("../mongoose/user-mongo");
 const bcrypt = require("bcrypt");
 const { sendPushNotificationAll, sendPushNotification } = require("../services/firebase");
 const jwt = require("jsonwebtoken");
-const {userregister, loginuser, logout, verifyOtp} = require("../controller/authcontroller");
+const {userregister, loginuser, logout, verifyOtp, resendOtp} = require("../controller/authcontroller");
 const isloggedin = require("../middleware/isloggedin");
 const podcastsmongoose = require("../mongoose/podcasts-mongo");
 const videomongoose = require("../mongoose/video-mongo");
@@ -19,6 +19,7 @@ const userMongo = require("../mongoose/user-mongo");
 const notificationmongoose = require("../mongoose/notification-mongoose");
 const mongoose = require("mongoose");
 const { conn, getGFS } = require("../config/gridfs");
+const  SendEmail = require("../config/nodemailer");
 
 router.get("/register", (req, res) => {                                                                      //register page
     let err = req.flash("key")
@@ -41,6 +42,7 @@ router.get("/OTP", async function(req, res){                                    
 
 router.post("/verify-otp", verifyOtp)                                                                     //OTP checker
 
+router.post("/resend-otp", resendOtp);
 
 router.get("/",isloggedin,async function(req, res){                                                        // front page
   try{
@@ -396,7 +398,7 @@ router.post("/Join-community/:id",isloggedin,async (req, res) => {              
   try{
       const community = await communityMongo.findById(req.params.id).populate({
         path: "createdBy",
-        select: "fcmToken"
+        select: "fcmToken email"
       });
 
       if(!community.members.includes(req.user._id)){
@@ -413,6 +415,8 @@ router.post("/Join-community/:id",isloggedin,async (req, res) => {              
       if(fcmToken){
         await sendPushNotification(fcmToken, `Notification For ${ community.CommunityName }`, `${user.username} Joined ${ community.CommunityName }`, "join-community");  
       }
+
+      await SendEmail(community.createdBy.email, "Join Community", [{ filename: "community.jpg", content: community.CommunityDP, cid: "communityImage" }],`Congrats You Joined ${ community.CommunityName }`);
 
       if(fcm){
         await sendPushNotification(fcmToken, `Congrats You Joined ${ community.CommunityName }`, `Now We Give you An Opportunity To Change The World`, "join-community");  

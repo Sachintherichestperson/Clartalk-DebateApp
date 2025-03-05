@@ -2,6 +2,7 @@ const Agenda = require("agenda");
 const Debate = require("../mongoose/live-mongo");
 const User = require("../mongoose/user-mongo");
 const { sendPushNotificationAll, sendPushNotification } = require("./firebase");
+const SendEmail = require("../config/nodemailer");
 
 const agenda = new Agenda({ db: { address: "mongodb://localhost:27017/debateapp" } });
 
@@ -12,28 +13,60 @@ agenda.define("send debate reminder", async (job) => {
   const fcmTokens = allUsers.map(user => user.fcmToken).filter(Boolean);
 
   if (fcmTokens) {
-    await sendPushNotificationAll(fcmTokens, `Live ${title}`, `${title} debate session starts in 30 minutes!`);
+    await sendPushNotificationAll(fcmTokens, `Live ${title}`, `${title} debate session starts in 30 minutes!`, "Clartalk");
   }
 
 
-  const LiveCreator = await Debate.find({ creator: { $ne: null } }).populate("creator", "fcmToken");
+  const LiveCreator = await Debate.find({ creator: { $ne: null } }).populate("creator", "fcmToken email");
   const creatorfcmToken = LiveCreator.map(debate => debate.creator[0].fcmToken).filter(Boolean);
 
-  const Liveopponent = await Debate.find({ opponent: { $ne: null } }).populate("opponent", "fcmToken");
+  const Liveopponent = await Debate.find({ opponent: { $ne: null } }).populate("opponent", "fcmToken email");
   const opponentfcmToken = Liveopponent.map(debate => debate.opponent[0].fcmToken).filter(Boolean);
 
   const fcmToken = [...creatorfcmToken, ...opponentfcmToken].filter(Boolean);
 
   if (fcmToken) {
-    await sendPushNotificationAll(fcmToken, `Reminder: ${title}`, "Get Ready Only 30 minutes Left");
+    await sendPushNotificationAll(fcmToken, `Reminder: ${title}`, "Get Ready Only 30 minutes Left", "Clartalk");
   }
 
+  for (const debate of LiveCreator) {
+    const emails = Array.isArray(debate.creator) ? debate.creator.map(c => c.email) : [];
+
+    const images = debate.Thumbnail ? [{
+        filename: "Debate.jpg",
+        content: debate.Thumbnail,
+        cid: "DebateImage"
+    }] : [];
+
+    console.log("📩 Sending email to:", emails);
+
+    if (emails.length > 0) {
+        await SendEmail(emails, `Reminder: ${title}`, "Get Ready Only 30 minutes Left", images);
+    }
+}
+
+for (const debate of Liveopponent) {
+  const emails = Array.isArray(debate.opponent) ? debate.opponent.map(c => c.email) : [];
+
+  const images = debate.Thumbnail ? [{
+      filename: "Debate.jpg",
+      content: debate.Thumbnail,
+      cid: "DebateImage"
+  }] : [];
+
+  console.log("📩 Sending email to:", emails);
+
+  if (emails.length > 0) {
+      await SendEmail(emails, `Reminder: ${title}`, "Get Ready Only 30 minutes Left", images);
+  }
+}
   await job.remove();
 });
 
 const scheduleDebateReminders = async () => {
   try {
     const debates = await Debate.find(); // Fetch all scheduled debates
+    console.log("schedule debaters");
 
     for (const debate of debates) {
       
@@ -42,14 +75,16 @@ const scheduleDebateReminders = async () => {
 
 
       const existingJob = await agenda.jobs({ "data.title": debate.title });
+      console.log(existingJob.length);
 
       if (existingJob.length === 0) {
-
+        console.log(`The Debate will start in ${notificationTime}`);
         await agenda.schedule(notificationTime, "send debate reminder", {
           title: debate.title,
         });
       }
     }
+
   } catch (error) {
     console.error("❌ Error scheduling reminders:", error);
   }
@@ -87,6 +122,38 @@ agenda.define("creator debate reminder", async (job) => {
   if (fcmToken) {
     await sendPushNotificationAll(fcmToken, `Start: ${title}`, "Start The Debate", "Clartalk");
   }
+
+  for (const debate of LiveCreator) {
+    const emails = Array.isArray(debate.creator) ? debate.creator.map(c => c.email) : [];
+
+    const images = debate.Thumbnail ? [{
+        filename: "Debate.jpg",
+        content: debate.Thumbnail,
+        cid: "DebateImage"
+    }] : [];
+
+    console.log("📩 Sending email to:", emails);
+
+    if (emails.length > 0) {
+        await SendEmail(emails, `Reminder: ${title}`, "Start The Debate, It's Time", images);
+    }
+}
+
+for (const debate of Liveopponent) {
+  const emails = Array.isArray(debate.opponent) ? debate.opponent.map(c => c.email) : [];
+
+  const images = debate.Thumbnail ? [{
+      filename: "Debate.jpg",
+      content: debate.Thumbnail,
+      cid: "DebateImage"
+  }] : [];
+
+  console.log("📩 Sending email to:", emails);
+
+  if (emails.length > 0) {
+      await SendEmail(emails, `Reminder: ${title}`, "Start The Debate, It's Time", images);
+  }
+}
 
   await job.remove();
 });
