@@ -6,6 +6,7 @@
     <title>ClarTalk Debates</title>
     <link rel="stylesheet" href="./stylesheets/debate.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script type="module" src="/firebase-notification.js"></script>
 </head>
 <body>
     <section class="container">
@@ -44,6 +45,7 @@
                 </a>
             </nav>
         </header>
+        <div id="notification-container"></div>
             <div class="page">
                 <% vedios.forEach(function(video) { %>
                     <div class="videos">
@@ -63,6 +65,5 @@
             No More Videos
         </div>
     </section>
-    <script type="module" src="/firebase-notification.js"></script>
 </body>
 </html>
