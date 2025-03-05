@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Video</title>
+    <script src="/javascript/socket.io.js"></script>
     <link rel="stylesheet" href="/stylesheets/live-player.css">
     <style>
         #remoteVideos{
@@ -16,6 +17,8 @@
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script type="module" src="/firebase-notification.js"></script>
+     <script src="/javascript/live-player.js"></script>
 </head>
 <body>
     <section>
@@ -88,238 +91,9 @@
             </div>
         </div>
     </div>
-    </section>
-    <script src="/javascript/socket.io.js"></script>
-  <script>
-    const socket = io();
-    const postBtn = document.querySelector("#commentButtonComments");
-    const commentInput = document.querySelector("#commentInputComments");
-    const commentSection = document.querySelector(".allsinglecomment");
-    const liveId = "<%= Live._id %>";
-    console.log(liveId);
-
-    postBtn.addEventListener("click", () => {
-     const commentText = commentInput.value.trim(); 
-     if (commentText) {
-         const commentData = {
-             text: commentText,
-             userId: "<%= user._id %>",
-             liveId: liveId
-         };
-         console.log(commentData);
-         socket.emit("livenewComment", commentData);
-         commentInput.value = ""; // Clear input
-     }
-    });
-
- socket.on("liveaddComment", (data) => {
-     const commentElement = document.createElement("div");
-     commentElement.classList.add("single-comment");
-     commentElement.innerHTML = `
-         <img src="${data.image}" alt="" class="comment-image">
-         <p><strong class="strong">${data.username}:</strong> ${data.text}</p>
-     `;
-     commentSection.prepend(commentElement);
-
-     // Update comment count
-     commentCount.textContent = parseInt(commentCount.textContent) + 1;
- });
-
-
-     
- </script>
-<script>
-    let localStream;
-    let peerConnections = {};
-    let roomId;
-    let userType;
-    
-    const configuration = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
-    
-    async function joinRoom(type) {
-        roomId = document.getElementById("roomId").value.trim();
-        if (!roomId) return alert("Enter a Room ID!");
-    
-        userType = type; // "debater" or "viewer"
-        socket.emit("join-room", roomId, userType);
-    
-        if (userType === "debater") {
-            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            document.getElementById("localVideo").srcObject = localStream;
-
-            const remoteVideos = document.querySelectorAll("#remoteVideos video");
-                remoteVideos.forEach((video, index) => {
-                    if (index > 0) { // Hide all videos except the first one
-                video.style.display = "none";
-                }
-            });
-        }
-    }
-    
-    socket.on("new-user", async (userId, type) => {
-        console.log(`New ${type} joined: ${userId}`);
-    
-        createPeerConnection(userId);
-    
-        if (userType === "debater") {
-            sendOffer(userId);
-        }
-    });
-    
-    function createPeerConnection(userId) {
-        if (peerConnections[userId]) return; // Prevent duplicate connections
-    
-        const peerConnection = new RTCPeerConnection(configuration);
-    
-        peerConnection.ontrack = (event) => {
-            addRemoteStream(event.streams[0], userId);
-        };
-    
-        peerConnection.onicecandidate = (event) => {
-            if (event.candidate) {
-                socket.emit("ice-candidate", event.candidate, userId);
-            }
-        };
-    
-        peerConnections[userId] = peerConnection;
-    
-        if (userType === "debater" && localStream) {
-            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-        }
-    }
-    
-    async function sendOffer(userId) {
-        if (!peerConnections[userId]) return;
-    
-        const peerConnection = peerConnections[userId];
-    
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-        
-        socket.emit("offer", offer, userId);
-    }
-    
-    socket.on("offer", async (offer, senderId) => {
-        if (!peerConnections[senderId]) {
-            createPeerConnection(senderId);
-        }
-    
-        const peerConnection = peerConnections[senderId];
-    
-        if (peerConnection.signalingState !== "stable") {
-            console.warn("Waiting for stable signaling state...");
-            await new Promise(resolve => setTimeout(resolve, 100)); // Small delay for stable state
-        }
-    
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-    
-        const answer = await peerConnection.createAnswer();
-        await peerConnection.setLocalDescription(answer);
-        
-        socket.emit("answer", answer, senderId);
-    });
-    
-    socket.on("answer", async (answer, senderId) => {
-        if (peerConnections[senderId]) {
-            await peerConnections[senderId].setRemoteDescription(new RTCSessionDescription(answer));
-        }
-    });
-    
-    socket.on("ice-candidate", async (candidate, senderId) => {
-        if (peerConnections[senderId]) {
-            await peerConnections[senderId].addIceCandidate(new RTCIceCandidate(candidate));
-        }
-    });
-    
-    socket.on("user-disconnected", (userId) => {
-        if (peerConnections[userId]) {
-            peerConnections[userId].close();
-            delete peerConnections[userId];
-            removeRemoteStream(userId);
-        }
-    });
-    
-    function addRemoteStream(stream, userId) {
-        if (!document.getElementById(`video-${userId}`)) {
-            const videoElement = document.createElement("video");
-            videoElement.id = `video-${userId}`;
-            videoElement.className = "remote-Videos";
-            videoElement.autoplay = true;
-            videoElement.playsInline = true;
-            videoElement.srcObject = stream;
-            document.getElementById("remoteVideos").appendChild(videoElement);
-        }
-    }
-    
-    function removeRemoteStream(userId) {
-        const videoElement = document.getElementById(`video-${userId}`);
-        if (videoElement) videoElement.remove();
-    }
-    </script>
-    
-     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const commentsSection = document.querySelector(".comments");
-            const questionsSection = document.querySelector("#questions");
-            const commentsButton = document.querySelector("#buttons div:nth-child(1)");
-            const questionsButton = document.querySelector("#buttons div:nth-child(2)");
-            const icon = document.getElementById("icon");
-        
-            commentsButton.addEventListener("click", function () {
-                commentsSection.classList.toggle("active");
-                questionsSection.classList.remove("active");
-            });
-        
-            questionsButton.addEventListener("click", function () {
-                questionsSection.classList.toggle("active");
-                commentsSection.classList.remove("active");
-            });
-
-            let open = "open"
-            icon.addEventListener("click", function () {
-                if(open){
-                    commentsSection.classList.toggle("accent");
-                }else{
-                    commentsSection.classList.remove("accent");
-                }
-            });
-        });
-    </script>
+    </section> 
     <script>
-    const btn = document.querySelector("#commentButtonQuestions");
-    const input = document.querySelector("#commentInputQuestions");
-    const questions = document.querySelector(".questions");
-
-    btn.addEventListener("click", () => {
-        const Text = input.value.trim(); 
-
-        
-        if (Text) {
-            const questionData = {
-                questions: Text,
-                liveId: liveId
-            };
-
-            socket.emit("livequestions", questionData);
-            input.value = "";
-            console.log(questionData);
-        }
-       });
-
-       socket.on("liveaddquestion", (data) => {
-        console.log("Received on client:", data);
-
-    if (!data.questions || !Array.isArray(data.questions)) return;
-
-    const latestQuestion = data.questions[data.questions.length - 1];
-
-    const questionElement = document.createElement("div");
-    questionElement.classList.add("single-question");
-    questioznElement.innerHTML = `<strong class="strong">Questions:</strong><p>${latestQuestion}</p>`;
-
-    questions.prepend(questionElement);
-    });
+        const liveId = "<%= Live._id %>";
     </script>
-     <script type="module" src="/firebase-notification.js"></script>
 </body>
 </html>

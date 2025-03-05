@@ -6,6 +6,8 @@ const SendEmail = require("../config/nodemailer");
 
 const agenda = new Agenda({ db: { address: "mongodb://localhost:27017/debateapp" } });
 
+
+//30 minutes Left Remindar
 agenda.define("send debate reminder", async (job) => {
   const { title } = job.attrs.data;
 
@@ -63,39 +65,7 @@ for (const debate of Liveopponent) {
   await job.remove();
 });
 
-const scheduleDebateReminders = async () => {
-  try {
-    const debates = await Debate.find(); // Fetch all scheduled debates
-    console.log("schedule debaters");
-
-    for (const debate of debates) {
-      
-      const notificationTime = new Date(debate.Time);
-      notificationTime.setMinutes(notificationTime.getMinutes() - 30); // 30 minutes before
-
-
-      const existingJob = await agenda.jobs({ "data.title": debate.title });
-      console.log(existingJob.length);
-
-      if (existingJob.length === 0) {
-        console.log(`The Debate will start in ${notificationTime}`);
-        await agenda.schedule(notificationTime, "send debate reminder", {
-          title: debate.title,
-        });
-      }
-    }
-
-  } catch (error) {
-    console.error("❌ Error scheduling reminders:", error);
-  }
-};
-
-
-
-
-
-
-
+//Debate Start Reminder
 agenda.define("creator debate reminder", async (job) => {
   const { title } = job.attrs.data;
 
@@ -158,19 +128,56 @@ for (const debate of Liveopponent) {
   await job.remove();
 });
 
-const schedulecreatorsReminders = async () => {
+
+//30 minutes debate reminder callback
+const scheduleDebateReminders = async () => {
   try {
-    const debates = await Debate.find();
+    const now = new Date();
+    const debates = await Debate.find({ Time: { $gt: now } }); // Only future debates
+
+    console.log("📅 Scheduling debate reminders...");
 
     for (const debate of debates) {
-      // Correctly calculate notification time
       const notificationTime = new Date(debate.Time);
-      notificationTime.setMinutes(notificationTime.getMinutes());
+      notificationTime.setMinutes(notificationTime.getMinutes() - 30); // 30 minutes before
 
-      // Check if job is already scheduled
+      if (notificationTime < now) {
+        console.log(`⏳ Skipping ${debate.title} because it's already started.`);
+        continue; // Skip debates that have already started
+      }
+
       const existingJob = await agenda.jobs({ "data.title": debate.title });
 
-      if (existingJob.length === 0) {                                                               
+      if (existingJob.length === 0) {
+        console.log(`✅ Scheduling reminder for ${debate.title} at ${notificationTime}`);
+        await agenda.schedule(notificationTime, "send debate reminder", {
+          title: debate.title,
+        });
+      }
+    }
+  } catch (error) {
+    console.error("❌ Error scheduling reminders:", error);
+  }
+};
+
+//Debate Start Reminder Callback
+const schedulecreatorsReminders = async () => {
+  try {
+    const now = new Date();
+    const debates = await Debate.find({ Time: { $gt: now } }); // Only future debates
+
+    for (const debate of debates) {
+      const notificationTime = new Date(debate.Time);
+
+      if (notificationTime < now) {
+        console.log(`⏳ Skipping ${debate.title} creator reminder as it's already started.`);
+        continue; // Skip past debates
+      }
+
+      const existingJob = await agenda.jobs({ "data.title": debate.title });
+
+      if (existingJob.length === 0) {
+        console.log(`✅ Scheduling creator reminder for ${debate.title} at ${notificationTime}`);
         await agenda.schedule(notificationTime, "creator debate reminder", {
           title: debate.title,
         });

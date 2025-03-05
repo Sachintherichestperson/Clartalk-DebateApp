@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Build Your World</title>
     <link rel="stylesheet" href="/stylesheets/Community-builder.css">
+    <script type="module" src="/firebase-notification.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
 </head>
 <body>
     <section class="page">
@@ -35,20 +37,6 @@
             <input type="submit" value="Submit" class="submit">
         </form>
     </section>
-    <script type="module" src="/firebase-notification.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
-<script>
-  function initAutocomplete() {
-      var input = document.getElementById("location-input");
-      var autocomplete = new google.maps.places.Autocomplete(input);
-      
-      autocomplete.addListener("place_changed", function () {
-          var place = autocomplete.getPlace();
-          console.log("Selected Place:", place);
-      });
-  }
-
-  google.maps.event.addDomListener(window, "load", initAutocomplete);
-</script>
+    <script src="/javascript/Competition-creator.js"></script>
 </body>
 </html>
