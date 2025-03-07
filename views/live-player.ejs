@@ -17,8 +17,6 @@
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <script type="module" src="/firebase-notification.js"></script>
-     <script src="/javascript/live-player.js"></script>
 </head>
 <body>
     <section>
@@ -92,8 +90,11 @@
         </div>
     </div>
     </section> 
+    <script type="module" src="/firebase-notification.js"></script>
     <script>
         const liveId = "<%= Live._id %>";
     </script>
+    <script src="/javascript/live-player.js"></script>
+    <script src="/javascript/stream.js"></script>
 </body>
 </html>
