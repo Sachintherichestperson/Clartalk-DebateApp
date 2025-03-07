@@ -32,9 +32,11 @@
         createPeerConnection(userId);
     
         if (userType === "debater") {
+            // First debater should also send an offer to new debater
+            await new Promise(resolve => setTimeout(resolve, 500)); // Small delay to ensure stable signaling
             sendOffer(userId);
         }
-    });
+    });    
     
     function createPeerConnection(userId) {
         if (peerConnections[userId]) return; // Prevent duplicate connections
