@@ -6,6 +6,7 @@
     <title>Live Video</title>
     <script src="/javascript/socket.io.js"></script>
     <link rel="stylesheet" href="/stylesheets/live-player.css">
+    <link rel="icon" href="/images/nav.png" type="image/x-icon">
     <style>
         #remoteVideos{
             display: flex;
@@ -38,8 +39,8 @@
             <div class="main-buttons">
                 <% if(isCreator || isOpponent){ %>
                     <button class="start-stream-btn" onclick="joinRoom('debater')">Start Stream</button>
+                    <button class="end-call-btn" onclick="requestEndCallOTP()">End Call</button>
                 <% } %>
-                <button class="end-call-btn" onclick="joinRoom('viewer')">End Call</button>
             </div>
             <% if(isViewer){ %>
             <div class="about-video">
@@ -93,7 +94,22 @@
     <script type="module" src="/firebase-notification.js"></script>
     <script>
         const liveId = "<%= Live._id %>";
+        const Viewers = "<%= isViewer %>"
     </script>
+    <script>
+    window.onload = function () {
+        console.log("Page loaded. Checking if viewer should join...");
+
+        // Ensure 'isViewer' is properly checked (converting it to a boolean)
+        if (Viewers === "true" || Viewers === true) {
+            console.log("Viewer detected. Joining room...");
+            joinRoom('viewer');
+        } else {
+            console.log("Not a viewer, skipping auto-join.");
+        }
+    };
+</script>
+
     <script src="/javascript/live-player.js"></script>
     <script src="/javascript/stream.js"></script>
 </body>

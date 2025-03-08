@@ -9,6 +9,10 @@ const vedioSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"  
     }],
+    Stream: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "fs.files" 
+    }],
     Views: {
         type: Number,
         default: 0
