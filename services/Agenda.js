@@ -135,21 +135,17 @@ const scheduleDebateReminders = async () => {
     const now = new Date();
     const debates = await Debate.find({ Time: { $gt: now } }); // Only future debates
 
-    console.log("📅 Scheduling debate reminders...");
-
     for (const debate of debates) {
       const notificationTime = new Date(debate.Time);
       notificationTime.setMinutes(notificationTime.getMinutes() - 30); // 30 minutes before
 
       if (notificationTime < now) {
-        console.log(`⏳ Skipping ${debate.title} because it's already started.`);
         continue; // Skip debates that have already started
       }
 
       const existingJob = await agenda.jobs({ "data.title": debate.title });
 
       if (existingJob.length === 0) {
-        console.log(`✅ Scheduling reminder for ${debate.title} at ${notificationTime}`);
         await agenda.schedule(notificationTime, "send debate reminder", {
           title: debate.title,
         });
@@ -170,7 +166,6 @@ const schedulecreatorsReminders = async () => {
       const notificationTime = new Date(debate.Time);
 
       if (notificationTime < now) {
-        console.log(`⏳ Skipping ${debate.title} creator reminder as it's already started.`);
         continue; // Skip past debates
       }
 

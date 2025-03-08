@@ -242,9 +242,13 @@ io.on("connection", (socket) => {
             rooms[roomId].push({ id: socket.id, type: userType });
     
             socket.to(roomId).emit("new-user", socket.id, userType);
-            console.log(`User ${socket.id} joined room ${roomId} as ${userType}`);
+            socket.to(roomId).emit("user-connected"); 
         });
-    
+
+        socket.on("leave-room", (roomId) => {
+            socket.leave(roomId);
+            io.to(roomId).emit("user-disconnected", socket.id);
+        });
         
         socket.on("offer", (offer, receiverId) => {
             io.to(receiverId).emit("offer", offer, socket.id);
@@ -256,18 +260,39 @@ io.on("connection", (socket) => {
     
         socket.on("ice-candidate", (candidate, receiverId) => {
             io.to(receiverId).emit("ice-candidate", candidate, socket.id);
+        });      
+
+        socket.on("join_room", (roomId) => {
+            socket.join(roomId);
+            console.log(`User ${socket.id} joined room ${roomId}`);
         });
     
+        // Sending OTP to the other streamer
+        socket.on("send_otp", (data) => {
+            const { otp, roomId } = data;
+    
+            // Broadcast OTP to the other streamer in the room (excluding sender)
+            socket.to(roomId).emit("receive_otp", { otp });
+        });
+    
+        // Verifying OTP and notifying both streamers
+        socket.on("verify_otp", (data) => {
+            const { enteredOTP, roomId } = data;
+    
+            io.to(roomId).emit("otp_success");
+        });
+    
+        // Redirecting both streamers
+        socket.on("end_call_redirect", ({ roomId }) => {
+            io.to(roomId).emit("redirect_to_home");
+        });        
+
         socket.on("disconnect", () => {
             for (const roomId in rooms) {
                 rooms[roomId] = rooms[roomId].filter(user => user.id !== socket.id);
                 io.to(roomId).emit("user-disconnected", socket.id);
             }
-            console.log("User disconnected: ", socket.id);
         });
 });
 
-server.listen(3000, "0.0.0.0",async () => {
-    await agenda.start();
-    console.log("Server running on port 3000 and accessible on network");
-});
+server.listen(3000);

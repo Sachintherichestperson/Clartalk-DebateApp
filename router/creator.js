@@ -376,6 +376,17 @@ router.post("/reject/:id",isloggedin,async function (req, res) {
   }
 });
 
+router.post("/end-call/:id",isloggedin, async(req, res) => {
+  try {
+        const { LiveStatus } = req.body;
+  
+        await livemongo.findByIdAndUpdate(req.params.id, { LiveStatus });
+        res.status(200).json({ message: 'Status updated successfully', redirect: "/" });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 router.get("/Building-The-Community", function(req, res){
   res.render("community-builder")
 });
