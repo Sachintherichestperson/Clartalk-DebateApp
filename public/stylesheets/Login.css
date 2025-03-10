@@ -136,3 +136,13 @@ a:hover {
         font-size: 14px;
     }
 }
+
+@media (max-width: 480px) {
+    #container {
+        width: 70%;
+        padding: 20px 35px 20px 20px;
+    }
+    body {
+        padding: 60px 0px 20px 0px;
+    }
+}

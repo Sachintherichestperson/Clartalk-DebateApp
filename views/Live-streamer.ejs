@@ -4,16 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Page</title>
-    <link rel="stylesheet" href="/stylesheets/Livedebate-player.css">
-    <style>
-        .strong{
-            color: #ffcc00;
-        }
-    </style>
+    <link rel="stylesheet" href="/stylesheets/vedioplayer.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-    <section>
+    <section class="main-page">
         <div class="vediopage">
             <nav>
                 <img src="/images/nav.png" alt="Logo" class="logo">
@@ -21,37 +16,11 @@
             </nav>
             <div class="video-and-suggestions">
                 <div class="video-section">
-                    <img src="data:image/jpeg;base64,<%= Live.Thumbnail.toString('base64') %>" alt="" class="video-player">
-                    <p class="video-title"><%= Live.title %></p>
-                    <% if(Live.LiveStatus === "Processing" || Live.LiveStatus === "Live"){ %>
-                        <% if(creator || opponent){ %>
-                            <a href="/Livedebate/<%= Live._id %>" class="link">
-                                <div class="Watch">
-                                <p class="amount">Start The Debate</p>
-                                </div>
-                            </a>
-                        <% }else{ %>
-                            <% if(Booking || Live.Type === "regular") { %>
-                                <a href="/Livedebate/<%= Live._id %>" class="link">
-                                    <div class="Watch">
-                                    <p class="amount">Watch Stream</p>
-                                    </div>
-                                </a>
-                            <% }else{ %>
-                                <a href="/payment-for/<%= Live.creator[0]._id %>/payment/<%= Live._id %>" class="link">
-                                    <div class="Pay">
-                                    <p class="amount">PAY: ₹19</p>
-                                    </div>
-                                </a>
-                            <% } %>
-                        <% } %>
-                    <% }else if (Live.LiveStatus === "Ended"){ %>
-                        <a href="/Live-Stream-Recorded/<%= Live._id %>" class="link">
-                            <div class="Watch">
-                            <p class="amount">Watch The Debate</p>
-                            </div>
-                        </a>
-                    <% } %>
+                    <video controls autoplay class="video-player" id="videoPlayer">
+                        <source src="/video/stream/<%= videoFile._id %>" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <h1 class="video-title"><%= Live.title %></h1>
                     <div class="video-user-info">
                         <% if (Live.creator[0].image > 0) { %>
                             <img src="data:image/jpeg;base64,<%= Live.creator[0].image.toString('base64') %>" alt="Creator" class="user-avatar">
@@ -75,7 +44,6 @@
                     <div class="video-info">
                         <p>
                             <span class="views-count"><%= Live.Views %> Views</span>
-                            <span class="upload-date"> •  </span>
                         </p>
                         <div class="description-container">
                             <p class="video-description"><%= Live.description %></p>
@@ -102,7 +70,7 @@
                                         <% } else { %>
                                             <img src="/images/default.png" alt="Default Profile" class="comment-image">
                                         <% } %>
-                                        <p><strong class="strong"><%= comment.userId.username %>:</strong> <%= comment.text %></p>
+                                        <p><strong><%= comment.userId.username %>:</strong> <%= comment.text %></p>
                                     </div>
                                 <% }) %>
                             </div>
@@ -113,14 +81,13 @@
                 <div class="suggestions-section">
                     <h2 class="suggestions-header">Up Next</h2>
                     <% suggestions.forEach(function(suggestion) { %>
-                        <a href="/<%= currentRoute %>/<%= suggestion._id %>" class="suggestion-card">
+                        <a href="/Live-Stream-Recorded/<%= suggestion._id %>" class="suggestion-card">
                             <img src="data:image/jpeg;base64,<%= suggestion.Thumbnail.toString('base64') %>" alt="Thumbnail" class="suggestion-thumbnail">
                             <div class="suggestion-info">
                                 <p class="suggestion-title"><%= suggestion.title %></p>
                                 <p class="suggestion-creator"><%= suggestion.creator[0].username %></p>
                                 <p class="suggestion-meta">
                                     <span class="views"><%= suggestion.Views %> Views</span>
-                                    <span class="upload-date"> • </span>
                                 </p>
                             </div>
                         </a>
@@ -130,12 +97,14 @@
         </div>
     </section>
 </body>
-<script src="/socket.io/socket.io.js"></script>
 <script>
     const creatorId = "<%= Live.creator[0]._id %>";
     const UserId = "<%= user.username %>";
+    const currentRoute = "<%= currentRoute %>";
+    const videoId = "<%= Live._id %>";
+    const userid = "<%= user._id %>"
     const vedioId = "<%= Live._id %>"
-    const Iduser = "<%= user._id %>"
 </script>
-<script src="/javascript/Live-front.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/javascript/videoplayer.js"></script>
 </html>

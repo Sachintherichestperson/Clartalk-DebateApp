@@ -14,7 +14,7 @@
     "agenda": "^5.0.0",
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
-    "bson": "^6.10.2",
+    "bson": "^6.10.3",
     "config": "^3.3.12",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^5.1.0",

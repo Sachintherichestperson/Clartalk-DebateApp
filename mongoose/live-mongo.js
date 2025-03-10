@@ -39,7 +39,10 @@ const vedioSchema = new mongoose.Schema({
         enum: ['trending', 'regular'], // 'trending' if radio selected, 'regular' otherwise
         default: 'regular',
     },
-    EndingTime: String,
+    viewedBy: [{ 
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: "User" 
+          }],
     LiveStatus: {
         type: String,
         enum: ['Processing', 'Live', 'Ended'],

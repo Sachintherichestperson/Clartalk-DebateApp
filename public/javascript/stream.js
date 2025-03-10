@@ -67,18 +67,22 @@
         setTimeout(() => saveRecording(), 1000);
     }
     
-
     function saveRecording() {
-    const blob = new Blob(recordedChunks, { type: "video/webm" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "debate_recording.webm";
-    document.body.appendChild(a);
-    a.click();
-    URL.revokeObjectURL(url);
+        const blob = new Blob(recordedChunks, { type: "video/webm" });
+    
+        // Create FormData to send file
+        const formData = new FormData();
+        formData.append("vedio", blob, "debate_recording.webm");
+    
+        fetch(`/creator/Upload-call/${liveId}`, {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => console.log("Upload Success:", data))
+        .catch(error => console.error("Error uploading:", error));
     }
+    
 
     socket.on("user-connected", () => {
     setTimeout(startRecording, 3000); 
@@ -112,6 +116,7 @@ function generateOTP() {
 // Function to handle End Call and send OTP securely
 function requestEndCallOTP() {
     const otp = generateOTP();
+    console.log("OTP generated:", otp);
 
     // Emitting OTP to the other streamer in the room
     socket.emit("send_otp", { otp, roomId: liveId });
@@ -132,7 +137,6 @@ socket.on("receive_otp", (data) => {
 
 // Handling successful OTP verification
 socket.on("otp_success", () => {
-    alert("Call ending process confirmed!");
     stopRecording();
 
     // Emit to all users in the room so both streamers get redirected
@@ -147,7 +151,7 @@ socket.on("redirect_to_home", async () => {
         const response = await fetch(`/creator/end-call/${liveId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ LiveStatus: 'ended' })
+            body: JSON.stringify({ LiveStatus: 'Ended' })
         });
 
         const data = await response.json();

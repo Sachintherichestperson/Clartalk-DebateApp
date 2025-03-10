@@ -40,7 +40,7 @@ agenda.define("send debate reminder", async (job) => {
         cid: "DebateImage"
     }] : [];
 
-    console.log("📩 Sending email to:", emails);
+    console.log("📩 Sending email to: 43", emails);
 
     if (emails.length > 0) {
         await SendEmail(emails, `Reminder: ${title}`, "Get Ready Only 30 minutes Left", images);
@@ -56,7 +56,7 @@ for (const debate of Liveopponent) {
       cid: "DebateImage"
   }] : [];
 
-  console.log("📩 Sending email to:", emails);
+  console.log("📩 Sending email to: 59", emails);
 
   if (emails.length > 0) {
       await SendEmail(emails, `Reminder: ${title}`, "Get Ready Only 30 minutes Left", images);
@@ -102,7 +102,7 @@ agenda.define("creator debate reminder", async (job) => {
         cid: "DebateImage"
     }] : [];
 
-    console.log("📩 Sending email to:", emails);
+    console.log("📩 Sending email to 105:", emails);
 
     if (emails.length > 0) {
         await SendEmail(emails, `Reminder: ${title}`, "Start The Debate, It's Time", images);
@@ -118,7 +118,7 @@ for (const debate of Liveopponent) {
       cid: "DebateImage"
   }] : [];
 
-  console.log("📩 Sending email to:", emails);
+  console.log("📩 Sending email to: 121", emails);
 
   if (emails.length > 0) {
       await SendEmail(emails, `Reminder: ${title}`, "Start The Debate, It's Time", images);
