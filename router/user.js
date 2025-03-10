@@ -501,12 +501,91 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
 
   const comments = viewers.comment;
 
-  
-
-  res.render("Livedebate-player", { Live, follower, suggestions, currentRoute: "live-content-applying-page", isFollowing, user, Booking, creator, opponent, comments });
+  res.render("Livedebate-player", {
+     Live,
+     follower,
+     suggestions,
+     currentRoute: "live-content-applying-page",
+     isFollowing,
+     user,
+     Booking,
+     creator,
+     opponent,
+     comments
+    });
   }catch(err){
         res.send("404").status("Page Not Found");
   }
+});
+
+router.get("/Live-Stream-Recorded/:id",isloggedin, async function(req, res){                     //Live-Stream-Recorder/:id  
+  const Live = await liveMongo.findById(req.params.id).populate({
+    path: "BookingDoneBy",
+    select: "username"
+  }).populate({
+    path: "comment",
+    select: "text userId",
+    populate: {
+      path: "userId",
+      select: "username profile"
+    }
+  }).populate({
+    path: "creator",
+    select: "username followers Rankpoints"
+  });
+
+  let user = await User.findOne({email: req.user.email });
+
+  const followerscount = Live.creator[0].followers;
+  console.log(followerscount);
+  const follower = followerscount.length;
+  const isFollowing = followerscount.includes(req.user._id);
+
+  const creator = Live.creator[0];
+  const opponent = Live.opponent[0];
+
+  if (!Live.viewedBy.includes(req.user._id)) {
+    Live.Views += 1;
+    Live.viewedBy.push(req.user._id);
+    await Live.save();
+
+    const points = 15;
+    creator.Rankpoints += points;
+    await creator.save();
+
+    opponent.Rankpoints += points;
+    // await opponent.save();
+
+    await User.updateRanks();
+  }
+
+  const Livemongo = await liveMongo.find({ _id: { $ne: Live._id } }).limit(5).populate({
+    path: "creator",
+    select: "username"
+  });
+  const vediomongo = await videomongoose.find().limit(5).populate({
+    path: "creator",
+    select: "username"
+  });
+  const podcastmongo = await podcastsmongoose.find().limit(5).populate({
+    path: "creator",
+    select: "username"
+  });
+  const suggestions = [...Livemongo, ...vediomongo, ...podcastmongo];
+  console.log(suggestions);
+
+  const comments = Live.comment;
+
+  res.render("Live-streamer", {
+     Live,
+     videoFile: Live.Stream[0],
+     suggestions, 
+     currentRoute: "Live-Stream-Recorded", 
+     follower, 
+     isFollowing, 
+     user,
+     comments
+    });
 });
 
 router.post('/update-status/:id', async (req, res) => {

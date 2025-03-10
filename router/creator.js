@@ -22,6 +22,9 @@ const { setMaxListeners } = require("events");
 const server = createServer(app);
 const io = new Server(server);
 const allusers = {};
+const { ObjectId } = require("bson"); // Import BSON
+
+
 
 
 router.get("/creator/upload", function(req, res){
@@ -386,6 +389,40 @@ router.post("/end-call/:id",isloggedin, async(req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+router.post("/Upload-call/:id", isloggedin, videoUpload.single("vedio"), async (req, res) => {
+  try {
+    const Live = await livemongo.findById(req.params.id);
+
+    if (!Live) {
+      return res.status(404).json({ message: "Live debate not found!" });
+    }
+
+    // Check if the stream already has a video
+    if (Live.Stream.length > 0) {
+      return res.status(400).json({ message: "Video already uploaded for this debate!" });
+    }
+
+    if (!req.file || !req.file.id) {
+      return res.status(400).json({ message: "No valid video uploaded!" });
+    }
+
+    // Debugging: Check existing Stream array
+    console.log("Before update: ", Live.Stream);
+
+    Live.Stream.push(new ObjectId(req.file.id)); // Convert to ObjectId
+    await Live.save();
+
+    // Debugging: Check after update
+    console.log("After update: ", Live.Stream);
+
+    res.json({ message: "Video uploaded successfully", filename: req.file.filename });
+  } catch (err) {
+    console.error("Upload error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 router.get("/Building-The-Community", function(req, res){
   res.render("community-builder")

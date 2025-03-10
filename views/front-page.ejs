@@ -50,8 +50,15 @@
                         <img src="data:image/jpeg;base64,<%= vedio.Thumbnail.toString('base64') %>" alt="Video Thumbnail">
                         <div class="video-details">
                             <h3 class="video-title"><%= vedio.title %></h3>
-                            <p class="video-time" data-time="<%= vedio.Time %>">Time Left: Calculating...</p>
-                            <p class="video-status" style="display: none;">Live</p>
+                            <p>
+                                <% if (vedio.LiveStatus === "Processing"){ %>
+                                    <p class="video-time" data-time="<%= vedio.Time %>">Time Left: Calculating...</p>
+                                <% }else if(vedio.LiveStatus === "Live"){ %>
+                                    <div class="video-status"><%= vedio.LiveStatus %></div>
+                                <% }else{ %>
+                                    <div class="Ended-status"><%= vedio.LiveStatus %></div>
+                                <% } %>
+                            </p>
                         </div>
                     </a>
                 <% }) %>

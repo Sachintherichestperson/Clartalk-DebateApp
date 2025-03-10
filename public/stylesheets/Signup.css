@@ -188,6 +188,8 @@ a:hover {
 }
 }
 
+
+
 @keyframes fadeOut {
     0% {
         opacity: 1;
@@ -198,39 +200,17 @@ a:hover {
     }
 }
 
-@media (max-width: 768px) {
-    body {
-        padding: 20px;
-    }
-
-    #Sign-up {
-        width: 90%;
-        padding: 20px;
-    }
-
-    h1 {
-        font-size: 36px;
-    }
-
-    button {
-        font-size: 16px;
-    }
-
-    a {
-        font-size: 14px;
-    }
-}
-
-@media (max-width: 320px) {
+@media (max-width: 480px) {
     body {
         background-color: black; /* Consistent black background */
         color: white;
         margin: 0;
         display: flex;
-        justify-content: center;
-        align-items: center;
+        justify-content: unset;
+        align-items: unset;
         font-family: 'Arial', sans-serif;
         overflow: hidden;
+        padding: 10px 10px 10px 10px;
     }
     #container {
         width: 300px;
@@ -269,5 +249,24 @@ a:hover {
         cursor: pointer;
         transition: background-color 0.3s, transform 0.2s ease;
         width: 100%;
+    }
+}
+@media (max-width: 768px) {
+
+    #Sign-up {
+        width: 90%;
+        padding: 20px 10px 5px 16px;
+    }
+
+    h1 {
+        font-size: 36px;
+    }
+
+    button {
+        font-size: 16px;
+    }
+
+    a {
+        font-size: 14px;
     }
 }
