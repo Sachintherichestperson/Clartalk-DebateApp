@@ -6,9 +6,11 @@ const  SendEmail = require("../config/nodemailer");
 
 module.exports.userregister = async (req, res) => {
     try {
-        const { username, email, password, fcmToken } = req.body;
+        const { username, email, password } = req.body;
+        let { fcmToken } = req.body;
 
-        // Check if the user already exists
+        fcmToken = fcmToken || null;
+
         const user = await User.findOne({ email });
         if (user) {
             req.flash("key", "User already registered");
