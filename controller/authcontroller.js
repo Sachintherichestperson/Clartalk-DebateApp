@@ -14,14 +14,12 @@ module.exports.userregister = async (req, res) => {
         const user = await User.findOne({ email });
         if (user) {
             req.flash("key", "User already registered");
-            console.log("In Email");
             return res.redirect("/register");
         }
 
         const usernameId = await User.findOne({ username });
         if (usernameId) {
             req.flash("key", "Username not available");
-            console.log("In username");
             return res.redirect("/register");
         }
 
