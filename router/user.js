@@ -904,8 +904,11 @@ router.get("/Delete-Account", isloggedin, async (req, res) => {
     .populate("communities")
     .populate("MunCompetition")
     .populate("requests")
-    .populate("Sender");
+    .populate("Sender")
+    .populate("Live");
 
+    const Live = user.Live.filter(live => live.LiveStatus === "Processing" || live.LiveStatus === "Live");
+    
     if (!user) {
       return res.status(404).send("User not found.");
     }
@@ -916,7 +919,7 @@ router.get("/Delete-Account", isloggedin, async (req, res) => {
     await communityMongo.deleteMany({ _id: { $in: user.communities } });
     await competitionMongo.deleteMany({ _id: { $in: user.MunCompetition } });
 
-    if (user.requests.length > 0 || user.Sender.length > 0) {
+    if (Live.length) {
       return res.status(400).json({
         success: false,
         message: "You have pending live sessions. Complete them before deleting your account."

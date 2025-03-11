@@ -3,58 +3,58 @@
     let roomId;
     let userType;
     let combinedStream = new MediaStream();
-    let mediaRecorder;
-    let recordedChunks = [];
-    let canvasStream;
+    let frameCounter = 0;
     const configuration = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 
+    let recordedChunks = [];
+    let canvasStream;
+    let mediaRecorder;
+    
     function startRecording() {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-
-    canvas.width = 1280; // Adjust as needed
-    canvas.height = 720;
-
-    const localVideo = document.getElementById("localVideo");
-    const remoteVideos = document.querySelectorAll("#remoteVideos video");
-
-    function drawFrame() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Draw local video on the left
-        if (localVideo) {
-            ctx.drawImage(localVideo, 0, 0, canvas.width / 2, canvas.height);
-        }
-
-        // Draw first remote video on the right
-        let xOffset = canvas.width / 2;
-        remoteVideos.forEach((video, index) => {
-            if (index === 0) { // Only record the first remote stream for now
-                ctx.drawImage(video, xOffset, 0, canvas.width / 2, canvas.height);
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+    
+        canvas.width = 1280;
+        canvas.height = 720;
+    
+        const localVideo = document.getElementById("localVideo");
+        const remoteVideos = document.querySelectorAll("#remoteVideos video");
+    
+        function drawFrame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+            if (localVideo && !localVideo.paused && !localVideo.ended) {
+                ctx.drawImage(localVideo, 0, 0, canvas.width / 2, canvas.height);
             }
-        });
-
-        requestAnimationFrame(drawFrame);
-    }
-
-    drawFrame();
-
-    // Capture the canvas as a stream
-    canvasStream = canvas.captureStream(30); // 30 FPS
-    mediaRecorder = new MediaRecorder(canvasStream, { mimeType: "video/webm" });
-
-    mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-            recordedChunks.push(event.data);
+    
+            remoteVideos.forEach((video, index) => {
+                if (!video.paused && !video.ended && index === 0) {
+                    ctx.drawImage(video, canvas.width / 2, 0, canvas.width / 2, canvas.height);
+                }
+            });
+    
+            requestAnimationFrame(drawFrame);
         }
-    };
-
-    mediaRecorder.onstop = saveRecording;
-
-    mediaRecorder.start();
-    console.log("Recording started...");
+    
+        drawFrame();
+    
+        setTimeout(() => {
+            canvasStream = canvas.captureStream(30);
+            mediaRecorder = new MediaRecorder(canvasStream, { mimeType: "video/webm" });
+    
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                    console.log("Data available:", event.data);
+                }
+            };
+    
+            mediaRecorder.onstop = saveRecording;
+            mediaRecorder.start();
+            console.log("Recording started...");
+        }, 500);
     }
-
+    
     function stopRecording() {
         if (mediaRecorder && mediaRecorder.state !== "inactive") {
             mediaRecorder.stop();
@@ -63,14 +63,16 @@
             console.warn("MediaRecorder was already inactive.");
         }
     
-        // Ensure that `saveRecording()` is called even if mediaRecorder is inactive
-        setTimeout(() => saveRecording(), 1000);
+        setTimeout(saveRecording, 1000);
     }
     
     function saveRecording() {
-        const blob = new Blob(recordedChunks, { type: "video/webm" });
+        if (recordedChunks.length === 0) {
+            console.warn("No recorded chunks available.");
+            return;
+        }
     
-        // Create FormData to send file
+        const blob = new Blob(recordedChunks, { type: "video/webm" });
         const formData = new FormData();
         formData.append("vedio", blob, "debate_recording.webm");
     
@@ -83,32 +85,11 @@
         .catch(error => console.error("Error uploading:", error));
     }
     
-
     socket.on("user-connected", () => {
-    setTimeout(startRecording, 3000); 
+        setTimeout(startRecording, 3000);
     });
 
-    function drawFrame() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw remote video (full-screen)
-    remoteVideos.forEach((video, index) => {
-        if (index === 0) {
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        }
-    });
-
-    // Draw local video (small window on bottom-right)
-    if (localVideo) {
-        let smallWidth = 200;
-        let smallHeight = 150;
-        ctx.drawImage(localVideo, canvas.width - smallWidth - 10, canvas.height - smallHeight - 10, smallWidth, smallHeight);
-    }
-
-    requestAnimationFrame(drawFrame);
-    }
-
-// Function to generate a 6-digit OTP
+    
 function generateOTP() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
@@ -143,7 +124,6 @@ socket.on("otp_success", () => {
     socket.emit("end_call_redirect", { roomId: liveId });
     socket.emit("redirect_to_home", { roomId: liveId }); // Add this line
 });
-
 
 // Handling redirection for both streamers
 socket.on("redirect_to_home", async () => {
@@ -180,9 +160,15 @@ socket.on("redirect_to_home", async () => {
         socket.emit("join-room", roomId, userType);
 
     
-        if (userType === "debater") {
-            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            document.getElementById("localVideo").srcObject = localStream;
+        try{
+            if (userType === "debater") {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                document.getElementById("localVideo").srcObject = localStream;
+            }
+        }catch (error) {
+            console.error("Error accessing media devices:", error);
+            alert("Please allow access to your camera and microphone.");
+            return;
         }
     }
     

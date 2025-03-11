@@ -393,6 +393,7 @@ router.post("/end-call/:id",isloggedin, async(req, res) => {
 router.post("/Upload-call/:id", isloggedin, videoUpload.single("vedio"), async (req, res) => {
   try {
     const Live = await livemongo.findById(req.params.id);
+    console.log('Backend Accessed');
 
     if (!Live) {
       return res.status(404).json({ message: "Live debate not found!" });
@@ -423,11 +424,9 @@ router.post("/Upload-call/:id", isloggedin, videoUpload.single("vedio"), async (
   }
 });
 
-
 router.get("/Building-The-Community", function(req, res){
   res.render("community-builder")
 });
-
 
 router.post("/community/builder",upload.single("CommunityDP"), isloggedin, async function (req, res) {
   try{
