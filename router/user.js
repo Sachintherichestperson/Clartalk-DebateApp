@@ -24,7 +24,6 @@ const  SendEmail = require("../config/nodemailer");
 router.get("/register", (req, res) => {                                                                      //register page
     let err = req.flash("key")
     res.render("Register", { err });
-    console.log(err)
 });
 
 router.post("/register", userregister)                                                                     //register page--Uploader

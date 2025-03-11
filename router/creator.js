@@ -25,8 +25,6 @@ const allusers = {};
 const { ObjectId } = require("bson"); // Import BSON
 
 
-
-
 router.get("/creator/upload", function(req, res){
     res.render("upload")
 });
@@ -68,7 +66,6 @@ router.post("/upload-thumbnail", upload.single("Thumbnail"), isloggedin, async f
       res.status(500).send("Server Error");
   }
 });
-
 
 router.get("/video-content/upload", isloggedin, function(req, res) {
   if (!req.session.uploadData) {
@@ -265,6 +262,7 @@ router.get("/opponent-requests/:Id", isloggedin, async (req, res) => {
 
     // Fetch the contents with status 'pending'
     const contents = await livemongo.find({ status: "pending" });
+    const Time = contents.Time;
 
     // Render the page with requests and contents
     res.render("requests", { requests: user.requests, contents, opponentId, user });
