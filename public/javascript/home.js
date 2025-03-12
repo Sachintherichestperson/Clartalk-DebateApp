@@ -6,48 +6,73 @@
             alert(message.message);
         });
     
-        async function updateTimeLeft() {
-            const now = new Date();
-        
-            document.querySelectorAll('.video-card').forEach(async (videoCard) => {
-                const timeElement = videoCard.querySelector('.video-time');
-                const statusElement = videoCard.querySelector('.video-status');
-                const videoTime = new Date(timeElement.dataset.time);
-                const timeLeft = videoTime - now;
-        
-                if (timeLeft > 0) {
-                    // Time left: Show countdown, hide status
-                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-        
-                    timeElement.textContent = days > 0 
-                        ? `Time Left: ${days}d ${hours}h ${minutes}m` 
-                        : `Time Left: ${hours}h ${minutes}m`;
-        
-                    timeElement.style.display = "block";  // Show countdown
-                    statusElement.style.display = "none"; // Hide status
-                } else {
-                    // Time is up: Hide countdown, show status
-                    timeElement.style.display = "none";   // Hide countdown
-                    statusElement.style.display = "block"; // Show status
-        
-                    // Update status in database
-                    const videoId = videoCard.dataset.id;
-                    if (videoId) {
-                        await fetch(`/update-status/${videoId}`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ LiveStatus: 'Live' })
-                        });
-                    }
-                }
-            });
+        let intervalID; // Store interval reference
+
+async function updateTimeLeft() {
+    const now = new Date();
+    let allExpired = true; // Flag to check if all videos are expired
+
+    document.querySelectorAll('.video-card').forEach(async (videoCard) => {
+        let timeElement = videoCard.querySelector('.video-time');
+        let statusElement = videoCard.querySelector('.video-status');
+
+        // If missing, create and append them
+        if (!timeElement) {
+            timeElement = document.createElement("span");
+            timeElement.classList.add("video-time");
+            videoCard.appendChild(timeElement);
         }
-        
-        // Run every second
-        setInterval(updateTimeLeft, 1000);
-        updateTimeLeft();
+
+        if (!statusElement) {
+            statusElement = document.createElement("span");
+            statusElement.classList.add("video-status");
+            statusElement.style.display = "none";
+            videoCard.appendChild(statusElement);
+        }
+
+        const videoTime = new Date(timeElement.dataset.time);
+        const timeLeft = videoTime - now;
+
+        if (timeLeft > 0) {
+            allExpired = false; // At least one video is still counting
+
+            // Show countdown, hide status
+            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+
+            timeElement.textContent = days > 0 
+                ? `Time Left: ${days}d ${hours}h ${minutes}m` 
+                : `Time Left: ${hours}h ${minutes}m`;
+
+            timeElement.style.display = "block";  
+            statusElement.style.display = "none"; 
+        } else {
+            // Time is up: Hide countdown, show status
+            timeElement.style.display = "none";   
+            // Update status in database
+            const videoId = videoCard.dataset.id;
+            if (videoId) {
+                await fetch(`/update-status/${videoId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ LiveStatus: 'Live' })
+                });
+            }
+        }
+    });
+
+    // If all videos are expired, stop the interval
+    if (allExpired && intervalID) {
+        clearInterval(intervalID);
+        console.log("All countdowns are finished, interval stopped.");
+    }
+}
+
+// Start interval and store reference
+intervalID = setInterval(updateTimeLeft, 1000);
+updateTimeLeft(); // Run immediately once
+
         
         
     

@@ -35,6 +35,7 @@ async function sendPushNotification(token, title, body, notificationType) {
 
         user.notification.push(notification);
         await user.save();
+        console.log("notification",notification);
 
         return response;
     } catch (error) {
