@@ -415,7 +415,17 @@ router.post("/Join-community/:id",isloggedin,async (req, res) => {              
         await sendPushNotification(fcmToken, `Notification For ${ community.CommunityName }`, `${user.username} Joined ${ community.CommunityName }`, "join-community");  
       }
 
-      await SendEmail(community.createdBy.email, "Join Community", [{ filename: "community.jpg", content: community.CommunityDP, cid: "communityImage" }],`Congrats You Joined ${ community.CommunityName }`);
+      await SendEmail(
+        community.createdBy.email,
+        "Join Community",
+        `Congrats! You Joined ${community.CommunityName}`, // ✅ Text goes here
+        [{ 
+            filename: "community.jpg", 
+            content: community.CommunityDP, 
+            cid: "communityImage" 
+        }] // ✅ Images array here
+    );
+    
 
       if(fcm){
         await sendPushNotification(fcmToken, `Congrats You Joined ${ community.CommunityName }`, `Now We Give you An Opportunity To Change The World`, "join-community");  
@@ -428,6 +438,32 @@ router.post("/Join-community/:id",isloggedin,async (req, res) => {              
     console.log(err);
   }
 });
+
+router.get("/Exit-Community/:id", isloggedin, async (req, res) => {
+  try {
+      const community = await communityMongo.findById(req.params.id);
+      const user = await User.findById(req.user._id);
+
+      if (!community || !user) {
+          return res.status(404).send("Community or user not found.");
+      }
+
+      // Check if user is a member before removing
+      if (community.members.includes(user._id)) {
+          await communityMongo.findByIdAndUpdate(
+              req.params.id,
+              { $pull: { members: user._id } },  // Pulls user's ID from members array
+              { new: true }
+          );
+      }
+
+      res.redirect("/community");
+  } catch (error) {
+      console.error("Error exiting community:", error);
+      res.status(500).send("Server error");
+  }
+});
+
 
 router.post("/Community/:id/payment",isloggedin,async (req, res) => {                                 // Join-community/:id Page
   try{

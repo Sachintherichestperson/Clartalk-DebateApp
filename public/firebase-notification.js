@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-messaging.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics.js";
-import { getInAppMessaging } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-in-app-messaging.js";
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -18,7 +17,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 const analytics = getAnalytics(app);
-const inAppMessaging = getInAppMessaging(app);
 
 // Register Service Worker
 if ("serviceWorker" in navigator) {
@@ -31,8 +29,6 @@ if ("serviceWorker" in navigator) {
         });
 }
 
-// Enable In-App Messaging (optional: delay messages to avoid spam)
-inAppMessaging.setMessagesSuppressed(false);
 
 // Handle Foreground Push Notifications
 onMessage(messaging, (payload) => {
@@ -45,20 +41,4 @@ onMessage(messaging, (payload) => {
             icon: "/images/nav.png"
         });
     });
-
-    // Show In-App Message
-    showInAppMessage(payload.notification);
 });
-
-// Function to Display In-App Messages
-function showInAppMessage(notification) {
-    const messageBox = document.createElement("div");
-    messageBox.innerHTML = `
-        <div style="position: fixed; bottom: 10px; right: 10px; background: #333; color: white; padding: 10px; border-radius: 5px; z-index: 1000;">
-            <strong>${notification.title}</strong>
-            <p>${notification.body}</p>
-            <button onclick="this.parentElement.remove()">Close</button>
-        </div>
-    `;
-    document.body.appendChild(messageBox);
-}

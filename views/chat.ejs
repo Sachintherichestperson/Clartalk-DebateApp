@@ -17,18 +17,20 @@
                 <img src="data:image/jpeg;base64,<%= community.CommunityDP.toString('base64') %>" alt="Community Logo">
             </div>
             <h2 class="community-name"><%= community.CommunityName %></h2>
-            <div class="icon-container">
-                <span class="icon">&#9776;</span>
-                <div class="icon-dropdown-menu">
-                    <ul>
-                        <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
-                        <li><a href="/Settings"><i class="fas fa-cogs"></i> Settings</a></li>
-                        <li><a href="/Members/<%= community._id %>"><i class="fas fa-users"></i> Members</a></li>
-                        <li><a href="/Notification"><i class="fas fa-bell"></i> Notifications</a></li>
-                        <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Log-out</a></li>
-                    </ul>
+            <% if(member || type === "Public") {%>
+                <div class="icon-container">
+                    <span class="icon">&#9776;</span>
+                    <div class="icon-dropdown-menu">
+                        <ul>
+                            <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
+                            <li><a href="/Settings"><i class="fas fa-cogs"></i> Settings</a></li>
+                            <li><a href="/Members/<%= community._id %>"><i class="fas fa-users"></i> Members</a></li>
+                            <li><a href="/Notification"><i class="fas fa-bell"></i> Notifications</a></li>
+                            <li><a href="/Exit-Community/<%= community._id %>"><i class="fas fa-sign-out-alt"></i> Exit-Communtiy</a></li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
+            <% } %>
         </nav>
         <div class="chat-container">
             <div class="chat-panel">                     </div>
