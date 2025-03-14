@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
 const dbgr = require("debug")("development:mongoose");
-const config = require("config");
+
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/debateapp"; // Use env variable or local DB
 
 mongoose
-.connect(`${config.get("MONGODB_URI")}/debateapp`)
-.then(function(){
-    dbgr("Connected")
-})
-.catch(function(err){
-    dbgr(err)
-})
+  .connect(MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  .then(() => dbgr("Connected to MongoDB"))
+  .catch(err => dbgr("MongoDB Connection Error:", err));
 
 module.exports = mongoose.connection;
