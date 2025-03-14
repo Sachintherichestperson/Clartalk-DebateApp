@@ -6,7 +6,7 @@
     "node": "20.x"
   },
   "scripts": {
-    "test": " clartalk.js"
+    "start": "node clartalk.js"
   },
   "keywords": [],
   "author": "",
