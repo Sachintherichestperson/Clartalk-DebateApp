@@ -88,7 +88,7 @@ module.exports.verifyOtp = async (req, res) => {
         // Set JWT Token in Cookie
         res.cookie("user", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: process.env.NODE_ENV === "development",
             maxAge: 7 * 24 * 60 * 60 * 1000,
             sameSite: "strict",
         });
