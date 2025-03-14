@@ -6,79 +6,145 @@
     <title>ClarTalk - Notifications</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="./stylesheets/notification.css">
+    <style>
+        /* Skeleton Loader */
+        .skeleton {
+            background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite linear;
+        }
+
+        @keyframes loading {
+            from {
+                background-position: 200% 0;
+            }
+            to {
+                background-position: -200% 0;
+            }
+        }
+
+        .skeleton-box {
+            width: 100%;
+            height: 15px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+
+        .skeleton-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .skeleton-notification {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            border-bottom: 1px solid #ccc;
+        }
+        #notifications{
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
 </head>
 <body>
     <section class="container">
-    <header>
-        <div class="branding">
-            <img src="/images/nav.png" alt="ClarTalk Logo">
-            <div class="search-bar">
-                <i class="fa fa-search Search-icon"></i>
-            </div>
-        </div>
-        <nav class="navigation">
-            <a href="/" class="nav-link">
-                <i class="fas fa-tv"></i> Live
-            </a>
-            <a href="debate" class="nav-link">
-                <i class="fas fa-comments"></i> Entertainment
-            </a>
-            <a href="podcast" class="nav-link">
-                <i class="fas fa-podcast"></i> Podcasts
-            </a>
-            <a href="/community" class="nav-link">
-                <i class="fas fa-users"></i> Community
-            </a>
-            <a href="/creator/opponent-requests/<%= user._id %>" class="nav-link">
-                <i class="fas fa-envelope"></i> Requests
-            </a>
-            <a href="/LeaderBoard" class="nav-link">
-                <i class="fas fa-trophy"></i> Leaderboard
-            </a>
-            <a href="/MUN-competetion" class="nav-link">
-                <i class="fas fa-globe"></i> MUN
-            </a>
-            <a href="/Notification" class="nav-link active">
-                <i class="fas fa-bell"></i> Notifications
-            </a>
-            <a href="/profile" class="nav-link">
-                <i class="fas fa-user"></i> Profile
-            </a>
-        </nav>
-    </header>
-        <div class="page">
-            <!-- Notification 1 -->
-             <% user.notification.forEach(function(notification){ %>
-            <div class="notification">
-                <% if(notification.notificationType === "ClarTalk"){ %>
-                <div class="icon comment"><i class="fas fa-comment-alt"></i></div>
-                <% }else{ %>
-                    <div class="icon follow"><i class="fas fa-user-plus"></i></div>
-                <% } %>
-                <div class="content">
-                    <p><strong><%= notification.title %></strong><%= notification.body %></p>
-                    <span class="time">5 minutes ago</span>
+        
+        <!-- Header Section -->
+        <header>
+            <div class="branding">
+                <img src="/images/nav.png" alt="ClarTalk Logo">
+                <div class="search-bar">
+                    <i class="fa fa-search Search-icon"></i>
                 </div>
             </div>
-            <% }) %>
-            <!-- Notification 2 -->
-            <!-- <div class="notification">
-                <div class="icon like"><i class="fas fa-heart"></i></div>
-                <div class="content">
-                    <p><strong>Alice</strong> liked your debate on AI Ethics.</p>
-                    <span class="time">15 minutes ago</span>
-                </div>
-            </div> -->
+            
+            <!-- Navigation Bar -->
+            <nav class="navigation">
+                <a href="/" class="nav-link"><i class="fas fa-tv"></i> Live</a>
+                <a href="debate" class="nav-link"><i class="fas fa-comments"></i> Entertainment</a>
+                <a href="podcast" class="nav-link"><i class="fas fa-podcast"></i> Podcasts</a>
+                <a href="/community" class="nav-link"><i class="fas fa-users"></i> Community</a>
+                <a href="/creator/opponent-requests/<%= user._id %>" class="nav-link"><i class="fas fa-envelope"></i> Requests</a>
+                <a href="/LeaderBoard" class="nav-link"><i class="fas fa-trophy"></i> Leaderboard</a>
+                <a href="/MUN-competetion" class="nav-link"><i class="fas fa-globe"></i> MUN</a>
+                <a href="/Notification" class="nav-link active"><i class="fas fa-bell"></i> Notifications</a>
+                <a href="/profile" class="nav-link"><i class="fas fa-user"></i> Profile</a>
+            </nav>
+        </header>
 
-            <!-- Notification 3 -->
-            <!-- <div class="notification">
-                <div class="icon follow"><i class="fas fa-user-plus"></i></div>
-                <div class="content">
-                    <p><strong>Mark</strong> started following you.</p>
-                    <span class="time">30 minutes ago</span>
+        <!-- Notification Section -->
+        <div class="page">
+            <!-- Skeleton Loader (Shows While Loading) -->
+            <div id="skeleton-loader">
+                <div class="skeleton-notification">
+                    <div class="skeleton skeleton-icon"></div>
+                    <div>
+                        <div class="skeleton skeleton-box" style="width: 150px;"></div>
+                        <div class="skeleton skeleton-box" style="width: 200px;"></div>
+                    </div>
                 </div>
-            </div> -->
+                <div class="skeleton-notification">
+                    <div class="skeleton skeleton-icon"></div>
+                    <div>
+                        <div class="skeleton skeleton-box" style="width: 150px;"></div>
+                        <div class="skeleton skeleton-box" style="width: 200px;"></div>
+                    </div>
+                </div>
+                <div class="skeleton-notification">
+                    <div class="skeleton skeleton-icon"></div>
+                    <div>
+                        <div class="skeleton skeleton-box" style="width: 150px;"></div>
+                        <div class="skeleton skeleton-box" style="width: 200px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real Notifications (Hidden Until Data Loads) -->
+            <div id="notifications" style="display: none;">
+                <% 
+                const icons = {
+                    "clartalk": "fas fa-clipboard-check",
+                    "follow": "fas fa-user-plus",
+                    "join-community": "fas fa-users",
+                    "comment": "fas fa-comment-alt",
+                    "started": "fas fa-video",
+                    "rejected": "fas fa-times-circle",
+                    "community-created": "fas fa-users-cog",
+                    "30-min": "fas fa-clock",
+                    "competition": "fas fa-trophy"
+                };
+
+                user.notification.forEach(notification => {
+                    let notificationType = notification.notificationType.trim().toLowerCase();
+                    let iconClass = icons[notificationType] || "fas fa-bell";
+                %>
+                <div class="notification">
+                    <div class="icon">
+                        <i class="<%= iconClass %>"></i>
+                    </div>
+                    <div class="content">
+                        <p><strong><%= notification.title %></strong> <%= notification.body %></p>
+                        <span class="time">5 minutes ago</span>
+                    </div>
+                </div>
+                <% }); %>
+            </div>
         </div>
+        
     </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Simulating data fetch delay (You can replace this with real data fetching)
+            setTimeout(() => {
+                document.getElementById("skeleton-loader").style.display = "none"; // Hide Skeleton Loader
+                document.getElementById("notifications").style.display = "flex"; // Show Real Data
+            }, 2000); // Simulated 2-second delay
+        });
+    </script>
 </body>
 </html>
