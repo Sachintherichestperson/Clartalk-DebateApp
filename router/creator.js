@@ -229,7 +229,7 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
     const opponentfcm = opponentUser.fcmToken;
 
     if (opponentfcm) {
-    await sendPushNotification(opponentfcm, "New Request", `You have a new request from ${req.user.username} on ${title}`, "Clartalk");
+    await sendPushNotification(opponentfcm, "New Request", `You have a new request from ${req.user.username} on ${title}`, "Live-Request");
     }
 
     res.redirect("/")
@@ -318,7 +318,7 @@ router.post("/accept/:id",isloggedin,async function (req, res) {
     const fcmTokens = allUsers.map(user => user.fcmToken).filter(Boolean);
 
     if (fcmTokens.length > 0) {
-        await sendPushNotificationAll(fcmTokens, `${updateVideo.title}`, `Creator ${updateVideo.creator[0].username} vs ${updateVideo.opponent[0].username} is now live!`, "Clartalk");
+        await sendPushNotificationAll(fcmTokens, `${updateVideo.title}`, `Creator ${updateVideo.creator[0].username} vs ${updateVideo.opponent[0].username} is now live!`, "Accepted");
     }
 
     const fcmToken = updateVideo.creator.fcmToken;
@@ -368,7 +368,7 @@ router.post("/reject/:id",isloggedin,async function (req, res) {
     const fcmToken = updateVideo.creator.fcmToken;
 
     if(fcmToken){
-      await sendPushNotification(fcmToken, `${updateVideo.title}`, `Request Accepted By ${updateVideo.opponent[0].username} for ${updateVideo.title}`, "Request Rejected");
+      await sendPushNotification(fcmToken, `${updateVideo.title}`, `Request Accepted By ${updateVideo.opponent[0].username} for ${updateVideo.title}`, "Rejected");
     }
 
     res.redirect("/");
@@ -445,14 +445,14 @@ router.post("/community/builder",upload.single("CommunityDP"), isloggedin, async
        const fcmToken = user.fcmToken;
 
        if(fcmToken){
-        await sendPushNotification(fcmToken, `Congrats`, `Community created ${CommunityName}`, "Clartalk")
+        await sendPushNotification(fcmToken, `Congrats`, `Community created ${CommunityName}`, "community-created");
        }
 
        const Allusers = await User.find();
        const fcmTokens = Allusers.fcmToken;
 
        if(fcmTokens){
-        await sendPushNotificationAll(fcmTokens, `Attention World Changers`, `New Community Created ${CommunityName}`, "Clartalk");
+        await sendPushNotificationAll(fcmTokens, `Attention World Changers`, `New Community Created ${CommunityName}`, "community-Made");
        }
 
        await user.save();
@@ -546,13 +546,13 @@ router.post("/competition/builded", upload.single("CompetitionDP"), isloggedin, 
   const fcmTokens = allUsers.map(user => user.fcmToken).filter(Boolean);
 
   if (fcmTokens.length > 0) {
-      await sendPushNotificationAll(fcmTokens, "New Competition", `New competition [ ${CompetitionName}]  has been created!`, "Clartalk");
+      await sendPushNotificationAll(fcmTokens, "New Competition", `New competition [ ${CompetitionName}]  has been created!`, "competetion");
   }
 
   const fcmToken = user.fcmToken;
 
   if(fcmToken){
-    await sendPushNotification(fcmToken, `Congrats `, `New Competition ${CompetitionName} is created`, "Clartalk");
+    await sendPushNotification(fcmToken, `Congrats `, `New Competition ${CompetitionName} is created`, "competition");
   }
 
   res.redirect("/MUN-competetion");

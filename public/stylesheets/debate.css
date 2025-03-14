@@ -25,7 +25,7 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 70%;
+    width: 50%;
     height: 100px;
     position: relative;
     left: 200px;
@@ -72,15 +72,21 @@ header {
 .navigation {
     display: flex;
     justify-content: center;
-    gap: 20px;
     width: 100%;
+    height: 50px;
     margin-top: 10px;
+    background-color: #262626;
+    flex-direction: column;
+    overflow-y: auto;
+    scrollbar-width: none;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .nav-link {
     color: #ffffff;
     text-decoration: none;
-    padding: 10px 20px;
+    padding: 10px 40px;
     background: linear-gradient(135deg, #444, #333);
     border-radius: 20px;
     font-size: 16px;
@@ -455,4 +461,82 @@ a{
     .instruction {
         font-size: 16px;
     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Skeleton Loader */
+.skeleton-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: #121212;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    z-index: 9999;
+}
+
+.skeleton-header, .skeleton-nav, .skeleton-card {
+    background: linear-gradient(90deg, #1e1e1e 25%, #292929 50%, #1e1e1e 75%);
+    background-size: 400% 100%;
+    border-radius: 10px;
+    animation: shimmer 1.5s infinite linear;
+}
+
+.skeleton-header {
+    width: 80%;
+    height: 50px;
+}
+
+.skeleton-nav {
+    width: 60%;
+    height: 40px;
+}
+
+/* Skeleton Content */
+.skeleton-content {
+    display: flex;
+    gap: 20px;
+}
+
+.skeleton-card {
+    width: 250px;
+    height: 200px;
+    border-radius: 15px;
+}
+
+/* Shimmer Effect */
+@keyframes shimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+}
+
+/* Offline Message */
+.offline-message {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: red;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    display: none;
 }

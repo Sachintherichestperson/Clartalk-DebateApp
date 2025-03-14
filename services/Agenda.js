@@ -15,7 +15,7 @@ agenda.define("send debate reminder", async (job) => {
   const fcmTokens = allUsers.map(user => user.fcmToken).filter(Boolean);
 
   if (fcmTokens) {
-    await sendPushNotificationAll(fcmTokens, `Live ${title}`, `${title} debate session starts in 30 minutes!`, "Clartalk");
+    await sendPushNotificationAll(fcmTokens, `Live ${title}`, `${title} debate session starts in 30 minutes!`, "30-min");
   }
 
 
@@ -28,7 +28,7 @@ agenda.define("send debate reminder", async (job) => {
   const fcmToken = [...creatorfcmToken, ...opponentfcmToken].filter(Boolean);
 
   if (fcmToken) {
-    await sendPushNotificationAll(fcmToken, `Reminder: ${title}`, "Get Ready Only 30 minutes Left", "Clartalk");
+    await sendPushNotificationAll(fcmToken, `Reminder: ${title}`, "Get Ready Only 30 minutes Left", "30-min");
   }
 
   for (const debate of LiveCreator) {
@@ -86,11 +86,11 @@ agenda.define("creator debate reminder", async (job) => {
 
   // Send Notifications
   if (fcmTokens) {
-    await sendPushNotificationAll(fcmTokens, `Live ${title}`, `${title} debate session is starting now`, "Clartalk");
+    await sendPushNotificationAll(fcmTokens, `Live ${title}`, `${title} debate session is starting now`, "Started");
   }
 
   if (fcmToken) {
-    await sendPushNotificationAll(fcmToken, `Start: ${title}`, "Start The Debate", "Clartalk");
+    await sendPushNotificationAll(fcmToken, `Start: ${title}`, "Start The Debate", "Started");
   }
 
   for (const debate of LiveCreator) {

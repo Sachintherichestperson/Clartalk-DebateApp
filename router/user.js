@@ -464,7 +464,6 @@ router.get("/Exit-Community/:id", isloggedin, async (req, res) => {
   }
 });
 
-
 router.post("/Community/:id/payment",isloggedin,async (req, res) => {                                 // Join-community/:id Page
   try{
       const community = await communityMongo.findById(req.params.id);
@@ -975,9 +974,10 @@ router.get("/Delete-Account", isloggedin, async (req, res) => {
 router.get("/Notification",isloggedin, async function(req, res){
   const user = await User.findOne({ email: req.user.email }).populate({
     path: 'notification',
-    select: 'title body notificationTime',
+    select: 'title body notificationTime notificationType',
     options: { sort: { notificationTime: -1 } }
   });
+
 
   res.render("notification", { user });
 });
