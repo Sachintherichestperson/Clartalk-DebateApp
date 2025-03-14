@@ -1,4 +1,4 @@
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken")
 const User = require("../mongoose/user-mongo");
 const { sendPushNotification } = require("../services/firebase");
@@ -88,7 +88,7 @@ module.exports.verifyOtp = async (req, res) => {
         // Set JWT Token in Cookie
         res.cookie("user", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "development",
+            secure: process.env.NODE_ENV === "production",
             maxAge: 7 * 24 * 60 * 60 * 1000,
             sameSite: "strict",
         });
