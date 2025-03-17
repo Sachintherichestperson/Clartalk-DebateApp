@@ -23,6 +23,9 @@ const bodyParser = require("body-parser");
 const server = createServer(app);
 const io = new Server(server);
 require('dotenv').config();
+const OpenAI = require('openai');
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const allusers = {};
 
@@ -58,6 +61,42 @@ app.get("/firebase-config", (req, res) => {
         measurementId: process.env.FIREBASE_MEASUREMENT_ID
     });
 });
+
+// app.post('/generate-ai-comment', async (req, res) => {
+//     try {
+//         const { text, videoId, videoType, userId } = req.body;
+
+//         // Call OpenAI API to generate a response
+//         const completion = await openai.chat.completions.create({
+//             model: "gpt-4",
+//             messages: [
+//                 { role: "system", content: "You are an debate viewer. Your task is to analyzing live debate discussions and responding intelligently. and commenting on the debate as a viewer" },
+//                 { role: "user", content: text }
+//             ],
+//             max_tokens: 50
+//         });
+
+//         const aiComment = completion.choices[0]?.message?.content || "Couldn't generate a comment.";
+
+//         // Emit AI comment to all clients
+//         io.emit("liveaddComment", {
+//             text: aiComment,
+//             username: "AI_DebateBot",
+//             videoId: videoId,
+//             videoType: videoType,
+//             userId: userId,
+//             image: "/images/ai-avatar.png"
+//         });
+
+//         res.json({ comment: aiComment });
+
+//     } catch (error) {
+//         console.error("Error generating AI comment:", error);
+//         res.status(500).json({ error: "Failed to generate AI comment" });
+//     }
+// });
+
+
 
 
 app.use(flash());
@@ -227,6 +266,16 @@ io.on("connection", (socket) => {
                 text: newComment.text,
                 image: profileImage,
                 username: user.username,
+            });
+            const response = await fetch("http://localhost:3000/generate-ai-comment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    text: data.text,
+                    videoId: data.vedioId,
+                    videoType: data.videoType,
+                    userId: data.userId
+                })
             });
     
         } catch (error) {

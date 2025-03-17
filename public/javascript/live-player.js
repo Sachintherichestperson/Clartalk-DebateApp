@@ -29,7 +29,6 @@ socket.on("liveaddComment", (data) => {
     `;
     commentSection.prepend(commentElement);
 
-    // Update comment count
     commentCount.textContent = parseInt(commentCount.textContent) + 1;
 });
 
@@ -59,7 +58,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
-
 
 btn.addEventListener("click", () => {
 const Text = input.value.trim(); 
