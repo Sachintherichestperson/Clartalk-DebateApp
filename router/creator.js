@@ -382,7 +382,8 @@ router.post("/end-call/:id",isloggedin, async(req, res) => {
         const { LiveStatus } = req.body;
   
         await livemongo.findByIdAndUpdate(req.params.id, { LiveStatus });
-        res.status(200).json({ message: 'Status updated successfully' });
+        console.log("1");
+        res.status(200).json({ message: 'Status updated successfully', status: "success", redirect: "/" });
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }

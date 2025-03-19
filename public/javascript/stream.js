@@ -10,6 +10,7 @@
     const configuration = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 
 
+    console.log(liveId);
 
 let recognition;
 let debateTranscript = "";
@@ -214,13 +215,16 @@ socket.on("receive_otp", (data) => {
 socket.on("otp_success", () => {
     stopRecording();
 
+    setTimeout(() => {
+        socket.emit("end_call_redirect", { roomId: liveId });
+        socket.emit("redirect_to_home", { roomId: liveId });
+    }, 2000);
     // Emit to all users in the room so both streamers get redirected
-    socket.emit("end_call_redirect", { roomId: liveId });
-    socket.emit("redirect_to_home", { roomId: liveId }); // Add this line
 });
 
 // Handling redirection for both streamers
 socket.on("redirect_to_home", async () => {
+    console.log("Received redirect event");
     try {
         const response = await fetch(`/creator/end-call/${liveId}`, {
             method: 'POST',
@@ -233,8 +237,8 @@ socket.on("redirect_to_home", async () => {
         if (response.ok) {
             console.log("Redirecting after saving recording...");
             setTimeout(() => {
-                window.location.href = "/";
-            }, 3000); // Give time to complete the file download
+                window.location.href = data.redirect;
+            }, 5000); // Give time to complete the file download
         } else {
             console.error("Failed to update status:", data.error);
         }
