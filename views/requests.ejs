@@ -26,7 +26,7 @@
                 <a href="/community" class="nav-link">
                     <i class="fas fa-users"></i> Community
                 </a>
-                <a href="/creator/opponent-requests/<%= user._id %>" class="nav-link active">
+                <a href="/creator/opponent-requests/<%= user._id %>" class="nav-link active" id="active-tab">
                     <i class="fas fa-envelope"></i> Requests
                 </a>
                 <a href="/LeaderBoard" class="nav-link">
@@ -72,5 +72,14 @@
     <% } %>
     </section>
     <script type="module" src="/firebase-notification.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    let activeTab = document.getElementById("active-tab");
+    if (activeTab) {
+        activeTab.scrollIntoView({ behavior: "smooth", inline: "center" });
+    }
+});
+
+    </script>
 </body>
 </html>

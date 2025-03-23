@@ -19,7 +19,7 @@
                 <a href="/" class="nav-link">
                     <i class="fas fa-tv"></i> Live
                 </a>
-                <a href="debate" class="nav-link active">
+                <a href="debate" class="nav-link active" id="active-tab">
                     <i class="fas fa-comments"></i> Entertainment
                 </a>
                 <a href="podcast" class="nav-link">
@@ -81,5 +81,13 @@
         </div>
     </section>
     <script src="/javascript/skeleton.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    let activeTab = document.getElementById("active-tab");
+    if (activeTab) {
+        activeTab.scrollIntoView({ behavior: "smooth", inline: "center" });
+    }
+});
+    </script>
 </body>
 </html>

@@ -2,7 +2,7 @@ const multer = require("multer");
 const { GridFsStorage } = require("multer-gridfs-storage");
 const config = require("config");
 
-const mongoURI = config.get("MONGODB_URI") + "/debateapp";
+const mongoURI = "mongodb+srv://sachinbajaj:MySecurePass@clartalk.gzh9a.mongodb.net/?retryWrites=true&w=majority";
 
 // GridFS Storage Configuration
 const storage = new GridFsStorage({
