@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../mongoose/user-mongo");
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcryptjs');
+;
 const jwt = require("jsonwebtoken");
 const { sendPushNotificationAll, sendPushNotification } = require("../services/firebase");
 const upload = require("../config/multer");
