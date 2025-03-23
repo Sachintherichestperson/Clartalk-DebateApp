@@ -1,5 +1,4 @@
-const bcrypt = require('bcryptjs');
-;
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken")
 const User = require("../mongoose/user-mongo");
 const { sendPushNotification } = require("../services/firebase");
