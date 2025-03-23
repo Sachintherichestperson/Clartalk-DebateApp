@@ -3,9 +3,22 @@ const Debate = require("../mongoose/live-mongo");
 const User = require("../mongoose/user-mongo");
 const { sendPushNotificationAll, sendPushNotification } = require("./firebase");
 const SendEmail = require("../config/nodemailer");
+const fs = require("fs");
+const path = require("path");
 
-const agenda = new Agenda({ db: { address: "mongodb+srv://sachinbajaj:MySecurePass@cluster0.mongodb.net/debateapp?retryWrites=true&w=majority"} });
+const configPath = path.join(__dirname, "../config/development.json");
 
+let MONGODB_URI;
+try {
+    const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+    MONGODB_URI = config.MONGODB_URI;
+    if (!MONGODB_URI) throw new Error("MONGODB_URI is missing in development.json");
+} catch (error) {
+    console.error("❌ Error loading MONGODB_URI from development.json:", error);
+    process.exit(1); // Exit the app if the config is invalid
+}
+
+const agenda = new Agenda({ db: { address: MONGODB_URI } });
 
 
 //30 minutes Left Remindar
