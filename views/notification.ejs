@@ -71,7 +71,7 @@
                 <a href="/creator/opponent-requests/<%= user._id %>" class="nav-link"><i class="fas fa-envelope"></i> Requests</a>
                 <a href="/LeaderBoard" class="nav-link"><i class="fas fa-trophy"></i> Leaderboard</a>
                 <a href="/MUN-competetion" class="nav-link"><i class="fas fa-globe"></i> MUN</a>
-                <a href="/Notification" class="nav-link active"><i class="fas fa-bell"></i> Notifications</a>
+                <a href="/Notification" class="nav-link active"><i class="fas fa-bell" id="active-tab"></i> Notifications</a>
                 <a href="/profile" class="nav-link"><i class="fas fa-user"></i> Profile</a>
             </nav>
         </header>
@@ -145,6 +145,14 @@
                 document.getElementById("notifications").style.display = "flex"; // Show Real Data
             }, 2000); // Simulated 2-second delay
         });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    let activeTab = document.getElementById("active-tab");
+    if (activeTab) {
+        activeTab.scrollIntoView({ behavior: "smooth", inline: "center" });
+    }
+});
     </script>
 </body>
 </html>

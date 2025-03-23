@@ -42,7 +42,7 @@
                     <a href="/Notification" class="nav-link">
                         <i class="fas fa-bell"></i> Notifications
                     </a>
-                    <a href="/profile" class="nav-link active">
+                    <a href="/profile" class="nav-link active" id="active-tab">
                         <i class="fas fa-user"></i> Profile
                     </a>
                 </nav>
@@ -105,5 +105,13 @@
                      </div>
                 </div>
     </section>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    let activeTab = document.getElementById("active-tab");
+    if (activeTab) {
+        activeTab.scrollIntoView({ behavior: "smooth", inline: "center" });
+    }
+});
+    </script>
 </body>
 </html>
