@@ -12,11 +12,11 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "@paypal/checkout-server-sdk": "^1.0.3",
     "agenda": "^5.0.0",
     "axios": "^1.7.9",
+    "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
     "bson": "^6.10.3",
     "config": "^3.3.12",
@@ -57,5 +57,6 @@
     "connect-livereload": "^0.6.1",
     "livereload": "^0.9.3",
     "mocha": "^10.8.2"
-  }
+  },
+  "description": ""
 }
