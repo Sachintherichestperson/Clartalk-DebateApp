@@ -1,4 +1,4 @@
-const bcrypt = require("bcrypt");
+const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken")
 const User = require("../mongoose/user-mongo");
 const { sendPushNotification } = require("../services/firebase");
@@ -72,7 +72,7 @@ module.exports.verifyOtp = async (req, res) => {
 
         // OTP is valid, proceed with user registration
         const { username, email, password, fcmToken } = req.session.tempUser;
-        const hash = await bcrypt.hash(password, 10);
+        const hash = await bcryptjs.hash(password, 10);
         const newUser = new User({ username, email, password: hash, fcmToken });
         await newUser.save();
 
@@ -137,7 +137,7 @@ module.exports.loginuser = async (req, res) => {
             req.flash("usernot", "user not found")
             return res.redirect("/login")
         }
-        bcrypt.compare(password, user.password, function(err, result){
+        bcryptjs.compare(password, user.password, function(err, result){
             if(result){
                 let token = jwt.sign({ email: email}, process.env.JWT_KEY);
                 res.cookie("user", token);
