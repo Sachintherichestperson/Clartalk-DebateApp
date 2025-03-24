@@ -685,6 +685,23 @@ router.get("/Live-Stream-Recorded/:id",isloggedin, async function(req, res){    
     });
 });
 
+router.get("/get-status/:id", async (req, res) => {
+  try {
+      // Find the video by ID in the database
+      const video = await liveMongo.findById(req.params.id);
+
+      if (!video) {
+          return res.status(404).json({ error: "Video not found" });
+      }
+
+      // Send the current LiveStatus
+      res.status(200).json({ LiveStatus: video.LiveStatus });
+  } catch (error) {
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
 router.post('/update-status/:id', async (req, res) => {
   try {
       const { LiveStatus } = req.body;
