@@ -46,8 +46,6 @@
                     timeElement.style.display = "block";  
                     statusElement.style.display = "none"; 
                 } else {
-                    // Time is up: Hide countdown, show status
-                    timeElement.style.display = "none";   
                     
                     const videoId = videoCard.dataset.id;
                     if (videoId) {
