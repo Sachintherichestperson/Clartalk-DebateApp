@@ -16,7 +16,7 @@
     "@paypal/checkout-server-sdk": "^1.0.3",
     "agenda": "^5.0.0",
     "axios": "^1.7.9",
-    "bcryptjsjs": "^3.0.2",
+    "bcryptjs": "^3.0.2",
     "bson": "^6.10.3",
     "config": "^3.3.12",
     "connect-flash": "^0.1.1",
