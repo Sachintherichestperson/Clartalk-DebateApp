@@ -1,5 +1,5 @@
 const multer = require("multer");
-const { GridFsStorage } = require("multer-gridfs-storage");
+const { GridFsStorage } = require("multer-gridfs-storage");  // ✅ Fix the import
 const config = require("config");
 
 const mongoURI = "mongodb+srv://sachinbajaj:MySecurePass@clartalk.gzh9a.mongodb.net/?retryWrites=true&w=majority";
