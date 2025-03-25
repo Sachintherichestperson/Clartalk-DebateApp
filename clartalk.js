@@ -62,43 +62,77 @@ app.get("/firebase-config", (req, res) => {
 
 const axios = require("axios");
 
-app.post('/generate-ai-comment', async (req, res) => {
+const COHERE_API_KEY = process.env.Cohere_API_KEY
+console.log(COHERE_API_KEY);
+
+// app.post("/generate-ai-comment", async (req, res) => {
+//     try {
+//         const { text, videoId, videoType, userId } = req.body;
+
+//         if (!text) {
+//             return res.status(400).json({ error: "Text is required" });
+//         }
+
+//         const deepSeekResponse = await axios.post(
+//             "https://api.deepseek.com/v1/chat/completions",
+//             {
+//                 model: "deepseek-chat",
+//                 messages: [
+//                     { role: "system", content: "You are a helpful debate assistant providing insightful comments on debates." },
+//                     { role: "user", content: `Debate transcript: "${text}". Provide a brief AI-generated comment related to the discussion.` }
+//                 ],
+//                 temperature: 0.7
+//             },
+//             {
+//                 headers: {
+//                     "Content-Type": "application/json",
+//                     Authorization: `Bearer ${DEEPSEEK_API_KEY}`
+//                 }
+//             }
+//         );
+
+//         const aiComment = deepSeekResponse.data.choices[0].message.content;
+//         return res.json({ comment: aiComment });
+
+//     } catch (error) {
+//         console.error("Error fetching AI comment:", error);
+//         return res.status(500).json({ error: "Failed to generate AI comment" });
+//     }
+// });
+
+
+app.post("/generate-ai-comment", async (req, res) => {
     try {
         const { text, videoId, videoType, userId } = req.body;
 
-        const response = await axios.post(
-            "https://api.deepseek.com/v1/chat/completions",
+        if (!text) {
+            return res.status(400).json({ error: "Text is required" });
+        }
+
+        const cohereResponse = await axios.post(
+            "https://api.cohere.ai/generate",
             {
-                model: "deepseek-chat",
-                messages: [
-                    { role: "system", content: "You are an debate viewer. Analyze the live debate and generate a smart comment in hindi" },
-                    { role: "user", content: text }
-                ],
-                max_tokens: 50
+                model: "command", // Cohere's best model
+                prompt: `Debate transcript: "${text}". Provide a brief AI-generated comment related to the discussion.`,
+                max_tokens: 100,
+                temperature: 0.7
             },
-            { headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` } }
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${COHERE_API_KEY}`
+                }
+            }
         );
 
-        const aiComment = response.data.choices[0]?.message?.content || "Couldn't generate a comment.";
-
-        io.emit("liveaddComment", {
-            text: aiComment,
-            username: "AI_DebateBot",
-            videoId,
-            videoType,
-            userId,
-            image: "/images/ai-avatar.png"
-        });
-
-        res.json({ comment: aiComment });
+        const aiComment = cohereResponse.data.generations[0].text.trim();
+        return res.json({ comment: aiComment });
 
     } catch (error) {
-        console.error("Error generating AI comment:", error);
-        res.status(500).json({ error: "Failed to generate AI comment" });
+        console.error("Error fetching AI comment:", error.response?.data || error.message);
+        return res.status(500).json({ error: "Failed to generate AI comment" });
     }
 });
-
-
 
 
 app.use(flash());
