@@ -62,39 +62,43 @@ app.get("/firebase-config", (req, res) => {
     });
 });
 
-// app.post('/generate-ai-comment', async (req, res) => {
-//     try {
-//         const { text, videoId, videoType, userId } = req.body;
+const axios = require("axios");
 
-//         // Call OpenAI API to generate a response
-//         const completion = await openai.chat.completions.create({
-//             model: "gpt-4",
-//             messages: [
-//                 { role: "system", content: "You are an debate viewer. Your task is to analyzing live debate discussions and responding intelligently. and commenting on the debate as a viewer" },
-//                 { role: "user", content: text }
-//             ],
-//             max_tokens: 50
-//         });
+app.post('/generate-ai-comment', async (req, res) => {
+    try {
+        const { text, videoId, videoType, userId } = req.body;
 
-//         const aiComment = completion.choices[0]?.message?.content || "Couldn't generate a comment.";
+        const response = await axios.post(
+            "https://api.deepseek.com/v1/chat/completions",
+            {
+                model: "deepseek-chat",
+                messages: [
+                    { role: "system", content: "You are an AI debate viewer. Analyze the live debate and generate a smart comment." },
+                    { role: "user", content: text }
+                ],
+                max_tokens: 50
+            },
+            { headers: { Authorization: `Bearer YOUR_DEEPSEEK_API_KEY` } }
+        );
 
-//         // Emit AI comment to all clients
-//         io.emit("liveaddComment", {
-//             text: aiComment,
-//             username: "AI_DebateBot",
-//             videoId: videoId,
-//             videoType: videoType,
-//             userId: userId,
-//             image: "/images/ai-avatar.png"
-//         });
+        const aiComment = response.data.choices[0]?.message?.content || "Couldn't generate a comment.";
 
-//         res.json({ comment: aiComment });
+        io.emit("liveaddComment", {
+            text: aiComment,
+            username: "AI_DebateBot",
+            videoId,
+            videoType,
+            userId,
+            image: "/images/ai-avatar.png"
+        });
 
-//     } catch (error) {
-//         console.error("Error generating AI comment:", error);
-//         res.status(500).json({ error: "Failed to generate AI comment" });
-//     }
-// });
+        res.json({ comment: aiComment });
+
+    } catch (error) {
+        console.error("Error generating AI comment:", error);
+        res.status(500).json({ error: "Failed to generate AI comment" });
+    }
+});
 
 
 
