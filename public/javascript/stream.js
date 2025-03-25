@@ -12,94 +12,99 @@
 
     console.log(liveId);
 
-let recognition;
-let debateTranscript = "";
-
-function startSpeechRecognition() {
-    if (!('webkitSpeechRecognition' in window)) {
-        console.log("Speech recognition not supported in this browser.");
-        return;
-    }
-
-    recognition = new webkitSpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-
-    recognition.onresult = (event) => {
-        let lastResult = event.results[event.results.length - 1];
-        if (lastResult.isFinal) {
-            debateTranscript = lastResult[0].transcript;
-            console.log("Debate Transcript:", debateTranscript);
-            fetchAIComment(debateTranscript);
-        }
-    };
-
-    recognition.onerror = (event) => {
-        console.error("Speech recognition error:", event.error);
+    let recognition;
+    let debateTranscript = "";
+    let lastSentTranscript = "";
     
-        if (event.error === "no-speech") {
-            console.log("No speech detected, restarting recognition...");
-            recognition.start(); // Restart speech recognition
+    function startSpeechRecognition() {
+        if (!('webkitSpeechRecognition' in window)) {
+            console.log("Speech recognition not supported in this browser.");
+            return;
         }
-    };
     
-    recognition.start();
-}
-
-function startAIAutoComment() {
-    setInterval(async () => {
-        const latestTranscript = debateTranscript.trim();
-
-        if (latestTranscript.length > 0) {
-            await fetchAIComment(latestTranscript);
-        }
-    }, 10000); // Fetch AI comment every 10 seconds
-}
-
-window.onload = function () {
-    startSpeechRecognition();
-    startAIAutoComment();
-};
-
-async function fetchAIComment(debateText) {
-    try {
-        const response = await fetch('/generate-ai-comment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ debateText })
-        });
-
-        const data = await response.json();
-        console.log("AI Response:", data); // ✅ Check the response in console
-
-        if (data.comment) {
-            addCommentToUI('AI_DebateBot', data.comment, '/images/nav.png');
-        } else {
-            console.error("No comment received from AI.");
-        }
-    } catch (error) {
-        console.error("Error fetching AI comment:", error);
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+    
+        recognition.onresult = (event) => {
+            let lastResult = event.results[event.results.length - 1];
+            if (lastResult.isFinal) {
+                debateTranscript = lastResult[0].transcript;
+                console.log("Debate Transcript:", debateTranscript);
+            }
+        };
+    
+        recognition.onerror = (event) => {
+            console.error("Speech recognition error:", event.error);
+            console.log("Restarting speech recognition...");
+            recognition.stop();  
+            setTimeout(() => recognition.start(), 1000);
+        };
+    
+        recognition.start();
     }
-}
-
-
-function addCommentToUI(username, comment, image) {
-    const commentSection = document.querySelector(".allsinglecomment"); // Ensure this exists
-    if (!commentSection) {
-        console.error("Comment section not found.");
-        return;
+    
+    function startAIAutoComment() {
+        setInterval(async () => {
+            const latestTranscript = debateTranscript.trim();
+    
+            if (latestTranscript.length > 0 && latestTranscript !== lastSentTranscript) {
+                lastSentTranscript = latestTranscript;
+                await fetchAIComment(latestTranscript);
+            }
+        }, 10000);
     }
-
-    const commentElement = document.createElement("div");
-    commentElement.classList.add("single-comment");
-    commentElement.innerHTML = `
-        <img src="${image}" alt="" class="comment-image">
-        <p><strong class="strong">${username}:</strong> ${comment}</p>
-    `;
-
-    commentSection.prepend(commentElement);
-}
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        startSpeechRecognition();
+        startAIAutoComment();
+    });
+    
+    async function fetchAIComment(debateText) {
+        try {
+            const response = await fetch('/generate-ai-comment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    text: debateText, 
+                    videoId: "1234",  
+                    videoType: "debate",  
+                    userId: "5678"  
+                })
+            });
+    
+            const data = await response.json();
+    
+            if (response.ok && data.comment) {
+                addCommentToUI('AI_DebateBot', data.comment, '/images/nav.png');
+            } else {
+                console.error("No valid comment received from AI.", data);
+            }
+        } catch (error) {
+            console.error("Error fetching AI comment:", error);
+        }
+    }
+    
+    function addCommentToUI(username, comment, image) {
+        let commentSection = document.querySelector(".allsinglecomment");
+    
+        if (!commentSection) {
+            commentSection = document.createElement("div");
+            commentSection.classList.add("allsinglecomment");
+            document.body.appendChild(commentSection); 
+        }
+    
+        const commentElement = document.createElement("div");
+        commentElement.classList.add("single-comment");
+        commentElement.innerHTML = `
+            <img src="${image}" alt="" class="comment-image">
+            <p><strong class="strong">${username}:</strong> ${comment}</p>
+        `;
+    
+        commentSection.prepend(commentElement);
+    }
+    
 
 
 
