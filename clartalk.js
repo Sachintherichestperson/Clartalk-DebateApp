@@ -25,8 +25,6 @@ const io = new Server(server);
 require('dotenv').config();
 const OpenAI = require('openai');
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
 const allusers = {};
 
 require("dotenv").config();
@@ -73,12 +71,12 @@ app.post('/generate-ai-comment', async (req, res) => {
             {
                 model: "deepseek-chat",
                 messages: [
-                    { role: "system", content: "You are an AI debate viewer. Analyze the live debate and generate a smart comment." },
+                    { role: "system", content: "You are an debate viewer. Analyze the live debate and generate a smart comment in hindi" },
                     { role: "user", content: text }
                 ],
                 max_tokens: 50
             },
-            { headers: { Authorization: `Bearer YOUR_DEEPSEEK_API_KEY` } }
+            { headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` } }
         );
 
         const aiComment = response.data.choices[0]?.message?.content || "Couldn't generate a comment.";
