@@ -86,10 +86,11 @@ router.get("/debate", isloggedin, async function (req, res) {
       let userTags = user.SEOTags || [];
 
       if (!vedios) {
+          // Fetch videos from the database only if not found in cache
           vedios = await videomongoose.find({}).populate("Thumbnail");
 
-          // Cache the fetched videos
-          nodeCache.set("debate_videos", vedios);
+          // Cache the fetched videos with a TTL of 10 minutes (600 seconds)
+          nodeCache.set("debate_videos", vedios, 600);
       }
 
       // Sort videos: those matching SEOTags should come first
@@ -216,29 +217,45 @@ router.get("/video/stream/:id", async (req, res) => {
   }
 });
 
-router.get("/podcast", isloggedin, async function(req, res){                                               //podcast section Page
-  const user = await User.findOne({email: req.user.email}).populate("requests")
-  let vedios = await podcastsmongoose.find({});
+router.get("/podcast", isloggedin, async function(req, res) {
+  try {
+    // Fetch user data
+    const user = await User.findOne({ email: req.user.email }).populate("requests");
+    const userTags = user.SEOTags || [];
 
-  vedios.sort((a, b) => {
-    let aTags = Array.isArray(a.Tags)
+    // Check if podcasts are cached
+    let podcasts = nodeCache.get("podcast_videos");
+
+    if (!podcasts) {
+      // Fetch podcasts from the database only if not found in cache
+      podcasts = await podcastsmongoose.find({});
+
+      // Cache the fetched podcasts with a TTL of 10 minutes (600 seconds)
+      nodeCache.set("podcast_videos", podcasts, 600);
+    }
+
+    // Sort podcasts: those matching SEOTags should come first
+    podcasts.sort((a, b) => {
+      let aTags = Array.isArray(a.Tags)
         ? a.Tags.flatMap(tagString => tagString.split(',').map(tag => tag.trim()))
         : [];
-    let bTags = Array.isArray(b.Tags)
+      let bTags = Array.isArray(b.Tags)
         ? b.Tags.flatMap(tagString => tagString.split(',').map(tag => tag.trim()))
         : [];
 
+      let aMatches = aTags.filter(tag => userTags.includes(tag)).length;
+      let bMatches = bTags.filter(tag => userTags.includes(tag)).length;
 
-    let aMatches = aTags.filter(tag => userTags.includes(tag)).length;
-    let bMatches = bTags.filter(tag => userTags.includes(tag)).length;
+      return bMatches - aMatches; // Higher matches come first
+    });
 
+    const comments = podcasts.comment;
 
-    return bMatches - aMatches; // Higher matches come first
-});
-
-const comments = vedios.comment;
-
-  res.render("podcast", { vedios, user, comments });
+    res.render("podcast", { podcasts, user, comments });
+  } catch (error) {
+    console.error("Error fetching podcast page:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
  
 router.get("/podcast/:id", isloggedin, async function(req, res) {  
