@@ -26,8 +26,6 @@ const OpenAI = require('openai');
 
 const allusers = {};
 
-require("dotenv").config();
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
