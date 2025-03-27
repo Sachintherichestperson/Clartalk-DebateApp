@@ -1,87 +1,90 @@
 const admin = require("firebase-admin");
-const notificationmongoose = require("../mongoose/notification-mongoose")
-const serviceAccount = require("./notification.json");
+const notificationmongoose = require("../mongoose/notification-mongoose");
 const User = require("../mongoose/user-mongo");
+const serviceAccount = require("./notification.json");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
 
-async function sendPushNotification(token, title, body, notificationType) {
+async function sendPushNotification(token, title, body, notificationType = "push") {
     try {
-        if(!token){
+        if (!token) {
             console.log("No token provided");
             return;
         }
+
         const message = {
-            token: token,
+            token,
             notification: { title, body },
-            data: {
-                notificationType: notificationType  || "push"
-            }
+            data: { notificationType }
         };
 
+        // Send push notification
         const response = await admin.messaging().send(message);
 
+        // Fetch user and create notification
         const user = await User.findOne();
+        if (!user) return;
 
         const notification = new notificationmongoose({
-            notificationType: notificationType,
-            title: title,
-            body: body,
+            notificationType,
+            title,
+            body,
             notificationTo: user._id
         });
+
         await notification.save();
+        
+        user.notification.push(notification._id);
+        await user.save();  
 
-        user.notification.push(notification);
-        await user.save();
-        console.log("notification",notification);
-
+        console.log("Notification sent:", notification);
         return response;
     } catch (error) {
         console.error("Error sending notification:", error);
     }
 }
 
-async function sendPushNotificationAll(tokens, title, body, notificationType) {
+async function sendPushNotificationAll(tokens, title, body, notificationType = "push") {
     try {
         if (!tokens || tokens.length === 0) {
             console.log("No tokens provided");
             return;
         }
 
+        // Batch sending notifications
         const messages = tokens.map(token => ({
-            token: token,
+            token,
             notification: { title, body },
-            data: {
-                notificationType: notificationType  || "push"
-            }
+            data: { notificationType }
         }));
 
-        const users = await User.find();
-
         const response = await admin.messaging().sendEach(messages);
-        
+
+        // Fetch all users at once
+        const users = await User.find({}, "_id notification"); 
+
+        // Create a single notification entry for all users
         const notification = new notificationmongoose({
-            notificationType: notificationType,
-            title: title,
-            body: body,
-            notificationTo: users._id
+            notificationType,
+            title,
+            body,
+            notificationTo: users.map(user => user._id) // Store all user IDs
         });
         await notification.save();
 
-        for (const user of users) {
-            if (!user.notification) {
-                user.notification = []; // Ensure array exists
-            }
-            user.notification.push(notification._id); // Store only notification ID
-            await user.save(); // Save each user individually
-        }
+        await Promise.all(users.map(user => {
+            user.notification.push(notification._id);
+            return user.save();
+        }));
 
+        console.log("Batch notification sent to all users.");
         return response;
     } catch (error) {
-        console.error("Error sending notification:", error);
+        console.error("Error sending batch notifications:", error);
     }
 }
 
 module.exports = { sendPushNotification, sendPushNotificationAll };
+
