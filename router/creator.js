@@ -23,6 +23,7 @@ const server = createServer(app);
 const io = new Server(server);
 const allusers = {};
 const { ObjectId } = require("bson"); // Import BSON
+const nodeCache = require("../controller/Cache");
 
 
 router.get("/creator/upload", function(req, res){
@@ -104,7 +105,7 @@ router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, 
           user.podcast.push(podcast._id);
           await user.save();
 
-          cache.del("podcast_videos");
+          nodeCache.del("podcast_videos");
 
           req.session.uploadData = null; // Clear session
           res.redirect("/podcast");
@@ -445,6 +446,7 @@ router.post("/community/builder",upload.single("CommunityDP"), isloggedin, async
        });
 
        user.communities.push(community._id);
+       nodeCache.del("communities")
 
        const fcmToken = user.fcmToken;
 
@@ -558,6 +560,8 @@ router.post("/competition/builded", upload.single("CompetitionDP"), isloggedin, 
   if(fcmToken){
     await sendPushNotification(fcmToken, `Congrats `, `New Competition ${CompetitionName} is created`, "competition");
   }
+
+  nodeCache.del("MUN_competitions");
 
   res.redirect("/MUN-competetion");
 });
