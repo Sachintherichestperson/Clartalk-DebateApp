@@ -19,7 +19,6 @@ const liveMongo = require("./mongoose/live-mongo");
 const vediomongoose = require("./mongoose/video-mongo");
 const podcastmongoose = require("./mongoose/podcasts-mongo");
 const User = require("./mongoose/user-mongo");
-const bodyParser = require("body-parser");
 const server = createServer(app);
 const io = new Server(server);
 require('dotenv').config();
@@ -30,7 +29,6 @@ const allusers = {};
 require("dotenv").config();
 
 app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
