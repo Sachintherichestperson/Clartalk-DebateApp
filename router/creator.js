@@ -222,6 +222,7 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
     if (opponentfcm) {
     await sendPushNotification(opponentfcm, "New Request", `You have a new request from ${req.user.username} on ${title}`, "Live-Request");
     }
+    nodeCache.del("Live");
 
     res.redirect("/")
   } catch (err) {
