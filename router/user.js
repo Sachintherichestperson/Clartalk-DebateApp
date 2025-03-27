@@ -55,6 +55,32 @@ router.get("/thumbnail/:id",isloggedin,async (req, res) => {
   }
 });
 
+router.get("/image/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Search for the image in all three collections
+    const podcast = await podcastsmongoose.findOne({ _id: id }).select("Thumbnail");
+    const video = await videomongoose.findOne({ _id: id }).select("Thumbnail");
+    const liveStream = await liveMongo.findOne({ _id: id }).select("Thumbnail");
+
+    // Check which document contains the image
+    const imageDoc = podcast || video || liveStream;
+
+    if (!imageDoc || !imageDoc.Thumbnail) {
+      return res.status(404).json({ error: "Image not found" });
+    }
+
+    res.set("Content-Type", "image/jpeg");
+
+    res.send(imageDoc.Thumbnail);
+  } catch (error) {
+    console.error("❌ Error fetching image:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
 router.get("/",isloggedin,async function(req, res){                                                        // front page
   try{
     let vedios = nodeCache.get("Live");
@@ -117,30 +143,52 @@ router.get("/video/stream/:id", async (req, res) => {
   try {
     // Ensure GridFSBucket is initialized
     const gfs = getGFS();
-
     const fileId = new mongoose.Types.ObjectId(req.params.id);
 
-    // Check if the file exists in GridFS
-    const file = await conn.db.collection("videos.files").findOne({ _id: fileId });
+    // Fetch video metadata (only required fields)
+    const file = await conn.db.collection("videos.files").findOne(
+      { _id: fileId },
+      { projection: { length: 1, contentType: 1 } }
+    );
 
     if (!file) {
       return res.status(404).json({ error: "Video not found" });
     }
 
-    // Set response headers for video streaming
-    res.set({
-      "Content-Type": "video/mp4",
-      "Accept-Ranges": "bytes",
-    });
+    const fileSize = file.length;
+    const range = req.headers.range;
 
-    // Stream the video
-    const readStream = gfs.openDownloadStream(fileId);
-    readStream.pipe(res);
+    if (range) {
+      // Handle video seeking (partial content)
+      const [start, end] = range.replace(/bytes=/, "").split("-").map(Number);
+      const chunkStart = start || 0;
+      const chunkEnd = end ? Math.min(end, fileSize - 1) : fileSize - 1;
+      const chunkSize = chunkEnd - chunkStart + 1;
+
+      res.writeHead(206, {
+        "Content-Range": `bytes ${chunkStart}-${chunkEnd}/${fileSize}`,
+        "Accept-Ranges": "bytes",
+        "Content-Length": chunkSize,
+        "Content-Type": "video/mp4",
+      });
+
+      gfs.openDownloadStream(fileId, { start: chunkStart, end: chunkEnd }).pipe(res);
+    } else {
+      // Send full video if no range is requested
+      res.writeHead(200, {
+        "Content-Length": fileSize,
+        "Content-Type": "video/mp4",
+      });
+
+      gfs.openDownloadStream(fileId).pipe(res);
+    }
   } catch (err) {
-    console.error("Error streaming video:", err);
+    console.error("❌ Error streaming video:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+
 
 router.get("/debate/:id", isloggedin, async function(req, res) {                                             
   try {
@@ -159,8 +207,7 @@ router.get("/debate/:id", isloggedin, async function(req, res) {
             path: "userId",
             select: "username profile"
           }
-        })
-        .lean(); // Improve performance by returning plain objects
+        });
 
       if (!vedios) {
         return res.status(404).send("Video not found");

@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Page</title>
-    <link rel="stylesheet" href="/stylesheets/Livedebate-player.css">
-    <script src="/socket.io/socket.io.js"></script>
-    <script type="module" src="/firebase-notification.js"></script>
+    <link rel="stylesheet" href="/stylesheets/Livedebate-player.min.css">
 </head>
 <body>
     <section>
@@ -86,4 +84,6 @@
     const creatorId = "<%= Live.creator[0]._id %>";
     const UserId = "<%= user.username %>";
 </script>
+<script src="/socket.io/socket.io.js"></script>
+<script type="module" src="/firebase-notification.js"></script>
 </html>

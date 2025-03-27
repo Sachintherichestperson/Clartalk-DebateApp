@@ -22,9 +22,7 @@ const User = require("./mongoose/user-mongo");
 const server = createServer(app);
 const io = new Server(server);
 require('dotenv').config();
-const OpenAI = require('openai');
 
-const allusers = {};
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -59,41 +57,6 @@ app.get("/firebase-config", (req, res) => {
 const axios = require("axios");
 
 const COHERE_API_KEY = process.env.Cohere_API_KEY
-
-// app.post("/generate-ai-comment", async (req, res) => {
-//     try {
-//         const { text, videoId, videoType, userId } = req.body;
-
-//         if (!text) {
-//             return res.status(400).json({ error: "Text is required" });
-//         }
-
-//         const deepSeekResponse = await axios.post(
-//             "https://api.deepseek.com/v1/chat/completions",
-//             {
-//                 model: "deepseek-chat",
-//                 messages: [
-//                     { role: "system", content: "You are a helpful debate assistant providing insightful comments on debates." },
-//                     { role: "user", content: `Debate transcript: "${text}". Provide a brief AI-generated comment related to the discussion.` }
-//                 ],
-//                 temperature: 0.7
-//             },
-//             {
-//                 headers: {
-//                     "Content-Type": "application/json",
-//                     Authorization: `Bearer ${DEEPSEEK_API_KEY}`
-//                 }
-//             }
-//         );
-
-//         const aiComment = deepSeekResponse.data.choices[0].message.content;
-//         return res.json({ comment: aiComment });
-
-//     } catch (error) {
-//         console.error("Error fetching AI comment:", error);
-//         return res.status(500).json({ error: "Failed to generate AI comment" });
-//     }
-// });
 
 
 app.post("/generate-ai-comment", async (req, res) => {
@@ -176,6 +139,7 @@ io.on("connection", (socket) => {
 
         const fcm = creator.fcmToken;
 
+        console.log(fcm);
         if (fcm) {
             await sendPushNotification(fcm, `New Follower `, `${user.username} followed you`, "Follow");
         }

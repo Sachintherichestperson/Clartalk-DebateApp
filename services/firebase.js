@@ -1,175 +1,94 @@
-const Agenda = require("agenda");
-const Debate = require("../mongoose/live-mongo");
+const admin = require("firebase-admin");
+const notificationmongoose = require("../mongoose/notification-mongoose");
 const User = require("../mongoose/user-mongo");
-const { sendPushNotificationAll } = require("./firebase");
-const SendEmail = require("../config/nodemailer");
-const fs = require("fs");
-const path = require("path");
+const serviceAccount = require("./notification.json");
 
-const configPath = path.join(__dirname, "../config/development.json");
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
 
-// Load MongoDB URI only once and cache it
-let MONGODB_URI;
-try {
-    const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-    MONGODB_URI = config.MONGODB_URI;
-    if (!MONGODB_URI) throw new Error("MONGODB_URI is missing in development.json");
-} catch (error) {
-    console.error("❌ Error loading MONGODB_URI from development.json:", error);
-    process.exit(1);
+// ✅ Optimized function for a single user
+async function sendPushNotification(token, title, body, notificationType = "push") {
+    try {
+        if (!token) {
+            console.log("No token provided");
+            return;
+        }
+
+        const message = {
+            token,
+            notification: { title, body },
+            data: { notificationType }
+        };
+
+        // Send push notification
+        const response = await admin.messaging().send(message);
+
+        // Fetch user and create notification
+        const user = await User.findOne();
+        if (!user) return;
+
+        const notification = new notificationmongoose({
+            notificationType,
+            title,
+            body,
+            notificationTo: user._id
+        });
+
+        await notification.save();
+        
+        // Update user notification array
+        user.notification.push(notification._id);
+        await user.save();  // ✅ Only one save operation
+
+        console.log("Notification sent:", notification);
+        return response;
+    } catch (error) {
+        console.error("Error sending notification:", error);
+    }
 }
 
-const agenda = new Agenda({ db: { address: MONGODB_URI } });
-
-// 🟢 30-Minute Debate Reminder
-agenda.define("send debate reminder", async (job) => {
-    const { title } = job.attrs.data;
-
+// ✅ Optimized function for multiple users
+async function sendPushNotificationAll(tokens, title, body, notificationType = "push") {
     try {
-        // Fetch users and debates in parallel to reduce wait time
-        const [allUsers, debates] = await Promise.all([
-            User.find({ fcmToken: { $ne: null } }, "fcmToken"),
-            Debate.find({ $or: [{ creator: { $ne: null } }, { opponent: { $ne: null } }] })
-                .populate("creator", "fcmToken email")
-                .populate("opponent", "fcmToken email")
-        ]);
-
-        // Extract FCM tokens
-        const userTokens = allUsers.map(user => user.fcmToken).filter(Boolean);
-        const debateTokens = debates.flatMap(debate => [
-            debate.creator?.fcmToken,
-            debate.opponent?.fcmToken
-        ]).filter(Boolean);
-
-        const allTokens = [...userTokens, ...debateTokens];
-
-        if (allTokens.length) {
-            await sendPushNotificationAll(allTokens, `Live ${title}`, `${title} debate session starts in 30 minutes!`, "30-min");
+        if (!tokens || tokens.length === 0) {
+            console.log("No tokens provided");
+            return;
         }
 
-        // Extract emails
-        const emails = debates.flatMap(debate => [
-            ...(Array.isArray(debate.creator) ? debate.creator.map(c => c.email) : []),
-            ...(Array.isArray(debate.opponent) ? debate.opponent.map(c => c.email) : [])
-        ]).filter(Boolean);
+        // Batch sending notifications
+        const messages = tokens.map(token => ({
+            token,
+            notification: { title, body },
+            data: { notificationType }
+        }));
 
-        if (emails.length) {
-            const images = debates[0]?.Thumbnail ? [{
-                filename: "Debate.jpg",
-                content: debates[0].Thumbnail,
-                cid: "DebateImage"
-            }] : [];
+        // ✅ Batch send notifications in a single request
+        const response = await admin.messaging().sendEach(messages);
 
-            console.log("📩 Sending email to:", emails);
-            await SendEmail(emails, `Reminder: ${title}`, "Get Ready Only 30 minutes Left", images);
-        }
+        // Fetch all users at once
+        const users = await User.find({}, "_id notification"); // ✅ Select only required fields
 
-        await job.remove(); // Clean up job after execution
+        // Create a single notification entry for all users
+        const notification = new notificationmongoose({
+            notificationType,
+            title,
+            body,
+            notificationTo: users.map(user => user._id) // Store all user IDs
+        });
+        await notification.save();
+
+        // ✅ Update all users in parallel using Promise.all()
+        await Promise.all(users.map(user => {
+            user.notification.push(notification._id);
+            return user.save();
+        }));
+
+        console.log("Batch notification sent to all users.");
+        return response;
     } catch (error) {
-        console.error("❌ Error in sending debate reminder:", error);
+        console.error("Error sending batch notifications:", error);
     }
-});
+}
 
-// 🟢 Debate Start Reminder
-agenda.define("creator debate reminder", async (job) => {
-    const { title } = job.attrs.data;
-
-    try {
-        // Fetch users and debates in parallel
-        const [allUsers, debates] = await Promise.all([
-            User.find({ fcmToken: { $ne: null } }, "fcmToken"),
-            Debate.find({ $or: [{ creator: { $ne: null } }, { opponent: { $ne: null } }] })
-                .populate("creator", "fcmToken email")
-                .populate("opponent", "fcmToken email")
-        ]);
-
-        // Extract FCM tokens
-        const userTokens = allUsers.map(user => user.fcmToken).filter(Boolean);
-        const debateTokens = debates.flatMap(debate => [
-            debate.creator?.fcmToken,
-            debate.opponent?.fcmToken
-        ]).filter(Boolean);
-
-        const allTokens = [...userTokens, ...debateTokens];
-
-        if (allTokens.length) {
-            await sendPushNotificationAll(allTokens, `Live ${title}`, `${title} debate session is starting now`, "Started");
-        }
-
-        // Extract emails
-        const emails = debates.flatMap(debate => [
-            ...(Array.isArray(debate.creator) ? debate.creator.map(c => c.email) : []),
-            ...(Array.isArray(debate.opponent) ? debate.opponent.map(c => c.email) : [])
-        ]).filter(Boolean);
-
-        if (emails.length) {
-            const images = debates[0]?.Thumbnail ? [{
-                filename: "Debate.jpg",
-                content: debates[0].Thumbnail,
-                cid: "DebateImage"
-            }] : [];
-
-            console.log("📩 Sending email to:", emails);
-            await SendEmail(emails, `Reminder: ${title}`, "Start The Debate, It's Time", images);
-        }
-
-        await job.remove();
-    } catch (error) {
-        console.error("❌ Error in sending debate start reminder:", error);
-    }
-});
-
-// 🟢 Schedule 30-Minute Debate Reminders
-const scheduleDebateReminders = async () => {
-    try {
-        const now = new Date();
-        const debates = await Debate.find({ Time: { $gt: now } }); // Only future debates
-
-        for (const debate of debates) {
-            const notificationTime = new Date(debate.Time);
-            notificationTime.setMinutes(notificationTime.getMinutes() - 30); // 30 minutes before
-
-            if (notificationTime < now) continue; // Skip past debates
-
-            const existingJob = await agenda.jobs({ "data.title": debate.title });
-
-            if (existingJob.length === 0) {
-                await agenda.schedule(notificationTime, "send debate reminder", { title: debate.title });
-            }
-        }
-    } catch (error) {
-        console.error("❌ Error scheduling 30-minute reminders:", error);
-    }
-};
-
-// 🟢 Schedule Debate Start Reminders
-const schedulecreatorsReminders = async () => {
-    try {
-        const now = new Date();
-        const debates = await Debate.find({ Time: { $gt: now } }); // Only future debates
-
-        for (const debate of debates) {
-            const notificationTime = new Date(debate.Time);
-
-            if (notificationTime < now) continue; // Skip past debates
-
-            const existingJob = await agenda.jobs({ "data.title": debate.title });
-
-            if (existingJob.length === 0) {
-                console.log(`✅ Scheduling creator reminder for ${debate.title} at ${notificationTime}`);
-                await agenda.schedule(notificationTime, "creator debate reminder", { title: debate.title });
-            }
-        }
-    } catch (error) {
-        console.error("❌ Error scheduling debate start reminders:", error);
-    }
-};
-
-// 🟢 Start Agenda and Schedule Reminders
-(async function () {
-    await agenda.start();
-    await scheduleDebateReminders();
-    await schedulecreatorsReminders();
-})();
-
-module.exports = agenda;
+module.exports = { sendPushNotification, sendPushNotificationAll };
