@@ -4,176 +4,584 @@ const User = require("../mongoose/user-mongo");
 const bcryptjs = require("bcryptjs");
 const { sendPushNotificationAll, sendPushNotification } = require("../services/firebase");
 const jwt = require("jsonwebtoken");
-const { userregister, loginuser, logout, verifyOtp, resendOtp } = require("../controller/authcontroller");
+const {userregister, loginuser, logout, verifyOtp, resendOtp} = require("../controller/authcontroller");
 const isloggedin = require("../middleware/isloggedin");
 const podcastsmongoose = require("../mongoose/podcasts-mongo");
 const videomongoose = require("../mongoose/video-mongo");
 const liveMongo = require("../mongoose/live-mongo");
 const communityMongo = require("../mongoose/community-mongo");
+const competitionMongo = require("../mongoose/competition-mongo");
 const upload = require("../config/multer");
+const schedule = require("node-schedule");
+const Socket  = require("socket.io");
+const Razorpay = require("razorpay");
+const userMongo = require("../mongoose/user-mongo");
+const notificationmongoose = require("../mongoose/notification-mongoose");
 const mongoose = require("mongoose");
 const { conn, getGFS } = require("../config/gridfs");
+const  SendEmail = require("../config/nodemailer");
 const nodeCache = require("../controller/Cache");
 
-// Set cache expiration times
-const CACHE_TIME = 600; // 10 minutes
-
-// Register Page
-router.get("/register", (req, res) => {
-    res.render("Register", { err: req.flash("key") });
+router.get("/register", (req, res) => {                                                                      //register page
+    let err = req.flash("key")
+    res.render("Register", { err });
 });
-router.post("/register", userregister);
 
-// Login Page
-router.get("/login", (req, res) => {
-    res.render("login", { err: req.flash("usernot") });
+router.post("/register", userregister)                                                                     //register page--Uploader
+
+router.get("/login", function(req, res){                                                                   //Login Page
+    let err = req.flash("usernot")
+    res.render("login", {err})
 });
-router.post("/login", loginuser);
 
-// OTP Routes
-router.get("/OTP", (req, res) => res.render("OTP"));
-router.post("/verify-otp", verifyOtp);
+router.post("/login", loginuser)                                                                         //Login Page-Uploader
+
+router.get("/OTP", async function(req, res){                                                  //OTP Page
+  res.render("OTP");
+});
+
+router.post("/verify-otp", verifyOtp)                                                                     //OTP checker
+
 router.post("/resend-otp", resendOtp);
 
-// Thumbnail Fetch
-router.get("/thumbnail/:id", isloggedin, async (req, res) => {
-    try {
-        const thumbnail = await liveMongo.findById(req.params.id, "Thumbnail").lean();
-        if (!thumbnail) return res.status(404).send("Not found");
+router.get("/thumbnail/:id",isloggedin,async (req, res) => {
+  try{
+    const thumbnail = await liveMongo.findById(req.params.id);
 
-        res.set("Content-Type", "image/jpeg").send(thumbnail.Thumbnail);
-    } catch (error) {
-        res.status(500).send("Internal Server Error");
-    }
+    res.set('Content-Type', 'image/jpeg'); // Set correct content type
+    res.send(thumbnail.Thumbnail); // Send buffer directly
+  }catch(error){
+
+  }
 });
 
-// Front Page (Cached)
-router.get("/", isloggedin, async (req, res) => {
-    try {
-        let vedios = nodeCache.get("Live");
-        if (!vedios) {
-            vedios = await liveMongo.find({ status: "accept" }).lean();
-            nodeCache.set("Live", vedios, CACHE_TIME);
-        }
+router.get("/",isloggedin,async function(req, res){                                                        // front page
+  try{
+    let vedios = nodeCache.get("Live");
+    console.log("Node-Cache", vedios);
 
-        const user = await User.findOne({ email: req.user.email }).populate("requests Sender").lean();
-        res.render("front-page", { vedios, user });
-    } catch (err) {
-        res.status(500).send("Internal Server Error");
+    if (!vedios) {
+        vedios = await liveMongo.find({ status: "accept" });
+
+        nodeCache.set("Live", vedios);
     }
+    const user = await User.findOne({email: req.user.email}).populate("requests").populate( "Sender" );
+
+
+    res.render("front-page", {vedios, user})
+  }catch(err){
+    console.error("Error fetching data:", err);
+
+    // Send an error response instead of a blank page
+    res.status(500).send("Internal Server Error");
+  }
 });
 
-// Debate Page with Cached Sorting
-router.get("/debate", isloggedin, async (req, res) => {
-    try {
-        let vedios = nodeCache.get("debate_videos");
-        if (!vedios) {
-            vedios = await videomongoose.find({}).populate("Thumbnail").lean();
-            nodeCache.set("debate_videos", vedios, CACHE_TIME);
-        }
+router.get("/debate", isloggedin, async function (req, res) { 
+  try {
+      let vedios = nodeCache.get("debate_videos");
+      let user = await User.findOne({ email: req.user.email }).populate("requests");
+      let userTags = user.SEOTags || [];
+      
 
-        const user = await User.findOne({ email: req.user.email }).populate("requests").lean();
-        const userTags = user.SEOTags || [];
+      if (!vedios) {
+          vedios = await videomongoose.find({}).populate("Thumbnail");
 
-        vedios.sort((a, b) => {
-            const aMatches = (a.Tags || []).filter(tag => userTags.includes(tag)).length;
-            const bMatches = (b.Tags || []).filter(tag => userTags.includes(tag)).length;
-            return bMatches - aMatches;
-        });
+          // Cache the fetched videos
+          nodeCache.set("debate_videos", vedios, 600);
+      }
 
-        res.render("debate", { vedios, user });
-    } catch (error) {
-        res.status(500).send("Server error");
-    }
+      // Sort videos: those matching SEOTags should come first
+      vedios.sort((a, b) => {
+          let aTags = Array.isArray(a.Tags) 
+              ? a.Tags.flatMap(tagString => tagString.split(',').map(tag => tag.trim()))
+              : [];
+          let bTags = Array.isArray(b.Tags) 
+              ? b.Tags.flatMap(tagString => tagString.split(',').map(tag => tag.trim()))
+              : [];
+
+          let aMatches = aTags.filter(tag => userTags.includes(tag)).length;
+          let bMatches = bTags.filter(tag => userTags.includes(tag)).length;
+
+          return bMatches - aMatches; // Higher matches come first
+      });
+
+      res.render("debate", { vedios, user });
+  } catch (error) {
+      console.error("Error fetching debate page:", error);
+      res.status(500).send("Server error");
+  }
 });
 
-// Debate Video Page with Optimized DB Calls
-router.get("/debate/:id", isloggedin, async (req, res) => {
-    try {
-        let vedios = nodeCache.get(`debate_video_${req.params.id}`);
-        if (!vedios) {
-            vedios = await videomongoose.findById(req.params.id)
-                .populate("creator", "username followers Rankpoints")
-                .populate({
-                    path: "comment",
-                    select: "text userId",
-                    populate: { path: "userId", select: "username profile" }
-                })
-                .lean();
+router.get("/debate/:id", isloggedin, async function(req, res) {                                             
+  try {
+    let vedios = nodeCache.get(`debate_video_${req.params.id}`);
+    console.log(`debate_video ${vedios}`);
 
-            if (!vedios) return res.status(404).send("Video not found");
+    if (!vedios) {
+      vedios = await videomongoose.findById(req.params.id)
+        .populate({
+          path: "creator",
+          select: "username followers Rankpoints"
+        })
+        .populate({
+          path: "comment",
+          select: "text userId",
+          populate: {
+            path: "userId",
+            select: "username profile"
+          }
+        })
+        .lean(); // Improve performance by returning plain objects
 
-            nodeCache.set(`debate_video_${req.params.id}`, vedios, CACHE_TIME);
-        }
+      if (!vedios) {
+        return res.status(404).send("Video not found");
+      }
 
-        let user = await User.findOne({ email: req.user.email }).lean();
-        const creator = vedios.creator;
-        const follower = (creator.followers || []).length;
-        const isFollowing = creator.followers.includes(req.user._id);
-
-        if (!vedios.viewedBy.includes(req.user._id)) {
-            vedios.Views++;
-            vedios.viewedBy.push(req.user._id);
-
-            await videomongoose.updateOne({ _id: vedios._id }, { $inc: { Views: 1 }, $push: { viewedBy: req.user._id } });
-            await User.updateOne({ _id: creator._id }, { $inc: { Rankpoints: 10 } });
-            await User.updateRanks();
-            nodeCache.set(`debate_video_${req.params.id}`, vedios, CACHE_TIME);
-        }
-
-        const suggestions = await videomongoose.find({ _id: { $ne: vedios._id } }).limit(5).populate("creator", "username").lean();
-        res.render("vedioplayer", { vedios, videoFile: vedios.vedio, suggestions, currentRoute: "debate", follower, isFollowing, user, comments: vedios.comment });
-    } catch (err) {
-      res.status(500).send(`Server error: ${err.message}`);
+      nodeCache.set(`debate_video_${req.params.id}`, vedios, 600); // Cache for 10 minutes
     }
+
+    // Directly get creator details from vedios instead of another DB call
+    const creator = vedios.creator; 
+
+    let user = await User.findOne({ email: req.user.email }).lean();
+
+    const followerscount = creator.followers || [];
+    const follower = followerscount.length;
+    const isFollowing = followerscount.includes(req.user._id);
+    
+    let updateNeeded = false;
+    let rankPointsIncrease = 0;
+
+    if (!vedios.viewedBy.includes(req.user._id)) {
+      vedios.Views += 1;
+      vedios.viewedBy.push(req.user._id);
+      rankPointsIncrease = 10; // Increase rank points for views
+      updateNeeded = true;
+    }
+
+    // Batch update to avoid multiple DB writes
+    if (updateNeeded) {
+      await videomongoose.updateOne(
+        { _id: vedios._id },
+        { $inc: { Views: 1 }, $push: { viewedBy: req.user._id } }
+      );
+
+      await User.updateOne(
+        { _id: creator._id },
+        { $inc: { Rankpoints: rankPointsIncrease } }
+      );
+
+      await User.updateRanks();
+
+      // Update cache after DB modifications
+      nodeCache.set(`debate_video_${req.params.id}`, vedios, 600);
+    }
+
+    const suggestions = await videomongoose
+      .find({ _id: { $ne: vedios._id } })
+      .limit(5)
+      .populate({ path: "creator", select: "username" })
+      .lean();
+
+    res.render("vedioplayer", {
+      vedios, 
+      videoFile: vedios.vedio,
+      suggestions, 
+      currentRoute: "debate", 
+      follower, 
+      isFollowing, 
+      user,
+      comments: vedios.comment
+    });
+
+  } catch (err) {
+    console.error("Error fetching video:", err);
+    res.status(500).send("Server error");
+  }
 });
 
-// Video Streaming with GridFS
 router.get("/video/stream/:id", async (req, res) => {
-    try {
-        const gfs = getGFS();
-        const fileId = new mongoose.Types.ObjectId(req.params.id);
-        const file = await conn.db.collection("videos.files").findOne({ _id: fileId });
+  try {
+    // Ensure GridFSBucket is initialized
+    const gfs = getGFS();
 
-        if (!file) return res.status(404).json({ error: "Video not found" });
+    const fileId = new mongoose.Types.ObjectId(req.params.id);
 
-        res.set({ "Content-Type": "video/mp4", "Accept-Ranges": "bytes" });
-        gfs.openDownloadStream(fileId).pipe(res);
-    } catch (err) {
-        res.status(500).json({ error: "Internal server error" });
+    // Check if the file exists in GridFS
+    const file = await conn.db.collection("videos.files").findOne({ _id: fileId });
+
+    if (!file) {
+      return res.status(404).json({ error: "Video not found" });
     }
+
+    // Set response headers for video streaming
+    res.set({
+      "Content-Type": "video/mp4",
+      "Accept-Ranges": "bytes",
+    });
+
+    // Stream the video
+    const readStream = gfs.openDownloadStream(fileId);
+    readStream.pipe(res);
+  } catch (err) {
+    console.error("Error streaming video:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
-// Podcast Section with Caching
-router.get("/podcast", isloggedin, async (req, res) => {
-    try {
-        let vedios = nodeCache.get("podcast_videos");
-        if (!vedios) {
-            vedios = await podcastsmongoose.find({}).populate("Thumbnail").lean();
-            nodeCache.set("podcast_videos", vedios, CACHE_TIME);
-        }
+router.get("/podcast", isloggedin, async function(req, res){ 
+  let vedios = nodeCache.get("podcast_videos");                                              //podcast section Page
+  const user = await User.findOne({email: req.user.email}).populate("requests")
+  let userTags = user.SEOTags || [];
 
-        const user = await User.findOne({ email: req.user.email }).populate("requests").lean();
-        res.render("podcast", { vedios, user });
-    } catch (error) {
-        res.status(500).send("Server error");
-    }
+  if (!vedios) {
+    vedios = await podcastsmongoose.find({}).populate("Thumbnail");
+
+    // Cache the fetched videos
+    nodeCache.set("podcast_videos", vedios, 600);
+}
+
+
+  vedios.sort((a, b) => {
+    let aTags = Array.isArray(a.Tags)
+        ? a.Tags.flatMap(tagString => tagString.split(',').map(tag => tag.trim()))
+        : [];
+    let bTags = Array.isArray(b.Tags)
+        ? b.Tags.flatMap(tagString => tagString.split(',').map(tag => tag.trim()))
+        : [];
+
+
+    let aMatches = aTags.filter(tag => userTags.includes(tag)).length;
+    let bMatches = bTags.filter(tag => userTags.includes(tag)).length;
+
+
+    return bMatches - aMatches; // Higher matches come first
 });
 
-// Community Page with Cached Queries
-router.get("/community", isloggedin, async (req, res) => {
-    try {
-        let communities = nodeCache.get("communities");
-        if (!communities) {
-            communities = await communityMongo.find({}, { _id: 1, name: 1, createdBy: 1 }).populate("createdBy", "username").limit(20).lean();
-            nodeCache.set("communities", communities, CACHE_TIME);
-        }
 
-        const user = await User.findOne({ email: req.user.email }).populate("requests").lean();
-        res.render("community", { communities, user });
-    } catch (error) {
-        res.status(500).send("Server error");
+  res.render("podcast", { vedios, user });
+});
+ 
+router.get("/podcast/:id", isloggedin, async function(req, res) {  
+  try {
+    let vedios = nodeCache.get(`podcast_video_${req.params.id}`);
+
+    if (!vedios) {
+      vedios = await podcastsmongoose.findById(req.params.id)
+      .populate({
+          path: "creator",
+          select: "username followers Rankpoints"
+      }).populate({
+        path: "comment",
+        select: "text userId",
+        populate: {
+          path: "userId",
+          select: "username profile"
+        }
+      });
+
+      if (!vedios) {
+        return res.status(404).send("Podcast not found");
+      }
+
+      // Cache the podcast video
+      nodeCache.set(`podcast_video_${req.params.id}`, vedios, 600); // Cache for 10 mins
     }
+
+    const creator = await User.findById(vedios.creator[0]._id).populate("Rankpoints");
+    let user = await User.findOne({ email: req.user.email });
+
+    const followerscount = vedios.creator[0].followers;
+    const follower = followerscount.length;
+    const isFollowing = followerscount.includes(req.user._id);
+    
+    if (!vedios.viewedBy.includes(req.user._id)) {
+      vedios.Views += 1;
+      vedios.viewedBy.push(req.user._id);
+      await vedios.save();
+
+      const points = 10;
+      creator.Rankpoints += points;
+      await creator.save();
+
+      await User.updateRanks();
+
+      // Update cache with new views count
+      nodeCache.set(`podcast_video_${req.params.id}`, vedios, 600);
+    }
+
+    const suggestions = await podcastsmongoose.find({ _id: { $ne: vedios._id } }).limit(5).populate({
+        path: "creator",
+        select: "username"
+    });
+
+    const comments = vedios.comment;
+    
+    res.render("vedioplayer", {
+      vedios, 
+      videoFile: vedios.vedio,
+      suggestions, 
+      currentRoute: "podcast", 
+      follower, 
+      isFollowing, 
+      user,
+      comments
+    });
+
+  } catch(err) {
+    console.error("Error fetching podcast:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+router.get("/community", isloggedin, async function(req, res) {  
+  const cacheKey = "communities";
+  let communities = nodeCache.get(cacheKey);
+
+  const userPromise = User.findOne({ email: req.user.email }).populate("requests").lean();
+
+  if (!communities) {
+      communities = await communityMongo.find({}, { _id: 1, name: 1, createdBy: 1 })
+          .populate({ path: "createdBy", select: "username" })
+          .limit(20)
+          .lean();
+
+      nodeCache.set(cacheKey, communities, 600);
+  }
+
+  const user = await userPromise;
+
+  res.render("community", { communities, user });
+});
+
+router.get("/logout", logout);                                                                             //Logout route
+
+router.get("/community-chat/:id",isloggedin ,async function(req, res){                                    //community-chat/:id Page
+  try{
+    const community = await communityMongo.findById(req.params.id);
+    const user = await User.findOne({email: req.user.email});
+    
+    const member = community.members.some(memberId => memberId.toString() === req.user._id.toString());
+    
+    const type = community.CommunityType;
+
+    res.render("chat", {community, user, member, type });
+  }catch(err){
+    res.send(err)
+    console.log(err.message)
+  }
+});
+
+router.get("/profile",isloggedin,async function(req, res){                                                //profile Page
+  const user = await User.findOne({email: req.user.email}).populate("followers").populate("vedio").populate("podcast").populate("profile").populate("requests");
+
+  const videoCount = user.vedio ? user.vedio.length : 0;
+  const debateCount = user.podcast ? user.podcast.length : 0;
+  const totalContent = videoCount + debateCount;
+
+  const profile = user.profile;
+  const Rank = user.Rank;
+  console.log(Rank);
+  
+  const followerCount = user.followers ? user.followers.length : 0;
+
+  res.render("profile", { user, totalContent, followerCount, profile });
+});
+
+router.get("/uploaded-content", isloggedin, async function (req, res) {                                   //uploaded-content Page
+  try {
+    const user = await User.findOne({ email: req.user.email })
+              .populate({
+                  path: "vedio",
+                  select: "title description createdAt Thumbnail Views"
+              })
+              .populate({
+                  path: "podcast",
+                  select: "title description createdAt Thumbnail Views"
+              });
+    
+          if (!user) {
+              return res.status(404).send("User not found");
+          }
+    
+    
+          // Add a `type` property to distinguish between videos and podcasts
+          const vedios = [
+              ...user.vedio.map(v => ({ ...v.toObject(), type: "debate" })),
+              ...user.podcast.map(p => ({ ...p.toObject(), type: "podcast" }))
+          ];
+
+    res.render("Uploaded-content-profile", { vedios, user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while fetching data.");
+  }
+});
+
+router.get("/My-World",isloggedin, async function(req, res){                                             //Myworld Page
+  const communities = await User.findOne({email: req.user.email}).populate("communities");
+  res.render("Myworld", { communities })
+});
+
+router.get("/SentRequests",isloggedin, async function (req, res) {                                       //Sent Requests Page
+  const contents = await User.findOne({ email: req.user.email }).populate({
+    path: "Sender",
+    select: "OpponentName requestId",
+    populate: {
+      path: "OpponentName",
+      select: "username"
+    }
+  });
+
+  res.render("Sentrequests", { contents });
+});
+
+router.get("/update-route",isloggedin, async function(req, res){                                      // update-route/:id  Page
+  const profileupdate = await User.findOne({ email: req.user.email }).populate("profile");
+  let err = req.flash("key");
+  res.render("update-profile", { profileupdate, err })
+});
+
+router.post("/update-profile", isloggedin, upload.single("profile"), async function (req, res) {          // update-profile   Page
+  try {
+    let { username } = req.body;
+    let profileImageBuffer = req.file ? req.file.buffer : null; // Get the file buffer or null if no file is uploaded
+
+    const user = await User.findOne({ email: req.user.email });
+    if (profileImageBuffer) {
+      user.profile = profileImageBuffer;  // Save the buffer data
+    }
+
+    if (username === user.username) {
+      req.flash("key", "username already exist");
+      return res.redirect("/update-route")
+    } 
+    
+    user.username = username;
+    await user.save();
+
+    res.redirect("/profile");
+  } catch (err) {
+    res.status(404).send(err);
+  }
+});
+
+router.get("/LeaderBoard", isloggedin, async function (req, res) { // LeaderBoard Page
+  try {
+    const user = await User.findOne({ email: req.user.email });
+
+    // Fetch top users sorted by Rankpoints in descending order
+    const LeaderBoards = await User.find().sort({ Rankpoints: -1 }).limit(10);
+
+    // Assign ranks to users
+    LeaderBoards.forEach((creator, index) => {
+      creator.Rank = index + 1; // Rank starts from 1
+    });
+
+
+    res.render("leaderBoard", { user, LeaderBoards });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+router.post("/Join-community/:id",isloggedin,async (req, res) => {                                 // Join-community/:id Page
+  try{
+      const community = await communityMongo.findById(req.params.id).populate({
+        path: "createdBy",
+        select: "fcmToken email"
+      });
+
+      if(!community.members.includes(req.user._id)){
+        community.members.push(req.user._id);
+        await community.save();
+      }else{
+       res.send("Already a member");
+      }
+      const fcmToken = community.createdBy.fcmToken;
+
+      const user = await User.findById(req.user._id);
+      const fcm = user.fcmToken;
+
+      if(fcmToken){
+        await sendPushNotification(fcmToken, `Notification For ${ community.CommunityName }`, `${user.username} Joined ${ community.CommunityName }`, "join-community");  
+      }
+
+      await SendEmail(
+        community.createdBy.email,
+        "Join Community",
+        `Congrats! You Joined ${community.CommunityName}`, // ✅ Text goes here
+        [{ 
+            filename: "community.jpg", 
+            content: community.CommunityDP, 
+            cid: "communityImage" 
+        }] // ✅ Images array here
+    );
+    
+
+      if(fcm){
+        await sendPushNotification(fcmToken, `Congrats You Joined ${ community.CommunityName }`, `Now We Give you An Opportunity To Change The World`, "join-community");  
+      }
+
+      const redirectUrl = req.get("Referrer") || "/";
+      res.redirect(redirectUrl);
+
+  }catch(err){
+    console.log(err);
+  }
+});
+
+router.get("/Exit-Community/:id", isloggedin, async (req, res) => {
+  try {
+      const community = await communityMongo.findById(req.params.id);
+      const user = await User.findById(req.user._id);
+
+      if (!community || !user) {
+          return res.status(404).send("Community or user not found.");
+      }
+
+      // Check if user is a member before removing
+      if (community.members.includes(user._id)) {
+          await communityMongo.findByIdAndUpdate(
+              req.params.id,
+              { $pull: { members: user._id } },  // Pulls user's ID from members array
+              { new: true }
+          );
+      }
+
+      res.redirect("/community");
+  } catch (error) {
+      console.error("Error exiting community:", error);
+      res.status(500).send("Server error");
+  }
+});
+
+router.post("/Community/:id/payment",isloggedin,async (req, res) => {                                 // Join-community/:id Page
+  try{
+      const community = await communityMongo.findById(req.params.id);
+      res.render("payment-for-community", { community });
+  }catch(err){
+    console.log(err);
+  }
+});
+
+router.get("/Members/:id",isloggedin,async (req, res) => {                                                    // Members/:id Page
+  const members = await communityMongo.findById(req.params.id).populate({
+    path: "members",
+    select: "username"
+  });
+
+  res.render("Members", {members});
+});
+
+router.get("/Send-merge-request",isloggedin,async function(req, res){
+  res.render("Send-merge-request")
+});
+
+router.get("/settings",isloggedin,async function (req, res) {                                                  //settings   Page
+  res.render("settings");
 });
 
 router.get("/logout", logout);                                                                             //Logout route
@@ -788,26 +1196,9 @@ router.get("/start-debate", isloggedin, async function (req, res) {
   }
 });
 
-router.get("/MUN-competetion", isloggedin, async function(req, res) {
-  try {
-    const cacheKey = "MUN_competitions";
-    let competition = nodeCache.get(cacheKey);
-
-    if (!competition) {
-      console.log("Fetching MUN competitions from DB...");
-      competition = await competitionMongo.find().lean();
-
-      nodeCache.set(cacheKey, competition, 600); // Cache for 10 minutes
-    } else {
-      console.log("Serving MUN competitions from cache...");
-    }
-
-    res.render("MUN-PAGE", { competition });
-
-  } catch (err) {
-    console.error("Error fetching competitions:", err);
-    res.status(500).send("Internal Server Error");
-  }
+router.get("/MUN-competetion",isloggedin, async function(req, res){
+  const competition = await competitionMongo.find({});
+     res.render("MUN-PAGE", { competition });
 });
 
 router.get("/Discover-Page-of-MUN/:id",isloggedin, async function(req, res){
