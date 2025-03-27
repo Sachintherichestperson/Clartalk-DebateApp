@@ -124,7 +124,7 @@ router.get("/debate/:id", isloggedin, async (req, res) => {
         const suggestions = await videomongoose.find({ _id: { $ne: vedios._id } }).limit(5).populate("creator", "username").lean();
         res.render("vedioplayer", { vedios, videoFile: vedios.vedio, suggestions, currentRoute: "debate", follower, isFollowing, user, comments: vedios.comment });
     } catch (err) {
-        res.status(500).send("Server error");
+        res.status(500).send("Server error",err);
     }
 });
 
