@@ -121,48 +121,46 @@ router.get("/debate/:id", isloggedin, async function(req, res) {
     if (!vedios) {
       vedios = await videomongoose.findById(req.params.id)
         .select("creator comment Views viewedBy vedio")
-        .lean()
-        .exec();
+        .lean();
 
       if (!vedios) {
         return res.status(404).send("Video not found");
       }
 
-      // Fetch creator, comments, and suggested videos in parallel for max speed
+      // Fetch creator, comments, and suggestions in parallel
       const [creator, comments, suggestions] = await Promise.all([
-        User.findById(vedios.creator).select("username followers Rankpoints").lean().exec(),
-        Comment.find({ _id: { $in: vedios.comment || [] } }) // Prevent error if no comments
+        User.findById(vedios.creator).select("username followers Rankpoints").lean(),
+        Comment.find({ _id: { $in: vedios.comment } })
           .select("text userId")
           .populate("userId", "username profile")
-          .lean()
-          .exec(),
-        videomongoose.find({ _id: { $ne: vedios._id } })
+          .lean(),
+        videomongoose.find({ _id: { $ne: vedios._id } }) // ✅ Always fetch suggestions
           .select("vedio creator")
           .populate("creator", "username")
           .limit(5)
           .lean()
-          .exec()
       ]);
 
-      // Assign fetched data (ensure creator exists)
-      vedios.creator = creator || {};
+      // Ensure suggestions is never undefined
+      vedios.creator = creator;
       vedios.comment = comments;
-      vedios.suggestions = suggestions || [];
+      vedios.suggestions = suggestions || []; // ✅ Set fallback if undefined
 
-      // Store full response in cache
       nodeCache.set(`debate_video_${req.params.id}`, vedios, 600);
     }
 
-    // Get logged-in user
-    let user = await User.findOne({ email: req.user.email }).lean().exec();
+    // ✅ Ensure suggestions is defined before rendering
+    const suggestions = vedios.suggestions || [];
+
+    let user = await User.findOne({ email: req.user.email }).lean();
 
     const followerscount = vedios.creator.followers || [];
     const follower = followerscount.length;
-    const isFollowing = followerscount.map(id => id.toString()).includes(req.user._id.toString());
-
+    const isFollowing = followerscount.includes(req.user._id);
+    
     let updateNeeded = false;
 
-    if (!vedios.viewedBy.map(id => id.toString()).includes(req.user._id.toString())) {
+    if (!vedios.viewedBy.includes(req.user._id)) {
       vedios.viewedBy.push(req.user._id);
       updateNeeded = true;
     }
@@ -172,23 +170,23 @@ router.get("/debate/:id", isloggedin, async function(req, res) {
         videomongoose.updateOne(
           { _id: vedios._id },
           { $inc: { Views: 1 }, $push: { viewedBy: req.user._id } }
-        ).exec(),
+        ),
         User.updateOne(
           { _id: vedios.creator._id },
           { $inc: { Rankpoints: 10 } }
-        ).exec()
+        )
       ]);
 
       await User.updateRanks();
 
-      // Update cache after DB modifications
+      // ✅ Ensure the updated video is cached again
       nodeCache.set(`debate_video_${req.params.id}`, vedios, 600);
     }
 
     res.render("vedioplayer", {
       vedios, 
       videoFile: vedios.vedio,
-      suggestions, 
+      suggestions,  // ✅ Now it will always be defined
       currentRoute: "debate", 
       follower, 
       isFollowing, 
@@ -198,10 +196,9 @@ router.get("/debate/:id", isloggedin, async function(req, res) {
 
   } catch (err) {
     console.error("Error fetching video:", err);
-    res.status(500).send("Serv");
+    res.status(500).send("Server error");
   }
 });
-
 
 
 router.get("/video/stream/:id", async (req, res) => {
