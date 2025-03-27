@@ -147,6 +147,7 @@ router.get("/debate/:id", isloggedin, async function(req, res) {
       // Assign fetched data (ensure creator exists)
       vedios.creator = creator || {};
       vedios.comment = comments;
+      vedios.suggestions = suggestions || [];
 
       // Store full response in cache
       nodeCache.set(`debate_video_${req.params.id}`, vedios, 600);
