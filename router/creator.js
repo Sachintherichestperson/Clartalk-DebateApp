@@ -75,7 +75,7 @@ router.get("/video-content/upload", isloggedin, function(req, res) {
   res.render("video-uploader"); 
 });
 
-router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, async function(req, res) {
+router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, async function (req, res) {
   try {
       if (!req.session.uploadData) {
           return res.redirect("/");
@@ -83,59 +83,46 @@ router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, 
 
       let { title, description, Thumbnail, contentType, Tags } = req.session.uploadData;
       let videoFile = req.file ? req.file.id : null;
-
       if (!videoFile) {
-          return res.send("Video upload is required");
+          return res.status(400).send("Video upload is required");
       }
 
       let uploadDate = new Date();
-      const user = await User.findOne({ email: req.user.email });
+      let user = await User.findOne({ email: req.user.email }).lean(); // Using `.lean()` for faster read  
 
-      if (contentType === "podcast") {
-          let podcast = await podcastsmongoose.create({
-              title,
-              description,
-              Thumbnail,
-              vedio: videoFile,
-              createdAt: uploadDate,
-              creator: user._id,
-              Tags
-          });
+      req.session.uploadData = null; // Clear session immediately to prevent slowdowns  
 
-          user.podcast.push(podcast._id);
-          await user.save();
+      res.redirect(contentType === "podcast" ? "/podcast" : "/creator/video-content/upload");
 
-          nodeCache.del("podcast_videos");
+      // Process the upload in the background after redirection
+      setImmediate(async () => {
+          try {
+              if (contentType === "podcast") {
+                  let podcast = await podcastsmongoose.create({
+                      title, description, Thumbnail, vedio: videoFile, createdAt: uploadDate, creator: user._id, Tags
+                  });
 
-          req.session.uploadData = null; // Clear session
-          res.redirect("/podcast");
+                  await User.updateOne({ _id: user._id }, { $push: { podcast: podcast._id } });
+                  nodeCache.del("podcast_videos");
+              } else {
+                  let video = await videomongoose.create({
+                      title, description, Thumbnail, vedio: videoFile, createdAt: uploadDate, creator: user._id, Tags
+                  });
 
-      } else if (contentType === "video") {
-          let video = await videomongoose.create({
-              title,
-              description,
-              Thumbnail,
-              vedio: videoFile,
-              createdAt: uploadDate,
-              creator: user._id,
-              Tags
-          });
-
-          user.vedio.push(video._id);
-          await user.save();
-
-          nodeCache.del("debate_videos");
-          req.session.uploadData = null;
-          res.redirect("/creator/video-content/upload");
-      } else {
-          res.redirect("/");
-      }
+                  await User.updateOne({ _id: user._id }, { $push: { vedio: video._id } });
+                  nodeCache.del("debate_videos");
+              }
+          } catch (err) {
+              console.error("Background Upload Error:", err);
+          }
+      });
 
   } catch (err) {
       console.log("Error:", err);
       res.status(500).send("Server Error");
   }
 });
+
 
 router.get("/creator/live",isloggedin ,async function(req, res){
   const live = await User.findOne({email: req.user.email});
