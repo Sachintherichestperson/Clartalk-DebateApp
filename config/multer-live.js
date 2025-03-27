@@ -22,7 +22,7 @@ const storage = new GridFsStorage({
   },
 });
 
-// Multer middleware: Accept only video files & set max size (100MB)
+
 const videoUpload = multer({
   storage,
   limits: { fileSize: 100 * 1024 * 1024 }, // 100MB max

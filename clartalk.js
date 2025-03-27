@@ -59,7 +59,6 @@ app.get("/firebase-config", (req, res) => {
 const axios = require("axios");
 
 const COHERE_API_KEY = process.env.Cohere_API_KEY
-console.log(COHERE_API_KEY);
 
 // app.post("/generate-ai-comment", async (req, res) => {
 //     try {
