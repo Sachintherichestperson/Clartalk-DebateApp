@@ -21,7 +21,6 @@ const mongoose = require("mongoose");
 const { conn, getGFS } = require("../config/gridfs");
 const  SendEmail = require("../config/nodemailer");
 const nodeCache = require("../controller/Cache");
-const Comment = require("../mongoose/comment-mongoose");
 
 router.get("/register", (req, res) => {                                                                      //register page
     let err = req.flash("key")
@@ -114,93 +113,6 @@ router.get("/debate", isloggedin, async function (req, res) {
   }
 });
 
-router.get("/debate/:id", isloggedin, async function(req, res) {                                             
-  try {
-    let vedios = nodeCache.get(`debate_video_${req.params.id}`);
-
-    if (!vedios) {
-      vedios = await videomongoose.findById(req.params.id)
-        .select("creator comment Views viewedBy vedio")
-        .lean();
-
-      if (!vedios) {
-        return res.status(404).send("Video not found");
-      }
-
-      // Fetch creator, comments, and suggestions in parallel
-      const [creator, comments, suggestions] = await Promise.all([
-        User.findById(vedios.creator).select("username followers Rankpoints").lean(),
-        Comment.find({ _id: { $in: vedios.comment } })
-          .select("text userId")
-          .populate("userId", "username profile")
-          .lean(),
-        videomongoose.find({ _id: { $ne: vedios._id } }) // ✅ Always fetch suggestions
-          .select("vedio creator")
-          .populate("creator", "username")
-          .limit(5)
-          .lean()
-      ]);
-
-      // Ensure suggestions is never undefined
-      vedios.creator = creator;
-      vedios.comment = comments;
-      vedios.suggestions = suggestions || []; // ✅ Set fallback if undefined
-
-      nodeCache.set(`debate_video_${req.params.id}`, vedios, 600);
-    }
-
-    // ✅ Ensure suggestions is defined before rendering
-    const suggestions = vedios.suggestions || [];
-
-    let user = await User.findOne({ email: req.user.email }).lean();
-
-    const followerscount = vedios.creator.followers || [];
-    const follower = followerscount.length;
-    const isFollowing = followerscount.includes(req.user._id);
-    
-    let updateNeeded = false;
-
-    if (!vedios.viewedBy.includes(req.user._id)) {
-      vedios.viewedBy.push(req.user._id);
-      updateNeeded = true;
-    }
-
-    if (updateNeeded) {
-      await Promise.all([
-        videomongoose.updateOne(
-          { _id: vedios._id },
-          { $inc: { Views: 1 }, $push: { viewedBy: req.user._id } }
-        ),
-        User.updateOne(
-          { _id: vedios.creator._id },
-          { $inc: { Rankpoints: 10 } }
-        )
-      ]);
-
-      await User.updateRanks();
-
-      // ✅ Ensure the updated video is cached again
-      nodeCache.set(`debate_video_${req.params.id}`, vedios, 600);
-    }
-
-    res.render("vedioplayer", {
-      vedios, 
-      videoFile: vedios.vedio,
-      suggestions,  // ✅ Now it will always be defined
-      currentRoute: "debate", 
-      follower, 
-      isFollowing, 
-      user,
-      comments: vedios.comment
-    });
-
-  } catch (err) {
-    console.error("Error fetching video:", err);
-    res.status(500).send("Server error");
-  }
-});
-
-
 router.get("/video/stream/:id", async (req, res) => {
   try {
     // Ensure GridFSBucket is initialized
@@ -227,6 +139,78 @@ router.get("/video/stream/:id", async (req, res) => {
   } catch (err) {
     console.error("Error streaming video:", err);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/debate/:id", isloggedin, async function(req, res) {                                             
+  try {
+    let vedios = nodeCache.get(`debate_video_${req.params.id}`);
+
+    if (!vedios) {
+      vedios = await videomongoose.findById(req.params.id)
+        .populate({
+          path: "creator",
+          select: "username followers Rankpoints"
+        })
+        .populate({
+          path: "comment",
+          select: "text userId",
+          populate: {
+            path: "userId",
+            select: "username profile"
+          }
+        })
+        .lean(); // Improve performance by returning plain objects
+
+      if (!vedios) {
+        return res.status(404).send("Video not found");
+      }
+
+      nodeCache.set(`debate_video_${req.params.id}`, vedios, 600); // Cache for 10 minutes
+    }
+
+    // Directly get creator details from vedios instead of another DB call
+    const creator = await User.findById(vedios.creator[0]._id).populate("Rankpoints");
+    let user = await User.findOne({ email: req.user.email }).lean();
+
+    const followerscount = vedios.creator[0].followers;
+    const follower = followerscount.length;
+    const isFollowing = followerscount.includes(req.user._id);
+
+    if (!vedios.viewedBy.includes(req.user._id)) {
+      vedios.Views += 1;
+      vedios.viewedBy.push(req.user._id);
+      await vedios.save();
+
+      const points = 10;
+      creator.Rankpoints += points;
+      await creator.save();
+
+      await User.updateRanks();
+
+    }
+
+    const suggestions = await videomongoose.find({ _id: { $ne: vedios._id } }).limit(5).populate({ 
+      path: "creator", 
+      select: "username" 
+    }).lean();
+
+    const comments = vedios.comment;
+
+    res.render("vedioplayer", {
+      vedios, 
+      videoFile: vedios.vedio,
+      suggestions, 
+      currentRoute: "debate", 
+      follower, 
+      isFollowing, 
+      user,
+      comments
+    });
+
+  } catch (err) {
+    console.error("Error fetching video:", err);
+    res.status(500).send("Server error");
   }
 });
 
@@ -279,7 +263,7 @@ router.get("/podcast/:id", isloggedin, async function(req, res) {
           path: "userId",
           select: "username profile"
         }
-      });
+      }).lean();
 
       if (!vedios) {
         return res.status(404).send("Podcast not found");
@@ -307,8 +291,6 @@ router.get("/podcast/:id", isloggedin, async function(req, res) {
 
       await User.updateRanks();
 
-      // Update cache with new views count
-      nodeCache.set(`podcast_video_${req.params.id}`, vedios, 600);
     }
 
     const suggestions = await podcastsmongoose.find({ _id: { $ne: vedios._id } }).limit(5).populate({
