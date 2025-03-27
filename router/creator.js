@@ -224,7 +224,7 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
     }
     nodeCache.del("Live");
 
-    res.redirect("/")
+    res.redirect("/");
   } catch (err) {
     console.log("error for router.post catch part ==== ", err);
     res.send(err);
