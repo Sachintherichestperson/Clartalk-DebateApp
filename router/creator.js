@@ -104,6 +104,8 @@ router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, 
           user.podcast.push(podcast._id);
           await user.save();
 
+          cache.del("podcast_videos");
+
           req.session.uploadData = null; // Clear session
           res.redirect("/podcast");
 
@@ -121,7 +123,8 @@ router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, 
           user.vedio.push(video._id);
           await user.save();
 
-          req.session.uploadData = null; // Clear session
+          nodeCache.del("debate_videos");
+          req.session.uploadData = null;
           res.redirect("/creator/video-content/upload");
       } else {
           res.redirect("/");
