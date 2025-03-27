@@ -159,8 +159,7 @@ router.get("/debate/:id", isloggedin, async function(req, res) {
             path: "userId",
             select: "username profile"
           }
-        })
-        .lean(); // Improve performance by returning plain objects
+        });
 
       if (!vedios) {
         return res.status(404).send("Video not found");
