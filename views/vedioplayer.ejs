@@ -4,20 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Page</title>
-    <link rel="stylesheet" href="/stylesheets/vedioplayer.css">
+    <link rel="stylesheet" href="/stylesheets/vedioplayer.min.css">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <section class="main-page">
         <div class="vediopage">
             <nav>
-                <img src="/images/nav.png" alt="Logo" class="logo">
+                <link rel="preload" as="image" href="/images/nav.png">
                 <input type="text" placeholder="Search for debates, podcasts, or live streams..." class="search-bar">
             </nav>
             <div class="video-and-suggestions">
                 <div class="video-section">
-                    <video controls autoplay class="video-player" id="videoPlayer">
-                        <source src="/video/stream/<%= videoFile._id %>" type="video/mp4">
+                    <video controls  class="video-player" id="videoPlayer" autoplay>
+                        <source src="/video/stream/<%= videoFile._id %>" type="video/mp4" autoplay>
                         Your browser does not support the video tag.
                     </video>
                     <h1 class="video-title"><%= vedios.title %></h1>
@@ -25,7 +26,7 @@
                         <% if (vedios.creator[0].image > 0) { %>
                             <img src="data:image/jpeg;base64,<%= vedios.creator[0].image.toString('base64') %>" alt="Creator" class="user-avatar">
                         <% } else { %>
-                            <img src="/images/Default.png" alt="Default Avatar" class="user-avatar">
+                            <img src="/images/Default.png" alt="Default Avatar" class="user-avatar" loading="lazy">
                         <% } %>
                         <div class="creator-details">
                             <a href="/creator/content/<%= vedios.creator[0]._id %>" class="creator-name">
@@ -53,12 +54,12 @@
                     <div class="comments">
                         <h2 class="comment-data">Comments 12980</h2>
                         <div class="msg-box">
-                            <img src="/images/default.png" alt="" class="comment-image">
+                            <img src="/images/Default.png" alt="" class="comment-image" loading="lazy">
                             <div class="txtmsg">Kis Kis ko Ye Best App Lagta he Like kare</div>
                         </div>
                         <div class="allcomments">
                             <div class="input-cmt">
-                                <img src="/images/default.png" alt="" class="input-img">
+                                <img src="/images/default.png" alt="" class="input-img" loading="lazy">
                                 <input type="text" placeholder="Write a comment..." class="comment-input" id="comment-input">
                                 <input type="button" value="Post" class="post-btn" id="post-btn">
                             </div>
@@ -67,9 +68,9 @@
                                     <div class="single-comment">
                                         <% if (comment.userId && comment.userId.profile) { %>
                                             <img src="data:image/jpeg;base64,<%= comment.userId.profile.toString('base64') %>" 
-                                                 alt="" class="comment-image">
+                                                 alt="" class="comment-image" loading="lazy">
                                         <% } else { %>
-                                            <img src="/images/default.png" alt="Default Profile" class="comment-image">
+                                            <img src="/images/default.png" alt="Default Profile" class="comment-image" loading="lazy">
                                         <% } %>
                                         <p><strong><%= comment.userId.username %>:</strong> <%= comment.text %></p>
                                     </div>
@@ -83,7 +84,7 @@
                     <h2 class="suggestions-header">Up Next</h2>
                     <% suggestions.forEach(function(suggestion) { %>
                         <a href="/<%= currentRoute %>/<%= suggestion._id %>" class="suggestion-card">
-                            <img src="data:image/jpeg;base64,<%= suggestion.Thumbnail.toString('base64') %>" alt="Thumbnail" class="suggestion-thumbnail">
+                            <img src="data:image/jpeg;base64,<%= suggestion.Thumbnail.toString('base64') %>" alt="Thumbnail" class="suggestion-thumbnail" loading="lazy">
                             <div class="suggestion-info">
                                 <p class="suggestion-title"><%= suggestion.title %></p>
                                 <p class="suggestion-creator"><%= suggestion.creator[0].username %></p>
@@ -99,6 +100,7 @@
         </div>
     </section>
 </body>
+<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 <script>
     const creatorId = "<%= vedios.creator[0]._id %>";
     const UserId = "<%= user.username %>";
@@ -106,7 +108,22 @@
     const videoId = "<%= vedios._id %>";
     const userid = "<%= user._id %>"
     const vedioId = "<%= vedios._id %>"
+
+    const player = new Plyr('#videoPlayer', {
+            controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'settings', 'fullscreen'],
+            settings: ['speed', 'quality'],
+            speed: { selected: 1, options: [0.5, 1, 1.5, 2] }
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+    const video = document.getElementById("videoPlayer");
+
+    video.addEventListener("loadedmetadata", () => {
+        console.log("Video Duration:", video.duration);
+    });
+});
+
 </script>
 <script src="/socket.io/socket.io.js"></script>
-<script src="/javascript/videoplayer.js"></script>
+<script src="/javascript/videoplayer.min.js"></script>
 </html>

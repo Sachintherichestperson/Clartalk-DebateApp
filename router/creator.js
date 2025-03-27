@@ -24,6 +24,7 @@ const io = new Server(server);
 const allusers = {};
 const { ObjectId } = require("bson"); // Import BSON
 const nodeCache = require("../controller/Cache");
+const sharp = require("sharp");
 
 
 router.get("/creator/upload", function(req, res){
@@ -33,7 +34,10 @@ router.get("/creator/upload", function(req, res){
 router.post("/upload-thumbnail", upload.single("Thumbnail"), isloggedin, async function(req, res) {
   try {
       let { title, description, contentType, Tags } = req.body;
-      let Thumbnail = req.file.buffer;
+      let Thumbnail = await sharp(req.file.buffer)
+          .resize(300) // Resize (adjust as needed)
+          .webp({ quality: 70 }) // Convert to WebP
+          .toBuffer();
 
       if (!Thumbnail) {
           return res.send("All fields are required");
@@ -122,7 +126,6 @@ router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, 
       res.status(500).send("Server Error");
   }
 });
-
 
 router.get("/creator/live",isloggedin ,async function(req, res){
   const live = await User.findOne({email: req.user.email});
