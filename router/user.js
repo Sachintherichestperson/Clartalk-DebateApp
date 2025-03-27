@@ -20,8 +20,7 @@ const notificationmongoose = require("../mongoose/notification-mongoose");
 const mongoose = require("mongoose");
 const { conn, getGFS } = require("../config/gridfs");
 const  SendEmail = require("../config/nodemailer");
-const NodeCache = require("node-cache");
-const nodeCache = new NodeCache({ stdTTL: 300 });
+const nodeCache = require("../controller/Cache");
 
 router.get("/register", (req, res) => {                                                                      //register page
     let err = req.flash("key")
@@ -336,15 +335,24 @@ router.get("/podcast/:id", isloggedin, async function(req, res) {
   }
 });
 
+router.get("/community", isloggedin, async function(req, res) {  
+  const cacheKey = "communities";
+  let communities = nodeCache.get(cacheKey);
 
-router.get("/community",isloggedin,async function(req, res){                                               //community Page
-  const communities = await communityMongo.find().populate({
-    path: "createdBy",
-    select: "username"
-  });
+  const userPromise = User.findOne({ email: req.user.email }).populate("requests").lean();
 
-  const user = await User.findOne({email: req.user.email}).populate("requests");
-  res.render("community", { communities, user } );
+  if (!communities) {
+      communities = await communityMongo.find({}, { _id: 1, name: 1, createdBy: 1 })
+          .populate({ path: "createdBy", select: "username" })
+          .limit(20)
+          .lean();
+
+      nodeCache.set(cacheKey, communities, 600);
+  }
+
+  const user = await userPromise;
+
+  res.render("community", { communities, user });
 });
 
 router.get("/logout", logout);                                                                             //Logout route
@@ -959,9 +967,26 @@ router.get("/start-debate", isloggedin, async function (req, res) {
   }
 });
 
-router.get("/MUN-competetion",isloggedin, async function(req, res){
-  const competition = await competitionMongo.find({});
-     res.render("MUN-PAGE", { competition });
+router.get("/MUN-competetion", isloggedin, async function(req, res) {
+  try {
+    const cacheKey = "MUN_competitions";
+    let competition = nodeCache.get(cacheKey);
+
+    if (!competition) {
+      console.log("Fetching MUN competitions from DB...");
+      competition = await competitionMongo.find().lean();
+
+      nodeCache.set(cacheKey, competition, 600); // Cache for 10 minutes
+    } else {
+      console.log("Serving MUN competitions from cache...");
+    }
+
+    res.render("MUN-PAGE", { competition });
+
+  } catch (err) {
+    console.error("Error fetching competitions:", err);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 router.get("/Discover-Page-of-MUN/:id",isloggedin, async function(req, res){
