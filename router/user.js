@@ -113,7 +113,7 @@ router.get("/debate", isloggedin, async function (req, res) {
   }
 });
 
-router.get("/debate/:id", isloggedin, async function (req, res) {
+router.get("/debate/:id", isloggedin, async function(req, res) {                                             
   try {
     let vedios = nodeCache.get(`debate_video_${req.params.id}`);
 
