@@ -1,44 +1,37 @@
 const multer = require("multer");
-const { GridFsStorage } = require("multer-gridfs-storage");  // ✅ Fix the import
-const config = require("config");
+const { GridFsStorage } = require("multer-gridfs-storage");
 
 const mongoURI = "mongodb+srv://sachinbajaj:MySecurePass@clartalk.gzh9a.mongodb.net/?retryWrites=true&w=majority";
 
 // GridFS Storage Configuration
 const storage = new GridFsStorage({
   url: mongoURI,
+  options: { useNewUrlParser: true, useUnifiedTopology: true }, // Ensures proper connection handling
   file: (req, file) => {
+    return new Promise((resolve, reject) => {
+      if (!file.mimetype.startsWith("video/")) {
+        return reject(new Error("Only video files are allowed!"));
+      }
 
-    // Only allow video files
-    if (file.mimetype.startsWith("video/")) {
-      return {
+      resolve({
         filename: `video-${Date.now()}-${file.originalname}`,
-        bucketName: "videos", // Store in "videos" bucket
-      };
-    } else {
-      return null; // Reject non-video files
-    }
+        bucketName: "videos",
+        chunkSizeBytes: 1048576
+      })
+    });
   },
 });
 
-// Handle storage events
-storage.on("connection", (db) => {
-});
-
-storage.on("error", (err) => {
-  console.error("GridFS Storage Error:", err);
-});
-
-// Multer middleware: Only accept video files & set max size (100MB)
-const videoUpload = multer({ 
-  storage: storage,
+// Multer middleware: Accept only video files & set max size (100MB)
+const videoUpload = multer({
+  storage,
   limits: { fileSize: 100 * 1024 * 1024 }, // 100MB max
   fileFilter: (req, file, cb) => {
     if (!file.mimetype.startsWith("video/")) {
       return cb(new Error("Only video files are allowed!"), false);
     }
     cb(null, true);
-  }
+  },
 });
 
 module.exports = videoUpload;
