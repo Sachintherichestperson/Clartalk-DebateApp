@@ -5,16 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Community Chat</title>
     <link rel="stylesheet" href="/stylesheets/chat.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">    
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script type="module" src="/firebase-notification.js"></script>
 </head>
 <body>
     <section class="community-chat-section">
         <nav class="community-nav">
             <div class="community-logo">
-                <img src="data:image/jpeg;base64,<%= community.CommunityDP.toString('base64') %>" alt="Community Logo">
+                <img src="<%= community.CommunityDP %>" alt="Community Logo">
             </div>
             <h2 class="community-name"><%= community.CommunityName %></h2>
             <% if(member || type === "Public") {%>
@@ -65,6 +63,8 @@
         const communityId = "<%= community._id %>";
         const community = "<%= community._id %>";
     </script>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="/javascript/chat.min.js"></script>
+    <script type="module" src="/firebase-notification.js"></script>
 </body>
 </html>

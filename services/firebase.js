@@ -41,7 +41,6 @@ async function sendPushNotification(token, title, body, notificationType = "push
         user.notification.push(notification._id);
         await user.save();  // ✅ Only one save operation
 
-        console.log("Notification sent:", notification);
         return response;
     } catch (error) {
         console.error("Error sending notification:", error);
@@ -84,7 +83,6 @@ async function sendPushNotificationAll(tokens, title, body, notificationType = "
             return user.save();
         }));
 
-        console.log("Batch notification sent to all users.");
         return response;
     } catch (error) {
         console.error("Error sending batch notifications:", error);

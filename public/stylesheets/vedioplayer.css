@@ -401,8 +401,8 @@ nav img{
         height: unset;
     }
     .post-btn {
-        width: unset;
-        height: unset;
+        width: 10%;
+        height: 10%;
         position: absolute;
         right: 10px;
         top: 50%;
@@ -414,6 +414,9 @@ nav img{
         border-radius: 25px;
         cursor: pointer;
         font-size: 20px;
+    }
+    .post-btn i{
+        display: flex;
     }
     .single-comment p{
         margin-left: 20px;
@@ -433,6 +436,7 @@ nav img{
         line-height: 1.8;
         max-height: 500px; /* Add a max-height to enable scrolling */
         overflow-y: auto; /* Enables scrolling for comments */
+        scrollbar-width: none;
     }
     
     .comment-data {

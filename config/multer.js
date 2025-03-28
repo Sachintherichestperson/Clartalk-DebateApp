@@ -1,7 +1,7 @@
 const multer = require("multer");
 require("dotenv").config();
 const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary"); // ✅ Import this
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 // Configure Cloudinary
 cloudinary.config({
@@ -13,16 +13,29 @@ cloudinary.config({
 // Configure Multer Storage with Cloudinary
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
-    params: {
-        folder: "uploads", // ✅ Cloudinary folder name
-        allowed_formats: ["jpg", "png", "jpeg", "webp", "avif"], // ✅ Allowed file types
-        public_id: (req, file) => {
-            return file.originalname.split(".")[0]; // ✅ File name without extension
-        },
+    params: async (req, file) => {
+        // Ensure only image files are uploaded
+        if (!file.mimetype.startsWith("image/")) {
+            throw new Error("Only image files are allowed!");
+        }
+        return {
+            folder: "uploads", // ✅ Cloudinary folder name
+            format: file.mimetype.split("/")[1], // ✅ Dynamically determine format
+            public_id: file.originalname.split(".")[0], // ✅ File name without extension
+        };
     },
 });
 
 // Multer Upload Middleware
-const upload = multer({ storage: storage });
+const upload = multer({
+    storage: storage,
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith("image/")) {
+            cb(null, true); // ✅ Accept the file
+        } else {
+            cb(new Error("Only images are allowed"), false); // ❌ Reject non-images
+        }
+    },
+});
 
 module.exports = upload;

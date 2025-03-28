@@ -59,9 +59,10 @@
                         </div>
                         <div class="allcomments">
                             <div class="input-cmt">
-                                <img src="/images/default.png" alt="" class="input-img" loading="lazy">
                                 <input type="text" placeholder="Write a comment..." class="comment-input" id="comment-input">
-                                <input type="button" value="Post" class="post-btn" id="post-btn">
+                                <button class="post-btn" id="post-btn" value="post">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
                             </div>
                             <div class="allsinglecomment" id="comment-section">
                                 <% comments.forEach(function(comment) { %>

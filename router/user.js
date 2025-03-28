@@ -78,7 +78,6 @@ router.get("/image/:id", async (req, res) => {
   }
 });
 
-
 router.get("/",isloggedin,async function(req, res){                                                        // front page
   try{
     let vedios = nodeCache.get("Live");
@@ -186,14 +185,9 @@ router.get("/video/stream/:id", async (req, res) => {
   }
 });
 
-
-
 router.get("/debate/:id", isloggedin, async function(req, res) {                                             
   try {
-    let vedios = nodeCache.get(`debate_video_${req.params.id}`);
-
-    if (!vedios) {
-      vedios = await videomongoose.findById(req.params.id)
+      const vedios = await videomongoose.findById(req.params.id)
         .populate({
           path: "creator",
           select: "username followers Rankpoints profile"
@@ -207,16 +201,8 @@ router.get("/debate/:id", isloggedin, async function(req, res) {
           }
         });
 
-      if (!vedios) {
-        return res.status(404).send("Video not found");
-      }
-
-      nodeCache.set(`debate_video_${req.params.id}`, vedios, 600); // Cache for 10 minutes
-    }
-
-    // Directly get creator details from vedios instead of another DB call
     const creator = await User.findById(vedios.creator[0]._id).populate("Rankpoints");
-    let user = await User.findOne({ email: req.user.email }).lean();
+    let user = await User.findOne({ email: req.user.email })
 
     const followerscount = vedios.creator[0].followers;
     const follower = followerscount.length;
@@ -234,7 +220,6 @@ router.get("/debate/:id", isloggedin, async function(req, res) {
       await User.updateRanks();
 
     }
-    console.log(vedios.creator[0].profile);
 
     const suggestions = await videomongoose.find({ _id: { $ne: vedios._id } }).limit(5).populate({ 
       path: "creator", 
@@ -367,18 +352,17 @@ router.get("/community", isloggedin, async function(req, res) {
   const cacheKey = "communities";
   let communities = nodeCache.get(cacheKey);
 
-  const userPromise = User.findOne({ email: req.user.email }).populate("requests").lean();
+  const userPromise = await User.findOne({ email: req.user.email }).populate("requests").lean();
 
   if (!communities) {
-      communities = await communityMongo.find({}, { _id: 1, name: 1, createdBy: 1 })
-          .populate({ path: "createdBy", select: "username" })
+      communities = await communityMongo.find({})
           .limit(20)
           .lean();
 
       nodeCache.set(cacheKey, communities, 600);
   }
 
-  const user = await userPromise;
+  const user = userPromise;
 
   res.render("community", { communities, user });
 });
@@ -410,7 +394,6 @@ router.get("/profile",isloggedin,async function(req, res){                      
 
   const profile = user.profile;
   const Rank = user.Rank;
-  console.log(Rank);
   
   const followerCount = user.followers ? user.followers.length : 0;
 
@@ -508,7 +491,6 @@ router.post("/update-profile", isloggedin, upload.single("profile"), async funct
   }
 });
 
-
 router.get("/LeaderBoard", isloggedin, async function (req, res) { // LeaderBoard Page
   try {
     const user = await User.findOne({ email: req.user.email });
@@ -529,48 +511,48 @@ router.get("/LeaderBoard", isloggedin, async function (req, res) { // LeaderBoar
   }
 });
 
-router.post("/Join-community/:id",isloggedin,async (req, res) => {                                 // Join-community/:id Page
-  try{
-      const community = await communityMongo.findById(req.params.id).populate({
-        path: "createdBy",
-        select: "fcmToken email"
-      });
+router.post("/Join-community/:id", isloggedin, async (req, res) => {
+  try {
+    const community = await communityMongo.findById(req.params.id).populate({
+      path: "createdBy",
+      select: "fcmToken email",
+    });
 
-      if(!community.members.includes(req.user._id)){
-        community.members.push(req.user._id);
-        await community.save();
-      }else{
-       res.send("Already a member");
-      }
-      const fcmToken = community.createdBy.fcmToken;
+    if (!community.members.includes(req.user._id)) {
+      community.members.push(req.user._id);
+      await community.save();
+    } else {
+      return res.send("Already a member");
+    }
 
-      const user = await User.findById(req.user._id);
-      const fcm = user.fcmToken;
+    const fcmToken = community.createdBy.fcmToken;
+    const user = await User.findById(req.user._id);
+    const fcm = user.fcmToken;
 
-      if(fcmToken){
-        await sendPushNotification(fcmToken, `Notification For ${ community.CommunityName }`, `${user.username} Joined ${ community.CommunityName }`, "join-community");  
-      }
+    const notifications = [];
 
-      await SendEmail(
-        community.createdBy.email,
-        "Join Community",
-        `Congrats! You Joined ${community.CommunityName}`, // ✅ Text goes here
-        [{ 
-            filename: "community.jpg", 
-            content: community.CommunityDP, 
-            cid: "communityImage" 
-        }] // ✅ Images array here
-    );
-    
+    if (fcmToken) {
+      notifications.push(sendPushNotification(fcmToken, `Notification For ${community.CommunityName}`, `${user.username} Joined ${community.CommunityName}`, "join-community"));
+    }
 
-      if(fcm){
-        await sendPushNotification(fcmToken, `Congrats You Joined ${ community.CommunityName }`, `Now We Give you An Opportunity To Change The World`, "join-community");  
-      }
+    if (fcm) {
+      notifications.push(sendPushNotification(fcm, `Congrats You Joined ${community.CommunityName}`, `Now We Give you An Opportunity To Change The World`, "join-community"));
+    }
 
-      const redirectUrl = req.get("Referrer") || "/";
-      res.redirect(redirectUrl);
+    // Send response early
+    const redirectUrl = req.get("Referrer") || "/";
+    res.redirect(redirectUrl);
 
-  }catch(err){
+    // Run background tasks (notifications + email)
+    await Promise.all(notifications);
+    await SendEmail(
+      community.createdBy.email,
+      "Join Community",
+      `Congrats! You Joined ${community.CommunityName}`,
+      [{ filename: "community.jpg", content: community.CommunityDP, cid: "communityImage" }]
+    ).catch(err => console.log("Email failed:", err));
+
+  } catch (err) {
     console.log(err);
   }
 });
@@ -1002,7 +984,6 @@ router.get("/get-status/:id", async (req, res) => {
       res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 router.post('/update-status/:id', async (req, res) => {
   try {

@@ -114,108 +114,104 @@ io.on("connection", (socket) => {
     });
 
     socket.on("chatMessage", async (data) => {
-        const newMessage = await Message.create({
-            Message: data.message,
-            sender: data.username
-        });
-
-        const community = await Community.findById(data.communityId);
-        community.Messages.push(newMessage._id);
-        await community.save();
-
-        io.emit("chatMessage", data);
+        try {
+            // Emit the message to all users immediately
+            io.emit("chatMessage", data);
+    
+            // Save the message asynchronously
+            const newMessage = new Message({
+                Message: data.message,
+                sender: data.username
+            });
+    
+            await newMessage.save();
+    
+            // Push message ID to community messages
+            await Community.findByIdAndUpdate(
+                data.communityId,
+                { $push: { Messages: newMessage._id } }
+            );
+    
+        } catch (error) {
+            console.error("Error sending message:", error);
+        }
     });
-
+    
     socket.on("Follow", async (data) => {
-        const { creatorId, UserId } = data;
-
-        const creator = await User.findById(creatorId);
-        const user = await User.findOne({ username: UserId });
-
-        if (!user || !creator) {
-            console.log('User or Creator not found');
-            return;
-        }
-
-        const fcm = creator.fcmToken;
-
-        console.log(fcm);
-        if (fcm) {
-            await sendPushNotification(fcm, `New Follower `, `${user.username} followed you`, "Follow");
-        }
-
-        if (!user.following.includes(creatorId)) {
-            user.following.push(creatorId);
-            creator.followers.push(user._id);
-            creator.followersCount += 1;
-
-            await user.save();
-            await creator.save();
-
-            io.emit("FollowStatusUpdated", { creatorId, UserId, isFollowing: true, followersCount: creator.followers.length });
-        } else {
-            user.following.pull(creatorId);
-            creator.followers.pull(user._id);
-            creator.followersCount -= 1;
-
-            await user.save();
-            await creator.save();
-
-            io.emit("FollowStatusUpdated", { creatorId, UserId, isFollowing: false, followersCount: creator.followers.length });
+        try {
+            const { creatorId, UserId } = data;
+    
+            const [creator, user] = await Promise.all([
+                User.findById(creatorId),
+                User.findOne({ username: UserId })
+            ]);
+    
+            if (!user || !creator) {
+                console.log("❌ User or Creator not found:", { creator, user });
+                return;
+            }
+    
+            const fcm = creator.fcmToken;
+            let isFollowing;
+    
+            if (!user.following.includes(creatorId)) {
+    
+                user.following.push(creatorId);
+                creator.followers.push(user._id);
+                creator.followersCount += 1;
+                isFollowing = true;
+    
+                await Promise.all([user.save(), creator.save()]);
+    
+                if (fcm) {
+                    sendPushNotification(fcm, `New Follower`, `${user.username} followed you`, "Follow")
+                        .catch(err => console.error("❌ Notification Error:", err));
+                }
+            } else {
+    
+                user.following.pull(creatorId);
+                creator.followers.pull(user._id);
+                creator.followersCount -= 1;
+                isFollowing = false;
+    
+                await Promise.all([user.save(), creator.save()]);
+            }
+    
+            io.emit("FollowStatusUpdated", { 
+                creatorId, 
+                UserId, 
+                isFollowing, 
+                followersCount: creator.followers.length 
+            });
+    
+        } catch (error) {
+            console.error("❌ Follow event error:", error);
         }
     });
+    
 
     socket.on("VideonewComment", async (data) => {
         try {
             const user = await User.findById(data.userId);
-            if (!user) {
-                console.error("User not found");
-                return;
-            }
+            if (!user) return;
     
-            // Save the comment to MongoDB
             const newComment = await comments.create({
                 text: data.text,
                 userId: data.userId,
                 videoType: data.videoType,
                 vedioId: data.vedioId
             });
-            
-           let fcmToken;
-           let title;
-           let username;
-
-            if (data.videoType === "debate") {
-                    const vedio = await vediomongoose.findById(data.vedioId).populate("creator");
-                    vedio.comment.push(newComment);
-                    await vedio.save();
-                    
-                    fcmToken = vedio.creator[0].fcmToken
-                    title = vedio.title
-                    username = vedio.username
-            } else {
-                const podcast = await podcastmongoose.findById(data.vedioId);
-                podcast.comment.push(newComment);
-                await podcast.save();
-                fcmToken = podcast.creator[0].fcmToken
-                title = podcast.title
-                username = podcast.username
-            }
-
-            if(fcmToken){
-                await sendPushNotification(fcmToken, `New Comment On ${title}`, `${user.username}: ${newComment.text}`, "Comment")
-            }
-
     
-            // Convert profile image to Base64 (if available)
-            const profileImage = user.profile
-                ? `data:image/png;base64,${user.profile.toString("base64")}`
-                : "/images/default.png"; // Default profile picture
+            // ⚡ Use bulk update instead of separate calls
+            await Promise.all([
+                vediomongoose.findByIdAndUpdate(data.vedioId, { $push: { comment: newComment._id } }),
+                podcastmongoose.findByIdAndUpdate(data.vedioId, { $push: { comment: newComment._id } })
+            ]);
     
-            // Emit the saved comment to all clients
+            // Send comment update instantly
             io.emit("addComment", {
                 text: newComment.text,
-                image: profileImage,
+                image: user.profile ? `data:image/png;base64,${user.profile.toString("base64")}` : "/images/default.png",
                 username: user.username,
             });
     
@@ -232,37 +228,35 @@ io.on("connection", (socket) => {
                 return;
             }
     
-            // Save the comment to MongoDB
-            const newComment = await comments.create({
+            // Emit the comment immediately for faster UI updates
+            const profileImage = user.profile
+                ? `data:image/png;base64,${user.profile.toString("base64")}`
+                : "/images/default.png"; // Default profile picture
+    
+            io.emit("liveaddComment", {
+                text: data.text,
+                image: profileImage,
+                username: user.username,
+            });
+    
+            // Save the comment asynchronously
+            const newComment = new comments({
                 text: data.text,
                 userId: data.userId,
                 videoType: "live",
                 liveId: data.liveId
             });
-
-            console.log("comments", newComment);
-
-            
-                const live = await liveMongo.findById(data.liveId);
-                live.comment.push(newComment);
-                console.log(live);
-
-                await live.save();
-            
-            
     
-            // Convert profile image to Base64 (if available)
-            const profileImage = user.profile
-                ? `data:image/png;base64,${user.profile.toString("base64")}`
-                : "/images/default.png"; // Default profile picture
+            await newComment.save();
     
-            // Emit the saved comment to all clients
-            io.emit("liveaddComment", {
-                text: newComment.text,
-                image: profileImage,
-                username: user.username,
-            });
-            const response = await fetch("http://localhost:3000/generate-ai-comment", {
+            // Push comment ID to liveMongo collection
+            await liveMongo.findByIdAndUpdate(
+                data.liveId,
+                { $push: { comment: newComment._id } }
+            );
+    
+            // Send the comment data to AI comment generator API asynchronously
+            fetch("http://localhost:3000/generate-ai-comment", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -271,29 +265,29 @@ io.on("connection", (socket) => {
                     videoType: data.videoType,
                     userId: data.userId
                 })
-            });
+            }).catch(err => console.error("AI Comment API Error:", err));
     
         } catch (error) {
             console.error("Error saving comment:", error);
         }
     });
-
+    
     socket.on("livequestions", async (data) => {
         try {
-
-            const question = await liveMongo.findById(data.liveId);
-            question.Questions.push(data.questions);
-            await question.save();
-
-
             io.emit("liveaddquestion", {
-                questions: question.Questions,
+                questions: data.questions,
             });
-
-        }catch(err){
-            console.log(err);
-            }
-        });
+    
+            await liveMongo.findByIdAndUpdate(
+                data.liveId,
+                { $push: { Questions: data.questions } }
+            );
+    
+        } catch (err) {
+            console.error("Error saving question:", err);
+        }
+    });
+    
 
         socket.on("join-room", (roomId, userType) => {
             socket.join(roomId);

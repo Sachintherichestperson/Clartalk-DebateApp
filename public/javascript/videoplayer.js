@@ -14,9 +14,16 @@
     
 
     followbtn.addEventListener("click", () => {
-        socket.emit("Follow", { creatorId, UserId });
-
         const span = followbtn.querySelector("span");
+        const isFollowing = span.classList.contains("unfollow");
+    
+        // Optimistically update UI (change follow/unfollow immediately)
+        span.classList.toggle("follow", isFollowing);
+        span.classList.toggle("unfollow", !isFollowing);
+        span.textContent = isFollowing ? "Follow" : "Unfollow";
+    
+        // Emit socket event
+        socket.emit("Follow", { creatorId, UserId });
     });
 
     socket.on("FollowStatusUpdated", (data) => {
@@ -76,20 +83,43 @@
      });
 
 
-postBtn.addEventListener("click", () => {
-    const commentText = commentInput.value.trim();
-    if (commentText) {
-        const commentData = {
-            text: commentText,
-            userId: userid,
-            videoType: currentRoute,
-            vedioId: vedioId
-        };
-        console.log(commentData);
-        socket.emit("VideonewComment", commentData);
-        commentInput.value = ""; // Clear input
-    }
-});
+     postBtn.addEventListener("click", () => {
+        const commentText = commentInput.value.trim();
+        if (commentText) {
+            // ⚡ Instantly update UI
+            const commentElement = document.createElement("div");
+            commentElement.classList.add("single-comment");
+            commentElement.innerHTML = `
+                <img src="/images/default.png" alt="" class="comment-image">
+                <p><strong>You:</strong> ${commentText}</p>
+            `;
+            commentSection.prepend(commentElement);
+            commentInput.value = ""; 
+    
+            // ⚡ Increment comment count instantly
+            commentCount.textContent = parseInt(commentCount.textContent) + 1;
+    
+            // Send to server without waiting
+            socket.emit("VideonewComment", { 
+                text: commentText, 
+                userId: userid, 
+                videoType: currentRoute, 
+                vedioId: vedioId 
+            });
+        }
+    });
+    
+    
+    socket.on("addComment", (data) => {
+        const commentElement = document.createElement("div");
+        commentElement.classList.add("single-comment");
+        commentElement.innerHTML = `
+            <img src="${data.image}" alt="" class="comment-image">
+            <p><strong>${data.username}:</strong> ${data.text}</p>
+        `;
+        commentSection.prepend(commentElement);
+    });
+    
 
 socket.on("addComment", (data) => {
     const commentElement = document.createElement("div");
@@ -104,7 +134,6 @@ socket.on("addComment", (data) => {
     commentCount.textContent = parseInt(commentCount.textContent) + 1;
 });
 
-
 commentbtn.addEventListener("click", (event) => {
     // Prevent click on the comment button itself from closing it
     event.stopPropagation();
@@ -114,7 +143,6 @@ commentbtn.addEventListener("click", (event) => {
 });
 
 document.addEventListener("click", (event) => {
-    // Check if the click is outside the comments and msgbox
     if (!allcomments.contains(event.target) && !msgbox.contains(event.target) && !commentbtn.contains(event.target)) {
         allcomments.classList.remove("active");
         msgbox.classList.remove("active");
