@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../mongoose/user-mongo");
-const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendPushNotificationAll, sendPushNotification } = require("../services/firebase");
 const upload = require("../config/multer");
@@ -12,19 +11,8 @@ const videomongoose = require("../mongoose/video-mongo");
 const livemongo = require("../mongoose/live-mongo");
 const communitymongo = require("../mongoose/community-mongo");
 const competitionmongo = require("../mongoose/competition-mongo");
-const app = express();
-const { createServer } = require("http");
-const { Server } = require("socket.io");
-const axios = require("axios");
-const path = require("path");
-const cron = require("node-cron");
-const { setMaxListeners } = require("events");
-const server = createServer(app);
-const io = new Server(server);
-const allusers = {};
-const { ObjectId } = require("bson"); // Import BSON
+const { ObjectId } = require("bson"); 
 const nodeCache = require("../controller/Cache");
-const sharp = require("sharp");
 
 
 router.get("/creator/upload", function(req, res){
@@ -398,8 +386,6 @@ router.post("/Upload-call/:id", isloggedin, videoUpload.single("vedio"), async (
       return res.status(400).json({ message: "No valid video uploaded!" });
     }
 
-    // Debugging: Check existing Stream array
-    console.log("Before update: ", Live.Stream);
 
     Live.Stream.push(new ObjectId(req.file.id)); // Convert to ObjectId
     await Live.save();
@@ -420,15 +406,17 @@ router.get("/Building-The-Community", function(req, res){
 
 router.post("/community/builder",upload.single("CommunityDP"), isloggedin, async function (req, res) {
   try{
-       let{ CommunityName, CommunityisAbout, CommunityDP, CommunityType, createdBy } = req.body;
+       let{ CommunityName, CommunityisAbout, CommunityType, createdBy } = req.body;
        const user = await User.findOne({email: req.user.email});
+
+       let CommunityDP = req.file ? req.file.path : null;
 
 
        const community = await communitymongo.create({
          CommunityName,
          CommunityisAbout,
          CommunityType,
-         CommunityDP: req.file.buffer,
+         CommunityDP,
          createdBy: user._id
        });
 
@@ -519,12 +507,14 @@ router.get("/Create-The-Competition",isloggedin, function(req, res){
 router.post("/competition/builded", upload.single("CompetitionDP"), isloggedin, async function (req, res) {
   let { CompetitionName, CompetitionisAbout, location, Date, fees } = req.body;
 
+  let CompetitionDP = req.file ? req.file.path : null;
+
   const user = await User.findOne({ email: req.user.email });
 
   const competition = await competitionmongo.create({
       CompetitionName,
       CompetitionisAbout,
-      CompetitionDP: req.file.buffer,
+      CompetitionDP,
       location,
       Date,
       fees,

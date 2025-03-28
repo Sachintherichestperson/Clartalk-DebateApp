@@ -2,9 +2,7 @@ const multer = require("multer");
 const { GridFsStorage } = require("multer-gridfs-storage");  // ✅ Fix the import
 const config = require("config");
 
-const mongoURI = "mongodb+srv://sachinbajaj:MySecurePass@clartalk.gzh9a.mongodb.net/?retryWrites=true&w=majority";
 
-// GridFS Storage Configuration
 const storage = new GridFsStorage({
   url: "mongodb://localhost:27017/clartalk",
   file: (req, file) => {
@@ -22,7 +20,7 @@ const storage = new GridFsStorage({
   },
 });
 
-// Handle storage events
+
 storage.on("connection", (db) => {
 });
 
@@ -30,10 +28,10 @@ storage.on("error", (err) => {
   console.error("GridFS Storage Error:", err);
 });
 
-// Multer middleware: Only accept video files & set max size (100MB)
+
 const videoUpload = multer({ 
   storage: storage,
-  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB max
+  limits: { fileSize: 100 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (!file.mimetype.startsWith("video/")) {
       return cb(new Error("Only video files are allowed!"), false);
