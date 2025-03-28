@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 const dbgr = require("debug")("development:mongoose");
 const config = require("config");
 
-// const MONGO_URI = process.env.MONGO_URI || config.get("MONGODB_URI") || "mongo"
+const MONGO_URI = process.env.MONGO_URI || config.get("MONGODB_URI")
 
-mongoose.connect("mongodb://localhost:27017/clartalk")
+mongoose.connect(MONGO_URI)
 .then(() => dbgr("MongoDB Connected! 🚀"))
 .catch((err) => dbgr("MongoDB Connection Error:"));
 
