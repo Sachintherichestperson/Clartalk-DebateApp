@@ -34,23 +34,19 @@ router.get("/creator/upload", function(req, res){
 router.post("/upload-thumbnail", upload.single("Thumbnail"), isloggedin, async function(req, res) {
   try {
       let { title, description, contentType, Tags } = req.body;
-      let Thumbnail = await sharp(req.file.buffer)
-          .resize(300) // Resize (adjust as needed)
-          .webp({ quality: 70 }) // Convert to WebP
-          .toBuffer();
 
+
+      let Thumbnail = req.file ? req.file.path : null;
       if (!Thumbnail) {
           return res.send("All fields are required");
       }
       
       let tags = req.body.Tags || '';
-      console.log(tags);
 
       if (typeof Tags === 'string' && Tags.trim().length > 0) {
         // Split the string into an array based on commas and trim spaces
         const tags = Tags.split(",").map(tag => tag.trim()).filter(tag => tag.length > 0);
 
-        console.log('Processed tags:', tags);
       }
 
 
@@ -129,7 +125,7 @@ router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, 
 
 router.get("/creator/live",isloggedin ,async function(req, res){
   const live = await User.findOne({email: req.user.email});
-    res.render("live-uploader", { live });
+  res.render("live-uploader", { live });
 });
 
 router.get("/content/:id", isloggedin, async function(req, res) {
@@ -166,7 +162,7 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
   try {
     let { title, description, creator, Time, opponent, Type } = req.body;
 
-    let Thumbnail = req.files.Thumbnail[0].buffer;
+    let Thumbnail = req.file ? req.file.path : null;
     let uploadDate = new Date();
 
     let now = new Date();

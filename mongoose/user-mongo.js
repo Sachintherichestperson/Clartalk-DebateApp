@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     password: String,
     fcmToken: String,
     profile: {
-        type: Buffer,
+        type: String,
     },
     communities: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Community' }],
     podcast: [{

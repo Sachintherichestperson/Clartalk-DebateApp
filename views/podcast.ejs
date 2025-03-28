@@ -11,7 +11,7 @@
     <section class="container">
         <header>
             <div class="branding">
-                <img src="/images/nav.png" alt="ClarTalk Logo">
+                <img src="/images/nav.png" alt="ClarTalk Logo" loading="lazy">
             </div>
             <nav class="navigation">
                 <a href="/" class="nav-link">
@@ -43,23 +43,10 @@
                 </a>
             </nav>
         </header>
-        <div class="skeleton-loader">
-            <div class="skeleton-header"></div>
-            <div class="skeleton-nav"></div>
-            <div class="skeleton-content">
-                <div class="skeleton-card"></div>
-                <div class="skeleton-card"></div>
-                <div class="skeleton-card"></div>
-            </div>
-        </div>
-        
-        <div class="offline-message">
-            <p>You are offline. Please check your internet connection.</p>
-        </div>
             <div class="page">
                 <% vedios.forEach(function(vedio){ %>
                     <a href="/podcast/<%= vedio._id %>" class="video-card">
-                        <img src="data:image/jpeg;base64,<%= vedio.Thumbnail.toString('base64') %>" alt="debates">
+                        <img src="<%= vedio.Thumbnail %>" alt="debates">
                         <div class="video-details">
                         <p class="video-title"><%= vedio.title %></p>
                         <p class="video-time"><%= vedio.createdAt.toLocaleDateString('en-GB') %></p>
@@ -74,6 +61,5 @@
         </div>
     </section>
     <script type="module" src="/firebase-notification.js"></script>
-    <script src="./javascript/skeleton.min.js"></script>
 </body>
 </html>

@@ -7,7 +7,7 @@ const videoSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "fs.files"  
   },
-    Thumbnail: Buffer,
+    Thumbnail: String,
     creator: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"  

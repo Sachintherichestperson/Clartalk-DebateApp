@@ -23,8 +23,8 @@
                     </video>
                     <h1 class="video-title"><%= vedios.title %></h1>
                     <div class="video-user-info">
-                        <% if (vedios.creator[0].image > 0) { %>
-                            <img src="data:image/jpeg;base64,<%= vedios.creator[0].image.toString('base64') %>" alt="Creator" class="user-avatar">
+                        <% if (vedios.creator[0].profile) { %>
+                            <img src="<%= vedios.creator[0].profile %>" alt="Creator" class="user-avatar">
                         <% } else { %>
                             <img src="/images/Default.png" alt="Default Avatar" class="user-avatar" loading="lazy">
                         <% } %>
@@ -67,7 +67,7 @@
                                 <% comments.forEach(function(comment) { %>
                                     <div class="single-comment">
                                         <% if (comment.userId && comment.userId.profile) { %>
-                                            <img src="data:image/jpeg;base64,<%= comment.userId.profile.toString('base64') %>" 
+                                            <img src="<%= comment.userId.profile %>" 
                                                  alt="" class="comment-image" loading="lazy">
                                         <% } else { %>
                                             <img src="/images/default.png" alt="Default Profile" class="comment-image" loading="lazy">
@@ -84,7 +84,7 @@
                     <h2 class="suggestions-header">Up Next</h2>
                     <% suggestions.forEach(function(suggestion) { %>
                         <a href="/<%= currentRoute %>/<%= suggestion._id %>" class="suggestion-card">
-                            <img src="data:image/jpeg;base64,<%= suggestion.Thumbnail.toString('base64') %>" alt="Thumbnail" class="suggestion-thumbnail" loading="lazy">
+                            <img src="<%= suggestion.Thumbnail %>" alt="Thumbnail" class="suggestion-thumbnail" loading="lazy">
                             <div class="suggestion-info">
                                 <p class="suggestion-title"><%= suggestion.title %></p>
                                 <p class="suggestion-creator"><%= suggestion.creator[0].username %></p>

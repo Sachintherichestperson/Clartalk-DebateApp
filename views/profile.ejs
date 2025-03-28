@@ -53,7 +53,7 @@
                      <div id="profile-page">
                         <span class="profile-img">
                             <% if(profile && profile.length > 0) { %>
-                                <img src="data:image/jpeg;base64,<%= profile.toString('base64') %>" alt="Profile Image">
+                                <img src="<%= user.profile %>" alt="Profile Image">
                             <% } else { %>
                                 <img src="/images/Default.png" alt="Default Profile Image">
                             <% } %>

@@ -44,27 +44,12 @@
                 </a>
             </nav>
         </header>
-        <div class="skeleton-loader">
-            <div class="skeleton-header"></div>
-            <div class="skeleton-nav"></div>
-            <div class="skeleton-content">
-                <div class="skeleton-card"></div>
-                <div class="skeleton-card"></div>
-                <div class="skeleton-card"></div>
-            </div>
-        </div>
-        
-        <div class="offline-message">
-            <p>You are offline. Please check your internet connection.</p>
-        </div>
-        
-        
         <div id="notification-container"></div>
             <div class="page">
                 <% vedios.forEach(function(video) { %>
                     <div class="videos">
                         <a href="/debate/<%= video._id %>">
-                            <img src="/image/<%= video._id %>" alt="debates">
+                            <img src="<%= video.Thumbnail %>" alt="debates">
                             <div class="video-details">
                                 <p class="video-title"><%= video.title %></p>
                                 <p class="video-time"><%= video.createdAt.toLocaleDateString('en-GB') %></p>
@@ -79,7 +64,6 @@
             No More Videos
         </div>
     </section>
-    <script src="/javascript/skeleton.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
     let activeTab = document.getElementById("active-tab");
