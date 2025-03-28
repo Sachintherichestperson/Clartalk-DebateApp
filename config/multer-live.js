@@ -2,9 +2,10 @@ const multer = require("multer");
 const { GridFsStorage } = require("multer-gridfs-storage");  // ✅ Fix the import
 const config = require("config");
 
+const mongoURI = "mongodb+srv://sachinbajaj:MySecurePass@clartalk.gzh9a.mongodb.net/?retryWrites=true&w=majority";
 
 const storage = new GridFsStorage({
-  url: "mongodb://localhost:27017/clartalk",
+  url: mongoURI,
   file: (req, file) => {
 
     // Only allow video files
