@@ -1,13 +1,14 @@
 const admin = require("firebase-admin");
 const notificationmongoose = require("../mongoose/notification-mongoose");
 const User = require("../mongoose/user-mongo");
-const serviceAccount = require("./notification.json");
+require('dotenv').config();
+const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+const serviceAccount = require(credentialsPath);
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
 
-// ✅ Optimized function for a single user
 async function sendPushNotification(token, title, body, notificationType = "push") {
     try {
         if (!token) {
