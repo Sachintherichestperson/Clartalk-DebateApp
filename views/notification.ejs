@@ -78,31 +78,7 @@
 
         <!-- Notification Section -->
         <div class="page">
-            <!-- Skeleton Loader (Shows While Loading) -->
-            <div id="skeleton-loader">
-                <div class="skeleton-notification">
-                    <div class="skeleton skeleton-icon"></div>
-                    <div>
-                        <div class="skeleton skeleton-box" style="width: 150px;"></div>
-                        <div class="skeleton skeleton-box" style="width: 200px;"></div>
-                    </div>
-                </div>
-                <div class="skeleton-notification">
-                    <div class="skeleton skeleton-icon"></div>
-                    <div>
-                        <div class="skeleton skeleton-box" style="width: 150px;"></div>
-                        <div class="skeleton skeleton-box" style="width: 200px;"></div>
-                    </div>
-                </div>
-                <div class="skeleton-notification">
-                    <div class="skeleton skeleton-icon"></div>
-                    <div>
-                        <div class="skeleton skeleton-box" style="width: 150px;"></div>
-                        <div class="skeleton skeleton-box" style="width: 200px;"></div>
-                    </div>
-                </div>
-            </div>
-
+        
             <!-- Real Notifications (Hidden Until Data Loads) -->
             <div id="notifications" style="display: none;">
                 <% 
@@ -134,25 +110,14 @@
                 <% }); %>
             </div>
         </div>
-        
     </section>
-
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Simulating data fetch delay (You can replace this with real data fetching)
-            setTimeout(() => {
-                document.getElementById("skeleton-loader").style.display = "none"; // Hide Skeleton Loader
-                document.getElementById("notifications").style.display = "flex"; // Show Real Data
-            }, 2000); // Simulated 2-second delay
-        });
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-    let activeTab = document.getElementById("active-tab");
-    if (activeTab) {
-        activeTab.scrollIntoView({ behavior: "smooth", inline: "center" });
-    }
-});
+    document.addEventListener("DOMContentLoaded", function () {
+        let activeTab = document.getElementById("active-tab");
+        if (activeTab) {
+            activeTab.scrollIntoView({ behavior: "smooth", inline: "center" });
+        }
+    });
     </script>
 </body>
 </html>

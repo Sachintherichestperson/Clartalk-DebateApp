@@ -44,25 +44,11 @@
                 </a>
             </nav>
         </header>
-
-        <div class="skeleton-loader">
-            <div class="skeleton-header"></div>
-            <div class="skeleton-nav"></div>
-            <div class="skeleton-content">
-                <div class="skeleton-card"></div>
-                <div class="skeleton-card"></div>
-                <div class="skeleton-card"></div>
-            </div>
-        </div>
-        
-        <div class="offline-message">
-            <p>You are offline. Please check your internet connection.</p>
-        </div>
         <main class="page">
             <% if (vedios.length > 0) { %>
                 <% vedios.forEach(function(vedio) { %>
                     <a href="/live-content-applying-page/<%= vedio._id %>" class="video-card" data-id="<%= vedio._id %>">
-                        <img src="data:image/jpeg;base64,<%= vedio.Thumbnail.toString('base64') %>" alt="Video Thumbnail">
+                        <img src="<%= vedio.Thumbnail %>" alt="Video Thumbnail">
                         <div class="video-details">
                             <h3 class="video-title"><%= vedio.title %></h3>
                             <p>

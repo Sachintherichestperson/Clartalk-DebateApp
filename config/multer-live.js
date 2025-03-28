@@ -6,7 +6,7 @@ const mongoURI = "mongodb+srv://sachinbajaj:MySecurePass@clartalk.gzh9a.mongodb.
 
 // GridFS Storage Configuration
 const storage = new GridFsStorage({
-  url: mongoURI,
+  url: "mongodb://localhost:27017/clartalk",
   file: (req, file) => {
 
     // Only allow video files

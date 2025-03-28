@@ -12,8 +12,6 @@ const liveMongo = require("../mongoose/live-mongo");
 const communityMongo = require("../mongoose/community-mongo");
 const competitionMongo = require("../mongoose/competition-mongo");
 const upload = require("../config/multer");
-const schedule = require("node-schedule");
-const Socket  = require("socket.io");
 const Razorpay = require("razorpay");
 const userMongo = require("../mongoose/user-mongo");
 const notificationmongoose = require("../mongoose/notification-mongoose");
@@ -198,7 +196,7 @@ router.get("/debate/:id", isloggedin, async function(req, res) {
       vedios = await videomongoose.findById(req.params.id)
         .populate({
           path: "creator",
-          select: "username followers Rankpoints"
+          select: "username followers Rankpoints profile"
         })
         .populate({
           path: "comment",
@@ -236,6 +234,7 @@ router.get("/debate/:id", isloggedin, async function(req, res) {
       await User.updateRanks();
 
     }
+    console.log(vedios.creator[0].profile);
 
     const suggestions = await videomongoose.find({ _id: { $ne: vedios._id } }).limit(5).populate({ 
       path: "creator", 
@@ -310,7 +309,7 @@ router.get("/podcast/:id", isloggedin, async function(req, res) {
           path: "userId",
           select: "username profile"
         }
-      }).lean();
+      });
 
       if (!vedios) {
         return res.status(404).send("Podcast not found");
@@ -472,29 +471,43 @@ router.get("/update-route",isloggedin, async function(req, res){                
   res.render("update-profile", { profileupdate, err })
 });
 
-router.post("/update-profile", isloggedin, upload.single("profile"), async function (req, res) {          // update-profile   Page
+router.post("/update-profile", isloggedin, upload.single("profile"), async function (req, res) { 
   try {
     let { username } = req.body;
-    let profileImageBuffer = req.file ? req.file.buffer : null; // Get the file buffer or null if no file is uploaded
+    let profileImageURL = req.file ? req.file.path : null;
+
+    console.log("Uploaded Image URL:", profileImageURL);
 
     const user = await User.findOne({ email: req.user.email });
-    if (profileImageBuffer) {
-      user.profile = profileImageBuffer;  // Save the buffer data
+
+    if (!user) {
+      req.flash("error", "User not found");
+      return res.redirect("/update-profile");
     }
 
-    if (username === user.username) {
-      req.flash("key", "username already exist");
-      return res.redirect("/update-route")
-    } 
-    
+    // Check if username already exists
+    const existingUser = await User.findOne({ username });
+    if (existingUser && existingUser.email !== req.user.email) {
+      req.flash("error", "Username already exists");
+      return res.redirect("/update-profile");
+    }
+
+    // ✅ Save Cloudinary URL to database
+    if (profileImageURL) {
+      user.profile = profileImageURL;
+    }
+
     user.username = username;
     await user.save();
 
+    req.flash("success", "Profile updated successfully!");
     res.redirect("/profile");
   } catch (err) {
-    res.status(404).send(err);
+    console.error("Upload Error:", err);
+    res.status(500).send("Something went wrong");
   }
 });
+
 
 router.get("/LeaderBoard", isloggedin, async function (req, res) { // LeaderBoard Page
   try {
