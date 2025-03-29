@@ -114,6 +114,61 @@ io.on("connection", (socket) => {
     });
 
     socket.on("chatMessage", async (data) => {
+<<<<<<< HEAD
+=======
+        const newMessage = await Message.create({
+            Message: data.message,
+            sender: data.username
+        });
+
+        const community = await Community.findById(data.communityId);
+        community.Messages.push(newMessage._id);
+        await community.save();
+
+        io.emit("chatMessage", data);
+    });
+
+    socket.on("Follow", async (data) => {
+        const { creatorId, UserId } = data;
+
+        const creator = await User.findById(creatorId);
+        const user = await User.findOne({ username: UserId });
+
+        if (!user || !creator) {
+            console.log('User or Creator not found');
+            return;
+        }
+
+        const fcm = creator.fcmToken;
+
+        console.log(fcm);
+        if (fcm) {
+            await sendPushNotification(fcm, `New Follower `, `${user.username} followed you`, "Follow");
+        }
+
+        if (!user.following.includes(creatorId)) {
+            user.following.push(creatorId);
+            creator.followers.push(user._id);
+            creator.followersCount += 1;
+
+            await user.save();
+            await creator.save();
+
+            io.emit("FollowStatusUpdated", { creatorId, UserId, isFollowing: true, followersCount: creator.followers.length });
+        } else {
+            user.following.pull(creatorId);
+            creator.followers.pull(user._id);
+            creator.followersCount -= 1;
+
+            await user.save();
+            await creator.save();
+
+            io.emit("FollowStatusUpdated", { creatorId, UserId, isFollowing: false, followersCount: creator.followers.length });
+        }
+    });
+
+    socket.on("VideonewComment", async (data) => {
+>>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
         try {
             // Emit the message to all users immediately
             io.emit("chatMessage", data);
@@ -201,6 +256,35 @@ io.on("connection", (socket) => {
                 videoType: data.videoType,
                 vedioId: data.vedioId
             });
+<<<<<<< HEAD
+=======
+            
+           let fcmToken;
+           let title;
+           let username;
+
+            if (data.videoType === "debate") {
+                    const vedio = await vediomongoose.findById(data.vedioId).populate("creator");
+                    vedio.comment.push(newComment);
+                    await vedio.save();
+                    
+                    fcmToken = vedio.creator[0].fcmToken
+                    title = vedio.title
+                    username = vedio.username
+            } else {
+                const podcast = await podcastmongoose.findById(data.vedioId);
+                podcast.comment.push(newComment);
+                await podcast.save();
+                fcmToken = podcast.creator[0].fcmToken
+                title = podcast.title
+                username = podcast.username
+            }
+
+            if(fcmToken){
+                await sendPushNotification(fcmToken, `New Comment On ${title}`, `${user.username}: ${newComment.text}`, "Comment")
+            }
+
+>>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
     
             // ⚡ Use bulk update instead of separate calls
             await Promise.all([
@@ -228,6 +312,7 @@ io.on("connection", (socket) => {
                 return;
             }
     
+<<<<<<< HEAD
             // Emit the comment immediately for faster UI updates
             const profileImage = user.profile
                 ? `data:image/png;base64,${user.profile.toString("base64")}`
@@ -267,10 +352,54 @@ io.on("connection", (socket) => {
                 })
             }).catch(err => console.error("AI Comment API Error:", err));
     
+=======
+            // Save the comment to MongoDB
+            const newComment = await comments.create({
+                text: data.text,
+                userId: data.userId,
+                videoType: "live",
+                liveId: data.liveId
+            });
+
+            console.log("comments", newComment);
+
+            
+                const live = await liveMongo.findById(data.liveId);
+                live.comment.push(newComment);
+                console.log(live);
+
+                await live.save();
+            
+            
+    
+            // Convert profile image to Base64 (if available)
+            const profileImage = user.profile
+                ? `data:image/png;base64,${user.profile.toString("base64")}`
+                : "/images/default.png"; // Default profile picture
+    
+            // Emit the saved comment to all clients
+            io.emit("liveaddComment", {
+                text: newComment.text,
+                image: profileImage,
+                username: user.username,
+            });
+            const response = await fetch("http://localhost:3000/generate-ai-comment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    text: data.text,
+                    videoId: data.vedioId,
+                    videoType: data.videoType,
+                    userId: data.userId
+                })
+            });
+    
+>>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
         } catch (error) {
             console.error("Error saving comment:", error);
         }
     });
+<<<<<<< HEAD
     
     socket.on("livequestions", async (data) => {
         try {
@@ -288,6 +417,25 @@ io.on("connection", (socket) => {
         }
     });
     
+=======
+
+    socket.on("livequestions", async (data) => {
+        try {
+
+            const question = await liveMongo.findById(data.liveId);
+            question.Questions.push(data.questions);
+            await question.save();
+
+
+            io.emit("liveaddquestion", {
+                questions: question.Questions,
+            });
+
+        }catch(err){
+            console.log(err);
+            }
+        });
+>>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
 
         socket.on("join-room", (roomId, userType) => {
             socket.join(roomId);

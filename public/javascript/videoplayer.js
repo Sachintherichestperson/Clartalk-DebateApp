@@ -14,6 +14,7 @@
     
 
     followbtn.addEventListener("click", () => {
+<<<<<<< HEAD
         const span = followbtn.querySelector("span");
         const isFollowing = span.classList.contains("unfollow");
     
@@ -24,6 +25,11 @@
     
         // Emit socket event
         socket.emit("Follow", { creatorId, UserId });
+=======
+        socket.emit("Follow", { creatorId, UserId });
+
+        const span = followbtn.querySelector("span");
+>>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
     });
 
     socket.on("FollowStatusUpdated", (data) => {
@@ -83,6 +89,7 @@
      });
 
 
+<<<<<<< HEAD
      postBtn.addEventListener("click", () => {
         const commentText = commentInput.value.trim();
         if (commentText) {
@@ -120,6 +127,22 @@
         commentSection.prepend(commentElement);
     });
     
+=======
+postBtn.addEventListener("click", () => {
+    const commentText = commentInput.value.trim();
+    if (commentText) {
+        const commentData = {
+            text: commentText,
+            userId: userid,
+            videoType: currentRoute,
+            vedioId: vedioId
+        };
+        console.log(commentData);
+        socket.emit("VideonewComment", commentData);
+        commentInput.value = ""; // Clear input
+    }
+});
+>>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
 
 socket.on("addComment", (data) => {
     const commentElement = document.createElement("div");
@@ -134,6 +157,10 @@ socket.on("addComment", (data) => {
     commentCount.textContent = parseInt(commentCount.textContent) + 1;
 });
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
 commentbtn.addEventListener("click", (event) => {
     // Prevent click on the comment button itself from closing it
     event.stopPropagation();
@@ -143,6 +170,10 @@ commentbtn.addEventListener("click", (event) => {
 });
 
 document.addEventListener("click", (event) => {
+<<<<<<< HEAD
+=======
+    // Check if the click is outside the comments and msgbox
+>>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
     if (!allcomments.contains(event.target) && !msgbox.contains(event.target) && !commentbtn.contains(event.target)) {
         allcomments.classList.remove("active");
         msgbox.classList.remove("active");

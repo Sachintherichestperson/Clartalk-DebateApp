@@ -1,7 +1,11 @@
 const multer = require("multer");
 require("dotenv").config();
 const cloudinary = require("cloudinary").v2;
+<<<<<<< HEAD
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
+=======
+const { CloudinaryStorage } = require("multer-storage-cloudinary"); // ✅ Import this
+>>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
 
 // Configure Cloudinary
 cloudinary.config({
@@ -9,6 +13,7 @@ cloudinary.config({
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+<<<<<<< HEAD
 
 // Configure Multer Storage with Cloudinary
 const storage = new CloudinaryStorage({
@@ -38,4 +43,22 @@ const upload = multer({
     },
 });
 
+=======
+
+// Configure Multer Storage with Cloudinary
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: "uploads", // ✅ Cloudinary folder name
+        allowed_formats: ["jpg", "png", "jpeg", "webp", "avif"], // ✅ Allowed file types
+        public_id: (req, file) => {
+            return file.originalname.split(".")[0]; // ✅ File name without extension
+        },
+    },
+});
+
+// Multer Upload Middleware
+const upload = multer({ storage: storage });
+
+>>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
 module.exports = upload;
