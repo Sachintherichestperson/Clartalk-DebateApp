@@ -3,10 +3,7 @@ const mongoose = require('mongoose');
 const videoSchema = new mongoose.Schema({
     title: String,
     description: String,            
-    vedio: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "fs.files"  
-  },
+    vedio:  String,
     Thumbnail: String,
     creator: [{
         type: mongoose.Schema.Types.ObjectId,

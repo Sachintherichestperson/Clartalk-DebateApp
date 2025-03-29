@@ -63,14 +63,10 @@ router.get("/video-content/upload", isloggedin, function(req, res) {
   res.render("video-uploader"); 
 });
 
-router.post("/entertainment/uploaded", upload.single("vedio"), isloggedin, async function (req, res) {
+router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, async function (req, res) {
   try {
     console.log("🔵 Request received for video upload");
 
-    if (!req.session.uploadData) {
-      console.log("❌ Session data missing, redirecting...");
-      return res.redirect("/");
-    }
 
     let { title, description, Thumbnail, contentType, Tags } = req.session.uploadData;
     let videoFile = req.file ? req.file.path : null; // Cloudinary URL
