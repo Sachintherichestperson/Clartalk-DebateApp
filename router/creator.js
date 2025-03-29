@@ -24,7 +24,7 @@ router.post("/upload-thumbnail", upload.single("Thumbnail"), isloggedin, async f
       let { title, description, contentType, Tags } = req.body;
 
 
-      let Thumbnail = req.file ? req.file.path : null;
+      let Thumbnail = req.file.path;
       if (!Thumbnail) {
           return res.send("All fields are required");
       }
@@ -44,7 +44,7 @@ router.post("/upload-thumbnail", upload.single("Thumbnail"), isloggedin, async f
           description,
           Thumbnail,
           contentType,
-          Tags
+          Tags: tags,
       };
 
       // Redirect user to video upload page
@@ -63,51 +63,59 @@ router.get("/video-content/upload", isloggedin, function(req, res) {
   res.render("video-uploader"); 
 });
 
-router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, async function (req, res) {
+router.post("/entertainment/uploaded", upload.single("vedio"), isloggedin, async function (req, res) {
   try {
-      if (!req.session.uploadData) {
-          return res.redirect("/");
+    console.log("🔵 Request received for video upload");
+
+    if (!req.session.uploadData) {
+      console.log("❌ Session data missing, redirecting...");
+      return res.redirect("/");
+    }
+
+    let { title, description, Thumbnail, contentType, Tags } = req.session.uploadData;
+    let videoFile = req.file ? req.file.path : null; // Cloudinary URL
+
+    if (!videoFile) {
+      console.log("❌ Video file missing in request");
+      return res.status(400).send("Video upload is required");
+    }
+
+    console.log("✅ Video uploaded successfully:", videoFile);
+    let uploadDate = new Date();
+    let user = await User.findOne({ email: req.user.email });
+
+    req.session.uploadData = null; // Clear session to prevent slowdowns  
+
+    res.redirect("/");
+
+    // 🔹 Background Process for Database Storage
+    setImmediate(async () => {
+      try {
+        if (contentType === "podcast") {
+          let podcast = await podcastsmongoose.create({
+            title, description, Thumbnail, vedio: videoFile, createdAt: uploadDate, creator: user._id, Tags
+          });
+
+          await User.updateOne({ _id: user._id }, { $push: { podcast: podcast._id } });
+          nodeCache.del("podcast_videos");
+          console.log("✅ Podcast uploaded successfully");
+        } else {
+          let video = await videomongoose.create({
+            title, description, Thumbnail, vedio: videoFile, createdAt: uploadDate, creator: user._id, Tags
+          });
+
+          await User.updateOne({ _id: user._id }, { $push: { vedio: video._id } });
+          nodeCache.del("debate_videos");
+          console.log("✅ Debate video uploaded successfully");
+        }
+      } catch (err) {
+        console.error("❌ Background Upload Error:", err);
       }
-
-      let { title, description, Thumbnail, contentType, Tags } = req.session.uploadData;
-      let videoFile = req.file ? req.file.id : null;
-      if (!videoFile) {
-          return res.status(400).send("Video upload is required");
-      }
-
-      let uploadDate = new Date();
-      let user = await User.findOne({ email: req.user.email }).lean(); // Using `.lean()` for faster read  
-
-      req.session.uploadData = null; // Clear session immediately to prevent slowdowns  
-
-      res.redirect(contentType === "podcast" ? "/podcast" : "/creator/video-content/upload");
-
-      // Process the upload in the background after redirection
-      setImmediate(async () => {
-          try {
-              if (contentType === "podcast") {
-                  let podcast = await podcastsmongoose.create({
-                      title, description, Thumbnail, vedio: videoFile, createdAt: uploadDate, creator: user._id, Tags
-                  });
-
-                  await User.updateOne({ _id: user._id }, { $push: { podcast: podcast._id } });
-                  nodeCache.del("podcast_videos");
-              } else {
-                  let video = await videomongoose.create({
-                      title, description, Thumbnail, vedio: videoFile, createdAt: uploadDate, creator: user._id, Tags
-                  });
-
-                  await User.updateOne({ _id: user._id }, { $push: { vedio: video._id } });
-                  nodeCache.del("debate_videos");
-              }
-          } catch (err) {
-              console.error("Background Upload Error:", err);
-          }
-      });
+    });
 
   } catch (err) {
-      console.log("Error:", err);
-      res.status(500).send("Server Error");
+    console.error("❌ Server Error:", err);
+    res.status(500).send("Server Error");
   }
 });
 

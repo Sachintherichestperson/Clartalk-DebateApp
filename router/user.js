@@ -78,47 +78,6 @@ router.get("/image/:id", async (req, res) => {
   }
 });
 
-router.post("/verify-otp", verifyOtp)                                                                     //OTP checker
-
-router.post("/resend-otp", resendOtp);
-
-router.get("/thumbnail/:id",isloggedin,async (req, res) => {
-  try{
-    const thumbnail = await liveMongo.findById(req.params.id);
-
-    res.set('Content-Type', 'image/jpeg'); // Set correct content type
-    res.send(thumbnail.Thumbnail); // Send buffer directly
-  }catch(error){
-
-  }
-});
-
-router.get("/image/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Search for the image in all three collections
-    const podcast = await podcastsmongoose.findOne({ _id: id }).select("Thumbnail");
-    const video = await videomongoose.findOne({ _id: id }).select("Thumbnail");
-    const liveStream = await liveMongo.findOne({ _id: id }).select("Thumbnail");
-
-    // Check which document contains the image
-    const imageDoc = podcast || video || liveStream;
-
-    if (!imageDoc || !imageDoc.Thumbnail) {
-      return res.status(404).json({ error: "Image not found" });
-    }
-
-    res.set("Content-Type", "image/jpeg");
-
-    res.send(imageDoc.Thumbnail);
-  } catch (error) {
-    console.error("❌ Error fetching image:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-
 router.get("/",isloggedin,async function(req, res){                                                        // front page
   try{
     let vedios = nodeCache.get("Live");
@@ -177,12 +136,64 @@ router.get("/debate", isloggedin, async function (req, res) {
   }
 });
 
+router.get("/video/stream/:id", async (req, res) => {
+  try {
+    if (!conn.readyState) {
+      console.log("❌ MongoDB not connected yet. Retrying...");
+      return res.status(500).json({ error: "MongoDB is not connected yet. Try again later." });
+    }
+
+    const gfs = getGFS();
+    const fileId = new mongoose.Types.ObjectId(req.params.id);
+    const file = await conn.db.collection("videos.files").findOne({ _id: fileId });
+
+    if (!file) {
+      return res.status(404).json({ error: "Video not found" });
+    }
+
+    const range = req.headers.range;
+    if (!range) {
+      return res.status(416).send("Requires Range header");
+    }
+
+    const fileSize = file.length;
+    const CHUNK_SIZE = 16 * 1024 * 1024; // 🔥 Increased to 16MB for smoother playback
+
+    const [startStr, endStr] = range.replace(/bytes=/, "").split("-");
+    const start = parseInt(startStr, 10);
+    const end = endStr ? parseInt(endStr, 10) : Math.min(start + CHUNK_SIZE, fileSize - 1);
+    const contentLength = end - start + 1;
+
+    res.writeHead(206, {
+      "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+      "Accept-Ranges": "bytes",
+      "Content-Length": contentLength,
+      "Content-Type": "video/mp4",
+      "Connection": "keep-alive", // 🔥 Keeps connection open for smoother streaming
+    });
+
+    const videoStream = gfs.openDownloadStream(fileId, { start, end });
+
+    videoStream.on("error", (err) => {
+      console.error("GridFS Streaming Error:", err);
+      res.status(500).end("Error streaming video");
+    });
+
+    videoStream.on("open", () => {
+      console.log(`Streaming video ${file.filename} from ${start} to ${end}`);
+    });
+
+    videoStream.pipe(res);
+
+  } catch (err) {
+    console.error("❌ Streaming error:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 router.get("/debate/:id", isloggedin, async function(req, res) {                                             
   try {
-    let vedios = nodeCache.get(`debate_video_${req.params.id}`);
-
-    if (!vedios) {
-      vedios = await videomongoose.findById(req.params.id)
+      const vedios = await videomongoose.findById(req.params.id)
         .populate({
           path: "creator",
           select: "username followers Rankpoints profile"
@@ -196,16 +207,8 @@ router.get("/debate/:id", isloggedin, async function(req, res) {
           }
         });
 
-      if (!vedios) {
-        return res.status(404).send("Video not found");
-      }
-
-      nodeCache.set(`debate_video_${req.params.id}`, vedios, 600); // Cache for 10 minutes
-    }
-
-    // Directly get creator details from vedios instead of another DB call
     const creator = await User.findById(vedios.creator[0]._id).populate("Rankpoints");
-    let user = await User.findOne({ email: req.user.email }).lean();
+    let user = await User.findOne({ email: req.user.email })
 
     const followerscount = vedios.creator[0].followers;
     const follower = followerscount.length;
@@ -223,7 +226,6 @@ router.get("/debate/:id", isloggedin, async function(req, res) {
       await User.updateRanks();
 
     }
-    console.log(vedios.creator[0].profile);
 
     const suggestions = await videomongoose.find({ _id: { $ne: vedios._id } }).limit(5).populate({ 
       path: "creator", 
