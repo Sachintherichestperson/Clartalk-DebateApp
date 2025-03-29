@@ -2,8 +2,7 @@ const admin = require("firebase-admin");
 const notificationmongoose = require("../mongoose/notification-mongoose");
 const User = require("../mongoose/user-mongo");
 require('dotenv').config();
-const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
-const serviceAccount = require(credentialsPath);
+const serviceAccount = require('/etc/secrets/notification.json')
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)

@@ -1,2 +1,3 @@
 .env
 services/notification.json
+services/firebase.js
