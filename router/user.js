@@ -1351,6 +1351,64 @@ router.get("/Notification",isloggedin, async function(req, res){
   res.render("notification", { user });
 });
 
+router.post("/save-token",isloggedin, async (req, res) => {
+  try {
+    console.log("API HITTED");
+
+    const { fcmToken } = req.body;
+    console.log("Received Token:", fcmToken);
+
+    if (!fcmToken) {
+      return res.status(400).json({ error: "Token is required" });
+    }
+
+    // Find user by ID (Ensure req.user exists & has _id)
+    const existingUser = await User.findOne({ _id: req.user._id });
+
+    if (!existingUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Update the user document with the new token
+    await User.updateOne({ _id: req.user._id }, { $set: { fcmToken: fcmToken } });
+
+    console.log("Token saved:", fcmToken);
+    res.json({ success: true, message: "Token stored successfully" });
+
+  } catch (error) {
+    console.error("Error saving token:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/delete-token", async (req, res) => {
+  try {
+    const { fcmToken } = req.body;
+    console.log("Disabling FCM Token API Hitted:", fcmToken);
+
+    if (!fcmToken) {
+      return res.status(400).json({ error: "Token is required" });
+    }
+
+    // Find user by fcmToken
+    const updatedUser = await User.findOneAndUpdate(
+      { fcmToken },
+      { $unset: { fcmToken: "null" } }, // Removes the token field
+      { new: true }
+    );
+
+    if (updatedUser) {
+      console.log("Token removed from database:", fcmToken);
+      return res.json({ success: true, message: "Token deleted successfully" });
+    } else {
+      return res.status(404).json({ success: false, message: "Token not found" });
+    }
+  } catch (error) {
+    console.error("Error deleting token:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 router.get("/Terms-&-condition", async function(req, res) {
   res.render("termsandcondition");
 });

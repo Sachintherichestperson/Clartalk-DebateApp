@@ -12,7 +12,7 @@
     <section class="main-page">
         <div class="vediopage">
             <nav>
-                <link rel="preload" as="image" href="/images/nav.png">
+                <link rel="preload" as="image" href="/images/nav.avif">
                 <input type="text" placeholder="Search for debates, podcasts, or live streams..." class="search-bar">
             </nav>
             <div class="video-and-suggestions">
@@ -26,7 +26,7 @@
                         <% if (vedios.creator[0].profile) { %>
                             <img src="<%= vedios.creator[0].profile %>" alt="Creator" class="user-avatar">
                         <% } else { %>
-                            <img src="/images/Default.png" alt="Default Avatar" class="user-avatar" loading="lazy">
+                            <img src="/images/Default.avif" alt="Default Avatar" class="user-avatar" loading="lazy">
                         <% } %>
                         <div class="creator-details">
                             <a href="/creator/content/<%= vedios.creator[0]._id %>" class="creator-name">
@@ -54,12 +54,12 @@
                     <div class="comments">
                         <h2 class="comment-data">Comments 12980</h2>
                         <div class="msg-box">
-                            <img src="/images/Default.webp" alt="" class="comment-image" loading="lazy">
+                            <img src="/images/Default.avif" alt="" class="comment-image" loading="lazy">
                             <div class="txtmsg">Kis Kis ko Ye Best App Lagta he Like kare</div>
                         </div>
                         <div class="allcomments">
                             <div class="input-cmt">
-                                <img src="/images/default.webp" alt="" class="input-img" loading="lazy">
+                                <img src="/images/Default.avif" alt="" class="input-img" loading="lazy">
                                 <input type="text" placeholder="Write a comment..." class="comment-input" id="comment-input">
                                 <button class="post-btn" id="post-btn" value="post">
                                     <i class="fas fa-paper-plane"></i>
@@ -72,7 +72,7 @@
                                             <img src="<%= comment.userId.profile %>" 
                                                  alt="" class="comment-image" loading="lazy">
                                         <% } else { %>
-                                            <img src="/images/default.png" alt="Default Profile" class="comment-image" loading="lazy">
+                                            <img src="/images/Default.avif" alt="Default Profile" class="comment-image" loading="lazy">
                                         <% } %>
                                         <p><strong><%= comment.userId.username %>:</strong> <%= comment.text %></p>
                                     </div>
@@ -91,8 +91,8 @@
                                 <p class="suggestion-title"><%= suggestion.title %></p>
                                 <p class="suggestion-creator"><%= suggestion.creator[0].username %></p>
                                 <p class="suggestion-meta">
-                                    <span class="views"><%= suggestion.Views %> Views</span>
-                                    <span class="upload-date"> • <%= suggestion.createdAt.toLocaleDateString('en-GB') %></span>
+                                    <span class="views" style="font-size: 12px;"><%= suggestion.Views %> Views</span>
+                                    <span class="upload-date"><%= suggestion.createdAt.toLocaleDateString('en-GB') %></span>
                                 </p>
                             </div>
                         </a>
