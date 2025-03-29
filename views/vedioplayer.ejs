@@ -18,7 +18,7 @@
             <div class="video-and-suggestions">
                 <div class="video-section">
                     <video controls  class="video-player" id="videoPlayer" autoplay>
-                        <source src="/video/stream/<%= videoFile._id %>" type="video/mp4" autoplay>
+                        <source src="<%= vedios.video %>" type="video/mp4" autoplay>
                         Your browser does not support the video tag.
                     </video>
                     <h1 class="video-title"><%= vedios.title %></h1>
@@ -54,15 +54,12 @@
                     <div class="comments">
                         <h2 class="comment-data">Comments 12980</h2>
                         <div class="msg-box">
-                            <img src="/images/Default.png" alt="" class="comment-image" loading="lazy">
+                            <img src="/images/Default.webp" alt="" class="comment-image" loading="lazy">
                             <div class="txtmsg">Kis Kis ko Ye Best App Lagta he Like kare</div>
                         </div>
                         <div class="allcomments">
                             <div class="input-cmt">
-<<<<<<< HEAD
-=======
-                                <img src="/images/default.png" alt="" class="input-img" loading="lazy">
->>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
+                                <img src="/images/default.webp" alt="" class="input-img" loading="lazy">
                                 <input type="text" placeholder="Write a comment..." class="comment-input" id="comment-input">
                                 <button class="post-btn" id="post-btn" value="post">
                                     <i class="fas fa-paper-plane"></i>

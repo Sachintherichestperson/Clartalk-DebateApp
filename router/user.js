@@ -36,7 +36,6 @@ router.post("/login", loginuser)                                                
 
 router.get("/OTP", async function(req, res){                                                  //OTP Page
   res.render("OTP");
-<<<<<<< HEAD
 });
 
 router.post("/verify-otp", verifyOtp)                                                                     //OTP checker
@@ -77,8 +76,6 @@ router.get("/image/:id", async (req, res) => {
     console.error("❌ Error fetching image:", error);
     res.status(500).json({ error: "Internal server error" });
   }
-=======
->>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
 });
 
 router.post("/verify-otp", verifyOtp)                                                                     //OTP checker
@@ -180,121 +177,6 @@ router.get("/debate", isloggedin, async function (req, res) {
   }
 });
 
-router.get("/video/stream/:id", async (req, res) => {
-  try {
-    // Ensure GridFSBucket is initialized
-    const gfs = getGFS();
-    const fileId = new mongoose.Types.ObjectId(req.params.id);
-<<<<<<< HEAD
-
-    // Fetch video metadata (only required fields)
-    const file = await conn.db.collection("videos.files").findOne(
-      { _id: fileId },
-      { projection: { length: 1, contentType: 1 } }
-    );
-
-    if (!file) {
-      return res.status(404).json({ error: "Video not found" });
-    }
-
-    const fileSize = file.length;
-    const range = req.headers.range;
-
-    if (range) {
-      // Handle video seeking (partial content)
-      const [start, end] = range.replace(/bytes=/, "").split("-").map(Number);
-      const chunkStart = start || 0;
-      const chunkEnd = end ? Math.min(end, fileSize - 1) : fileSize - 1;
-      const chunkSize = chunkEnd - chunkStart + 1;
-
-      res.writeHead(206, {
-        "Content-Range": `bytes ${chunkStart}-${chunkEnd}/${fileSize}`,
-        "Accept-Ranges": "bytes",
-        "Content-Length": chunkSize,
-        "Content-Type": "video/mp4",
-      });
-
-      gfs.openDownloadStream(fileId, { start: chunkStart, end: chunkEnd }).pipe(res);
-    } else {
-      // Send full video if no range is requested
-      res.writeHead(200, {
-        "Content-Length": fileSize,
-        "Content-Type": "video/mp4",
-      });
-
-      gfs.openDownloadStream(fileId).pipe(res);
-    }
-  } catch (err) {
-    console.error("❌ Error streaming video:", err);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-router.get("/debate/:id", isloggedin, async function(req, res) {                                             
-  try {
-      const vedios = await videomongoose.findById(req.params.id)
-        .populate({
-          path: "creator",
-          select: "username followers Rankpoints profile"
-        })
-        .populate({
-          path: "comment",
-          select: "text userId",
-          populate: {
-            path: "userId",
-            select: "username profile"
-          }
-        });
-
-    const creator = await User.findById(vedios.creator[0]._id).populate("Rankpoints");
-    let user = await User.findOne({ email: req.user.email })
-=======
-
-    // Fetch video metadata (only required fields)
-    const file = await conn.db.collection("videos.files").findOne(
-      { _id: fileId },
-      { projection: { length: 1, contentType: 1 } }
-    );
-
-    if (!file) {
-      return res.status(404).json({ error: "Video not found" });
-    }
-
-    const fileSize = file.length;
-    const range = req.headers.range;
-
-    if (range) {
-      // Handle video seeking (partial content)
-      const [start, end] = range.replace(/bytes=/, "").split("-").map(Number);
-      const chunkStart = start || 0;
-      const chunkEnd = end ? Math.min(end, fileSize - 1) : fileSize - 1;
-      const chunkSize = chunkEnd - chunkStart + 1;
-
-      res.writeHead(206, {
-        "Content-Range": `bytes ${chunkStart}-${chunkEnd}/${fileSize}`,
-        "Accept-Ranges": "bytes",
-        "Content-Length": chunkSize,
-        "Content-Type": "video/mp4",
-      });
-
-      gfs.openDownloadStream(fileId, { start: chunkStart, end: chunkEnd }).pipe(res);
-    } else {
-      // Send full video if no range is requested
-      res.writeHead(200, {
-        "Content-Length": fileSize,
-        "Content-Type": "video/mp4",
-      });
-
-      gfs.openDownloadStream(fileId).pipe(res);
-    }
-  } catch (err) {
-    console.error("❌ Error streaming video:", err);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-
-
 router.get("/debate/:id", isloggedin, async function(req, res) {                                             
   try {
     let vedios = nodeCache.get(`debate_video_${req.params.id}`);
@@ -324,7 +206,6 @@ router.get("/debate/:id", isloggedin, async function(req, res) {
     // Directly get creator details from vedios instead of another DB call
     const creator = await User.findById(vedios.creator[0]._id).populate("Rankpoints");
     let user = await User.findOne({ email: req.user.email }).lean();
->>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
 
     const followerscount = vedios.creator[0].followers;
     const follower = followerscount.length;
@@ -475,29 +356,17 @@ router.get("/community", isloggedin, async function(req, res) {
   const cacheKey = "communities";
   let communities = nodeCache.get(cacheKey);
 
-<<<<<<< HEAD
   const userPromise = await User.findOne({ email: req.user.email }).populate("requests").lean();
 
   if (!communities) {
       communities = await communityMongo.find({})
-=======
-  const userPromise = User.findOne({ email: req.user.email }).populate("requests").lean();
-
-  if (!communities) {
-      communities = await communityMongo.find({}, { _id: 1, name: 1, createdBy: 1 })
-          .populate({ path: "createdBy", select: "username" })
->>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
           .limit(20)
           .lean();
 
       nodeCache.set(cacheKey, communities, 600);
   }
 
-<<<<<<< HEAD
   const user = userPromise;
-=======
-  const user = await userPromise;
->>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
 
   res.render("community", { communities, user });
 });
@@ -529,10 +398,6 @@ router.get("/profile",isloggedin,async function(req, res){                      
 
   const profile = user.profile;
   const Rank = user.Rank;
-<<<<<<< HEAD
-=======
-  console.log(Rank);
->>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
   
   const followerCount = user.followers ? user.followers.length : 0;
 
@@ -630,10 +495,6 @@ router.post("/update-profile", isloggedin, upload.single("profile"), async funct
   }
 });
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
 router.get("/LeaderBoard", isloggedin, async function (req, res) { // LeaderBoard Page
   try {
     const user = await User.findOne({ email: req.user.email });
@@ -654,7 +515,6 @@ router.get("/LeaderBoard", isloggedin, async function (req, res) { // LeaderBoar
   }
 });
 
-<<<<<<< HEAD
 router.post("/Join-community/:id", isloggedin, async (req, res) => {
   try {
     const community = await communityMongo.findById(req.params.id).populate({
@@ -697,50 +557,6 @@ router.post("/Join-community/:id", isloggedin, async (req, res) => {
     ).catch(err => console.log("Email failed:", err));
 
   } catch (err) {
-=======
-router.post("/Join-community/:id",isloggedin,async (req, res) => {                                 // Join-community/:id Page
-  try{
-      const community = await communityMongo.findById(req.params.id).populate({
-        path: "createdBy",
-        select: "fcmToken email"
-      });
-
-      if(!community.members.includes(req.user._id)){
-        community.members.push(req.user._id);
-        await community.save();
-      }else{
-       res.send("Already a member");
-      }
-      const fcmToken = community.createdBy.fcmToken;
-
-      const user = await User.findById(req.user._id);
-      const fcm = user.fcmToken;
-
-      if(fcmToken){
-        await sendPushNotification(fcmToken, `Notification For ${ community.CommunityName }`, `${user.username} Joined ${ community.CommunityName }`, "join-community");  
-      }
-
-      await SendEmail(
-        community.createdBy.email,
-        "Join Community",
-        `Congrats! You Joined ${community.CommunityName}`, // ✅ Text goes here
-        [{ 
-            filename: "community.jpg", 
-            content: community.CommunityDP, 
-            cid: "communityImage" 
-        }] // ✅ Images array here
-    );
-    
-
-      if(fcm){
-        await sendPushNotification(fcmToken, `Congrats You Joined ${ community.CommunityName }`, `Now We Give you An Opportunity To Change The World`, "join-community");  
-      }
-
-      const redirectUrl = req.get("Referrer") || "/";
-      res.redirect(redirectUrl);
-
-  }catch(err){
->>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
     console.log(err);
   }
 });
@@ -1173,10 +989,6 @@ router.get("/get-status/:id", async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 2eba0c87247afa197b6f566bfacd31c5b6cc6626
 router.post('/update-status/:id', async (req, res) => {
   try {
       const { LiveStatus } = req.body;
