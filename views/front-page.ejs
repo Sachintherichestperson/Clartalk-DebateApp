@@ -12,7 +12,7 @@
     <section class="container">
         <header>
             <div class="branding">
-                <img src="/images/nav.png" alt="ClarTalk Logo">
+                <img src="/images/nav.avif" alt="ClarTalk Logo">
             </div>
             <nav class="navigation">
                 <a href="/" class="nav-link active">
@@ -65,7 +65,8 @@
                 <% }) %>
             <% } else { %>
                 <div class="instruction">
-                    No More Videos
+                    <p>Click on the button below to create a live debate</p>
+                    <a href="/creator/creator/Live" class="Button-instruction">Create Live</a>
                 </div>
             <% } %>
         </main>
@@ -78,6 +79,6 @@
     </div> -->
     <script src="/socket.io/socket.io.js"></script>
     <script src="./javascript/home.min.js"></script>
-    <script type="module" src="/firebase-notification.js"></script>
+    <script type="module" src="/firebase-notification.min.js"></script>
 </body>
 </html>

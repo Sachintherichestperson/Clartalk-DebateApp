@@ -6,9 +6,7 @@ const userSchema = new mongoose.Schema({
     email: String,
     password: String,
     fcmToken: String,
-    profile: {
-        type: String,
-    },
+    profile: String,
     communities: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Community' }],
     podcast: [{
         type: mongoose.Schema.Types.ObjectId,

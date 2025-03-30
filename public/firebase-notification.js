@@ -38,7 +38,7 @@ onMessage(messaging, (payload) => {
     navigator.serviceWorker.getRegistration().then(registration => {
         registration.showNotification(payload.notification.title, {
             body: payload.notification.body,
-            icon: "/images/nav.png"
+            icon: "/images/nav.avif"
         });
     });
 });

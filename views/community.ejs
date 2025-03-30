@@ -6,12 +6,28 @@
     <title>ClarTalk Community</title>
     <link rel="stylesheet" href="./stylesheets/community.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .Button-instruction{
+            padding: 10px;
+            background: linear-gradient(135deg,#ff5722,#ff9800);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 17px;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(255,87,34,.5);
+        }
+        .Button-instruction:hover{
+            background: linear-gradient(135deg,#ff9800,#ff5722);
+            transform: scale(1.5);
+        }
+        </style>
 </head>
 <body>
     <section class="container">
         <header>
             <div class="branding">
-                <img src="/images/nav.png" alt="ClarTalk Logo">    
+                <img src="/images/nav.avif" alt="ClarTalk Logo">    
             </div>
             <nav class="navigation">
                 <a href="/" class="nav-link">
@@ -58,9 +74,12 @@
                 </section>
             <% }) %>
             </main>
-        <div class="instruction">No More Communities</div>
+            <div class="instruction">
+                <p>Click on the button below to create a Community</p>
+                <a href="/creator//Building-The-Community" class="Button-instruction">Create Community</a>
+            </div>
     </section>
-    <script type="module" src="/firebase-notification.js"></script>
+    <script type="module" src="/firebase-notification.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
     let activeTab = document.getElementById("active-tab");

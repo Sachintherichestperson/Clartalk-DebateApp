@@ -77,7 +77,7 @@
             const data = await response.json();
     
             if (response.ok && data.comment) {
-                addCommentToUI('AI_DebateBot', data.comment, '/images/nav.png');
+                addCommentToUI('AI_DebateBot', data.comment, '/images/nav.avif');
             } else {
                 console.error("No valid comment received from AI.", data);
             }

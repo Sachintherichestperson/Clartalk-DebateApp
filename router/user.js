@@ -392,7 +392,12 @@ router.get("/community-chat/:id",isloggedin ,async function(req, res){          
 });
 
 router.get("/profile",isloggedin,async function(req, res){                                                //profile Page
-  const user = await User.findOne({email: req.user.email}).populate("followers").populate("vedio").populate("podcast").populate("profile").populate("requests");
+  const user = await User.findOne({email: req.user.email})
+  .populate("followers")
+  .populate("vedio")
+  .populate("podcast")
+  .populate("profile")
+  .populate("requests");
 
   const videoCount = user.vedio ? user.vedio.length : 0;
   const debateCount = user.podcast ? user.podcast.length : 0;
@@ -471,14 +476,14 @@ router.post("/update-profile", isloggedin, upload.single("profile"), async funct
 
     if (!user) {
       req.flash("error", "User not found");
-      return res.redirect("/update-profile");
+      return res.redirect("/profile");
     }
 
     // Check if username already exists
     const existingUser = await User.findOne({ username });
     if (existingUser && existingUser.email !== req.user.email) {
       req.flash("error", "Username already exists");
-      return res.redirect("/update-profile");
+      return res.redirect("/profile");
     }
 
     // ✅ Save Cloudinary URL to database

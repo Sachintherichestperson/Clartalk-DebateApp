@@ -6,12 +6,35 @@
     <title>Document</title>
     <link rel="stylesheet" href="./stylesheets/MUN-Page.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .instruction{
+            display: flex;
+            font-size: 15px;
+            align-items: center;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .Button-instruction{
+            padding: 10px;
+            background: linear-gradient(135deg,#ff5722,#ff9800);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 17px;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(255,87,34,.5);
+        }
+        .Button-instruction:hover{
+            background: linear-gradient(135deg,#ff9800,#ff5722);
+            transform: scale(1.5);
+        }
+        </style>
 </head>
 <body>
     <section class="container">
         <header>
             <div class="branding">
-                <img src="/images/nav.png" alt="ClarTalk Logo">     
+                <img src="/images/nav.avif" alt="ClarTalk Logo">     
             </div>
             <nav class="navigation">
                 <a href="/" class="nav-link">
@@ -47,7 +70,7 @@
             <% competition.forEach(function(competition){  %>
             <div class="box">
                 <div class="box-banner">
-                    <img src="data:image/jpeg;base64,<%= competition.CompetitionDP.toString('base64') %>" alt="MUN-IMAGE">
+                    <img src="<%= competition.CompetitionDP %>" alt="MUN-IMAGE">
                 </div>
                 <div class="competition-name">
                     <h4><%= competition.CompetitionName %></h4>
@@ -57,8 +80,12 @@
             </div>
             <% }) %>   
         </div>
+        <div class="instruction">
+            <p>Click on the button below to create a Competition</p>
+            <a href="/creator/Create-The-Competition" class="Button-instruction">Create Competition</a>
+        </div>
     </section>
-    <script type="module" src="/firebase-notification.js"></script>
+    <script type="module" src="/firebase-notification.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
     let activeTab = document.getElementById("active-tab");
