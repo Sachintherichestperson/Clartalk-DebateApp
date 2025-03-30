@@ -1173,7 +1173,7 @@ router.get("/Livedebate/:id", isloggedin, async function (req, res) {
 
       const RoomId = `${req.params.id}`;
 
-      const comments = Live.comment;
+      const comments = Live.comment || "Clartalk";
 
       function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
@@ -1181,7 +1181,7 @@ router.get("/Livedebate/:id", isloggedin, async function (req, res) {
             [array[i], array[j]] = [array[j], array[i]]; // Swap elements
         }
     }
-    const Questions = Live.Questions;
+    const Questions = Live.Questions || Clartalk;
 
     // Shuffle the comments array
     shuffleArray(comments);

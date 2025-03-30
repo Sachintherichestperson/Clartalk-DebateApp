@@ -65,14 +65,10 @@ router.get("/video-content/upload", isloggedin, function(req, res) {
 
 router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, async function (req, res) {
   try {
-    console.log("🔵 Request received for video upload");
-
-
     let { title, description, Thumbnail, contentType, Tags } = req.session.uploadData;
     let videoFile = req.file ? req.file.path : null; // Cloudinary URL
 
     if (!videoFile) {
-      console.log("❌ Video file missing in request");
       return res.status(400).send("Video upload is required");
     }
 
@@ -84,7 +80,6 @@ router.post("/entertainment/uploaded", videoUpload.single("vedio"), isloggedin, 
 
     res.redirect("/");
 
-    // 🔹 Background Process for Database Storage
     setImmediate(async () => {
       try {
         if (contentType === "podcast") {

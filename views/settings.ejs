@@ -18,9 +18,10 @@
         }
         .section {
             height: 100%;
-            width: 30%;
+            width: 100%;
             display: flex;
             justify-content: center;
+            flex-direction: column;
             gap: 20px;
             flex-wrap: wrap;
         }
@@ -32,7 +33,6 @@
             font-size: 0.85rem;
             color: rgba(255, 255, 255, 0.6);
             width: fit-content;
-            left: 38%;
             top: 40px;
             margin-bottom: 40px;
         }
@@ -68,7 +68,6 @@
             box-shadow: 0 8px 30px rgba(255, 0, 0, 0.61);
         }
     </style>
-    <!-- Firebase Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getMessaging, getToken, deleteToken } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-messaging.js";
@@ -202,11 +201,11 @@
             <div class="content">
                 <a href="/creator/Delete-content"><p>Delete Content</p></a>
             </div>
-            <div class="content">
+            <!-- <div class="content">
                 <a href="/Delete-Account" onclick="openModal(event)">
                     <p>Delete Account</p>
                 </a>
-            </div>
+            </div> -->
         </div>
 
         <!-- Notification Section -->
