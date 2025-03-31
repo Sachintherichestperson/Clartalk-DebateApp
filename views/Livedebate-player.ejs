@@ -21,7 +21,7 @@
             </nav>
             <div class="video-and-suggestions">
                 <div class="video-section">
-                    <img src="data:image/jpeg;base64,<%= Live.Thumbnail.toString('base64') %>" alt="" class="video-player">
+                    <img src="<%= Live.Thumbnail %>" alt="" class="video-player">
                     <p class="video-title"><%= Live.title %></p>
                     <% if(Live.LiveStatus === "Processing" || Live.LiveStatus === "Live"){ %>
                         <% if(creator || opponent){ %>
@@ -54,9 +54,9 @@
                     <% } %>
                     <div class="video-user-info">
                         <% if (Live.creator[0].image > 0) { %>
-                            <img src="data:image/jpeg;base64,<%= Live.creator[0].image.toString('base64') %>" alt="Creator" class="user-avatar">
+                            <img src="<%= Live.creator[0] %>" alt="Creator" class="user-avatar">
                         <% } else { %>
-                            <img src="/images/Default.png" alt="Default Avatar" class="user-avatar">
+                            <img src="/images/Default.avif" alt="Default Avatar" class="user-avatar">
                         <% } %>
                         <div class="creator-details">
                             <a href="/creator/content/<%= Live.creator[0]._id %>" class="creator-name">
@@ -84,12 +84,12 @@
                     <div class="comments">
                         <h2 class="comment-data">Comments 12980</h2>
                         <div class="msg-box">
-                            <img src="/images/Default.png" alt="" class="comment-image">
+                            <img src="/images/Default.avif" alt="" class="comment-image">
                             <div class="txtmsg">Kis Kis ko Ye Best App Lagta he Like kare</div>
                         </div>
                         <div class="allcomments">
                             <div class="input-cmt">
-                                <img src="/images/default.png" alt="" class="input-img">
+                                <img src="/images/Default.avif" alt="" class="input-img">
                                 <input type="text" placeholder="Write a comment..." class="comment-input" id="comment-input">
                                 <input type="button" value="Post" class="post-btn" id="post-btn">
                             </div>
@@ -97,10 +97,10 @@
                                 <% comments.forEach(function(comment) { %>
                                     <div class="single-comment">
                                         <% if (comment.userId && comment.userId.profile) { %>
-                                            <img src="data:image/jpeg;base64,<%= comment.userId.profile.toString('base64') %>" 
+                                            <img src="<%= comment.userId.profile %>" 
                                                  alt="" class="comment-image">
                                         <% } else { %>
-                                            <img src="/images/default.png" alt="Default Profile" class="comment-image">
+                                            <img src="/images/Default.avif" alt="Default Profile" class="comment-image">
                                         <% } %>
                                         <p><strong class="strong"><%= comment.userId.username %>:</strong> <%= comment.text %></p>
                                     </div>
@@ -114,7 +114,7 @@
                     <h2 class="suggestions-header">Up Next</h2>
                     <% suggestions.forEach(function(suggestion) { %>
                         <a href="/<%= currentRoute %>/<%= suggestion._id %>" class="suggestion-card">
-                            <img src="data:image/jpeg;base64,<%= suggestion.Thumbnail.toString('base64') %>" alt="Thumbnail" class="suggestion-thumbnail">
+                            <img src="<%= suggestion.Thumbnail %>" alt="Thumbnail" class="suggestion-thumbnail">
                             <div class="suggestion-info">
                                 <p class="suggestion-title"><%= suggestion.title %></p>
                                 <p class="suggestion-creator"><%= suggestion.creator[0].username %></p>
