@@ -2,17 +2,15 @@ const mongoose = require('mongoose');
 
 const vedioSchema = new mongoose.Schema({
     title: String,
-    description: String,            
-    vedio: Buffer,
-    Thumbnail: Buffer,
+    description: String,
+    Thumbnail: String,
     creator: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"  
     }],
-    Stream: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "fs.files" 
-    }],
+    Stream: {
+        type: String,
+    },
     Views: {
         type: Number,
         default: 0

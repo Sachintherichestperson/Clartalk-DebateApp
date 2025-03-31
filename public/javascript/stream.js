@@ -10,8 +10,6 @@
     const configuration = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 
 
-    console.log(liveId);
-
     let recognition;
     let debateTranscript = "";
     let lastSentTranscript = "";
@@ -68,9 +66,9 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     text: debateText, 
-                    videoId: "1234",  
-                    videoType: "debate",  
-                    userId: "5678"  
+                    videoId: liveId,  
+                    videoType: "Live",  
+                    userId: Viewers  
                 })
             });
     
@@ -138,18 +136,19 @@
     
         drawFrame();
     
+        canvasStream = canvas.captureStream(10);
         setTimeout(() => {
-            canvasStream = canvas.captureStream(30);
             mediaRecorder = new MediaRecorder(canvasStream, { mimeType: "video/webm" });
     
             mediaRecorder.ondataavailable = (event) => {
+                console.log("ondataavailable triggered, chunk size:", event.data.size);
                 if (event.data.size > 0) {
                     recordedChunks.push(event.data);
-                    console.log("Data available:", event.data);
+                    console.log("Chunk added to recordedChunks:", recordedChunks.length);
+                } else {
+                    console.warn("Received an empty chunk!");
                 }
             };
-    
-            mediaRecorder.onstop = saveRecording;
             mediaRecorder.start();
             console.log("Recording started...");
         }, 500);
@@ -159,14 +158,14 @@
         if (mediaRecorder && mediaRecorder.state !== "inactive") {
             mediaRecorder.stop();
             console.log("Recording stopped.");
+            setTimeout(saveRecording, 1000);
         } else {
             console.warn("MediaRecorder was already inactive.");
         }
-    
-        setTimeout(saveRecording, 1000);
     }
     
     function saveRecording() {
+        console.log("Save Recording....");
         if (recordedChunks.length === 0) {
             console.warn("No recorded chunks available.");
             return;
@@ -194,7 +193,7 @@ function generateOTP() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// Function to handle End Call and send OTP securely
+
 function requestEndCallOTP() {
     const otp = generateOTP();
     console.log("OTP generated:", otp);
@@ -211,12 +210,11 @@ function requestEndCallOTP() {
     }
 }
 
-// Handling OTP reception for the other streamer
+
 socket.on("receive_otp", (data) => {
     alert("Your opponent wants to end the call. Share this OTP: " + data.otp);
 });
 
-// Handling successful OTP verification
 socket.on("otp_success", () => {
     stopRecording();
 
@@ -224,12 +222,11 @@ socket.on("otp_success", () => {
         socket.emit("end_call_redirect", { roomId: liveId });
         socket.emit("redirect_to_home", { roomId: liveId });
     }, 2000);
-    // Emit to all users in the room so both streamers get redirected
+    
 });
 
-// Handling redirection for both streamers
+
 socket.on("redirect_to_home", async () => {
-    console.log("Received redirect event");
     try {
         const response = await fetch(`/creator/end-call/${liveId}`, {
             method: 'POST',

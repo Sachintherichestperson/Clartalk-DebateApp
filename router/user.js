@@ -81,7 +81,6 @@ router.get("/image/:id", async (req, res) => {
 router.get("/",isloggedin,async function(req, res){                                                        // front page
   try{
     let vedios = nodeCache.get("Live");
-    console.log("Node-Cache", vedios);
 
     if (!vedios) {
         vedios = await liveMongo.find({ status: "accept" });
@@ -90,12 +89,9 @@ router.get("/",isloggedin,async function(req, res){                             
     }
     const user = await User.findOne({email: req.user.email}).populate("requests").populate( "Sender" );
 
-
     res.render("front-page", {vedios, user})
   }catch(err){
     console.error("Error fetching data:", err);
-
-    // Send an error response instead of a blank page
     res.status(500).send("Internal Server Error");
   }
 });
@@ -910,7 +906,7 @@ router.get("/live-content-applying-page/:id",isloggedin, async function(req, res
   }
 });
 
-router.get("/Live-Stream-Recorded/:id",isloggedin, async function(req, res){                     //Live-Stream-Recorder/:id  
+router.get("/Live-Stream-Recorded/:id",isloggedin, async function(req, res){              
   const Live = await liveMongo.findById(req.params.id).populate({
     path: "BookingDoneBy",
     select: "username"
@@ -929,7 +925,6 @@ router.get("/Live-Stream-Recorded/:id",isloggedin, async function(req, res){    
   let user = await User.findOne({email: req.user.email });
 
   const followerscount = Live.creator[0].followers;
-  console.log(followerscount);
   const follower = followerscount.length;
   const isFollowing = followerscount.includes(req.user._id);
 
@@ -964,7 +959,6 @@ router.get("/Live-Stream-Recorded/:id",isloggedin, async function(req, res){    
     select: "username"
   });
   const suggestions = [...Livemongo, ...vediomongo, ...podcastmongo];
-  console.log(suggestions);
 
   const comments = Live.comment;
 

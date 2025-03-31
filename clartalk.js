@@ -56,8 +56,39 @@ app.get("/firebase-config", (req, res) => {
 
 const axios = require("axios");
 
-const COHERE_API_KEY = process.env.Cohere_API_KEY
+// app.post('/generate-ai-comment', async (req, res) => {
+//     const { text } = req.body;
 
+//     if (!text) {
+//         return res.status(400).json({ error: "No debate text provided!" });
+//     }
+
+//     try {
+//         const response = await axios.post(
+//             "https://openrouter.ai/api/v1/chat/completions",
+//             {
+//                 model: "openai/gpt-4o", 
+//                 messages: [{ role: "user", content: `Debate topic: ${text}. Generate a short engaging comment in Hinglish (Hindi + English).` }],
+//                 max_tokens: 100,
+//                 temperature: 0.7
+//             },
+//             {
+//                 headers: {
+//                     "Authorization": `Bearer ${API_KEY}`,
+//                     "HTTP-Referer": "http://localhost:3000",
+//                     "Content-Type": "application/json"
+//                 }
+//             }
+//         );
+
+//         const aiComment = response.data.choices[0].message.content;
+//         res.json({ comment: aiComment });
+
+//     } catch (error) {
+//         console.error("Error fetching AI comment:", error);
+//         res.status(500).json({ error: "Failed to generate AI comment." });
+//     }
+// });
 
 app.post("/generate-ai-comment", async (req, res) => {
     try {
@@ -67,23 +98,28 @@ app.post("/generate-ai-comment", async (req, res) => {
             return res.status(400).json({ error: "Text is required" });
         }
 
-        const cohereResponse = await axios.post(
-            "https://api.cohere.ai/generate",
+        const openRouterResponse = await axios.post(
+            "https://openrouter.ai/api/v1/chat/completions",
             {
-                model: "command", // Cohere's best model
-                prompt: `Debate transcript: "${text}". Provide a brief AI-generated comment related to the discussion.`,
+                model: "openai/gpt-4o",
+                messages: [
+                    { role: "system", content: "You are an AI that generates short, engaging, and natural-sounding comments for live debates, in Romanized Hindi. Keep it brief and conversational." },
+                    { role: "user", content: `Debate transcript: "${text}". Provide a short, natural comment in Romanized Hindi. No over-explaining—just a quick reaction like a real person, Avoid complex or formal words.` }
+                ],
                 max_tokens: 100,
-                temperature: 0.7
+                temperature: 0.7,
+                top_p: 0.9
             },
             {
                 headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${COHERE_API_KEY}`
+                    "Authorization": `Bearer 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`,
+                    "HTTP-Referer": "http://localhost:3000",
+                    "Content-Type": "application/json"
                 }
             }
         );
 
-        const aiComment = cohereResponse.data.generations[0].text.trim();
+        const aiComment = openRouterResponse.data.choices[0].message.content.trim();
         return res.json({ comment: aiComment });
 
     } catch (error) {
@@ -91,7 +127,6 @@ app.post("/generate-ai-comment", async (req, res) => {
         return res.status(500).json({ error: "Failed to generate AI comment" });
     }
 });
-
 
 app.use(flash());
 
@@ -189,7 +224,6 @@ io.on("connection", (socket) => {
         }
     });
     
-
     socket.on("VideonewComment", async (data) => {
         try {
             const user = await User.findById(data.userId);
@@ -239,7 +273,7 @@ io.on("connection", (socket) => {
                 username: user.username,
             });
     
-            // Save the comment asynchronously
+            
             const newComment = new comments({
                 text: data.text,
                 userId: data.userId,
@@ -249,13 +283,13 @@ io.on("connection", (socket) => {
     
             await newComment.save();
     
-            // Push comment ID to liveMongo collection
+            
             await liveMongo.findByIdAndUpdate(
                 data.liveId,
                 { $push: { comment: newComment._id } }
             );
     
-            // Send the comment data to AI comment generator API asynchronously
+            
             fetch("http://localhost:3000/generate-ai-comment", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

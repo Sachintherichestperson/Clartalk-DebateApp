@@ -145,7 +145,7 @@ router.get("/content/:id", isloggedin, async function(req, res) {
   }
 });
 
-router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { name: 'Thumbnail', maxCount: 1 }]), isloggedin, async function (req, res) {
+router.post("/stream/live", upload.single("Thumbnail"), isloggedin, async function (req, res) {
   try {
     let { title, description, creator, Time, opponent, Type } = req.body;
 
@@ -154,7 +154,7 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
 
     let now = new Date();
     let streamingDate = new Date(Time);
-    if (streamingDate < now) return res.status(400).send("Streaming date must be in the future!");
+    if (streamingDate < now) return res.status(400).send("Streaming Should be in future!");
 
     const opponentUser = await User.findOne({ username: opponent });
     if (!opponentUser) {
@@ -188,6 +188,7 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
       creatorId: req.user._id,
       title,
       description,
+      Type
     });
     await opponentUser.save();
 
@@ -208,11 +209,12 @@ router.post("/stream/live", upload.fields([{ name: 'vedio', maxCount: 1 }, { nam
     if (opponentfcm) {
     await sendPushNotification(opponentfcm, "New Request", `You have a new request from ${req.user.username} on ${title}`, "Live-Request");
     }
+
     nodeCache.del("Live");
 
     res.redirect("/");
   } catch (err) {
-    console.log("error for router.post catch part ==== ", err);
+    console.log("error for router.post catch part ", err);
     res.send(err);
   }
 });
@@ -360,7 +362,6 @@ router.post("/end-call/:id",isloggedin, async(req, res) => {
         const { LiveStatus } = req.body;
   
         await livemongo.findByIdAndUpdate(req.params.id, { LiveStatus });
-        console.log("1");
         res.status(200).json({ message: 'Status updated successfully', status: "success", redirect: "/" });
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
@@ -370,27 +371,22 @@ router.post("/end-call/:id",isloggedin, async(req, res) => {
 router.post("/Upload-call/:id", isloggedin, videoUpload.single("vedio"), async (req, res) => {
   try {
     const Live = await livemongo.findById(req.params.id);
-    console.log('Backend Accessed');
 
     if (!Live) {
       return res.status(404).json({ message: "Live debate not found!" });
     }
 
-    // Check if the stream already has a video
-    if (Live.Stream.length > 0) {
+    if (Live.Stream) {
       return res.status(400).json({ message: "Video already uploaded for this debate!" });
     }
 
-    if (!req.file || !req.file.id) {
+    if (!req.file) {
       return res.status(400).json({ message: "No valid video uploaded!" });
     }
 
 
-    Live.Stream.push(new ObjectId(req.file.id)); // Convert to ObjectId
+    Live.Stream = req.file.path;
     await Live.save();
-
-    // Debugging: Check after update
-    console.log("After update: ", Live.Stream);
 
     res.json({ message: "Video uploaded successfully", filename: req.file.filename });
   } catch (err) {
