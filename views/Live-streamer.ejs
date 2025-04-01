@@ -23,7 +23,7 @@
                     <h1 class="video-title"><%= Live.title %></h1>
                     <div class="video-user-info">
                         <% if (Live.creator[0].image > 0) { %>
-                            <img src="data:image/jpeg;base64,<%= Live.creator[0].image.toString('base64') %>" alt="Creator" class="user-avatar">
+                            <img src="<%= Live.creator.image %>" alt="Creator" class="user-avatar">
                         <% } else { %>
                             <img src="/images/Default.avif" alt="Default Avatar" class="user-avatar">
                         <% } %>
@@ -70,7 +70,8 @@
                                         <% } else { %>
                                             <img src="/images/Default.avif" alt="Default Profile" class="comment-image">
                                         <% } %>
-                                        <p><strong><%= comment.userId.username %>:</strong> <%= comment.text %></p>
+                                        <p><strong><%= comment.userId && comment.userId.username ? comment.userId.username : "Clartalk User" %>
+                                            :</strong> <%= comment.text %></p>
                                     </div>
                                 <% }) %>
                             </div>

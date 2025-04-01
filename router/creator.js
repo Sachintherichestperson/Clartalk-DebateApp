@@ -604,8 +604,10 @@ router.get("/delete-content/:type/:id", isloggedin, async function (req, res) {
     // Check which collection to delete from
     if (type === "debate") {
       deletedVideo = await videomongoose.findByIdAndDelete(id);
+      nodeCache.del("debate_videos");
     } else if (type === "podcast") {
       deletedVideo = await podcastsmongoose.findByIdAndDelete(id);
+      nodeCache.del("podcast_videos");
     } else {
       return res.status(400).send("Invalid content type");
     }
@@ -617,7 +619,7 @@ router.get("/delete-content/:type/:id", isloggedin, async function (req, res) {
     // Remove video reference from the user model
     const user = await User.findByIdAndUpdate(
       req.user._id,
-      { $pull: { vedio: id, podcast: id } }, // Make sure the field name matches your schema
+      { $pull: { vedio: id, podcast: id } },
       { new: true }
     );
 

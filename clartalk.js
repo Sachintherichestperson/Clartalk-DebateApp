@@ -21,6 +21,7 @@ const podcastmongoose = require("./mongoose/podcasts-mongo");
 const User = require("./mongoose/user-mongo");
 const server = createServer(app);
 const io = new Server(server);
+const axios = require("axios");
 require('dotenv').config();
 
 
@@ -30,8 +31,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.set("view engine", "ejs");
 
-const cors = require('cors');
-app.use(cors({ origin: '*' }));  // Allow all origins (for testing)
 
 app.use(
   expressSession({
@@ -54,41 +53,6 @@ app.get("/firebase-config", (req, res) => {
     });
 });
 
-const axios = require("axios");
-
-// app.post('/generate-ai-comment', async (req, res) => {
-//     const { text } = req.body;
-
-//     if (!text) {
-//         return res.status(400).json({ error: "No debate text provided!" });
-//     }
-
-//     try {
-//         const response = await axios.post(
-//             "https://openrouter.ai/api/v1/chat/completions",
-//             {
-//                 model: "openai/gpt-4o", 
-//                 messages: [{ role: "user", content: `Debate topic: ${text}. Generate a short engaging comment in Hinglish (Hindi + English).` }],
-//                 max_tokens: 100,
-//                 temperature: 0.7
-//             },
-//             {
-//                 headers: {
-//                     "Authorization": `Bearer ${API_KEY}`,
-//                     "HTTP-Referer": "http://localhost:3000",
-//                     "Content-Type": "application/json"
-//                 }
-//             }
-//         );
-
-//         const aiComment = response.data.choices[0].message.content;
-//         res.json({ comment: aiComment });
-
-//     } catch (error) {
-//         console.error("Error fetching AI comment:", error);
-//         res.status(500).json({ error: "Failed to generate AI comment." });
-//     }
-// });
 
 app.post("/generate-ai-comment", async (req, res) => {
     try {
@@ -112,7 +76,7 @@ app.post("/generate-ai-comment", async (req, res) => {
             },
             {
                 headers: {
-                    "Authorization": `Bearer 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`,
+                    "Authorization": `Bearer ${process.env.AI_API_KEY}`,
                     "HTTP-Referer": "http://localhost:3000",
                     "Content-Type": "application/json"
                 }
@@ -120,6 +84,15 @@ app.post("/generate-ai-comment", async (req, res) => {
         );
 
         const aiComment = openRouterResponse.data.choices[0].message.content.trim();
+
+        const aiUserId = "65a9f9d7e4b0e4c3f4b67891";
+
+        const newAIComment = new comments({
+            text: text,
+            userId: aiUserId,
+            videoType: videoType || "live",
+            liveId: videoId
+        });
         return res.json({ comment: aiComment });
 
     } catch (error) {
