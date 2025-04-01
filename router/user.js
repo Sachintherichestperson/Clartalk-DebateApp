@@ -1424,6 +1424,26 @@ router.get("/About-Us", isloggedin, async function (req, res) {
   res.render("About-us");
 });
 
+router.post("/Submit-Form", isloggedin, async function (req, res) {
+  try{
+    const { name, email, message } = req.body;
+    await SendEmail(
+      "bajajsachin100@gmail.com",
+      `${name} - ${email}`,
+      `${message}`,
+      );
+
+      await SendEmail(
+        email,
+        `Contact Form Submit`,
+        `${message}`,
+      );
+  
+      res.redirect("/profile");
+  }catch(err){
+    res.send(err)
+  }
+});
 
 
 

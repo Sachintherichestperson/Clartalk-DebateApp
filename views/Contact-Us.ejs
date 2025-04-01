@@ -3,9 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Contact Us - ClarTalk</title>
+    <link rel="stylesheet" href="/stylesheets/Contact.css">
 </head>
 <body>
-    <h1>Contact-Us</h1>
+    <div class="container">
+        <h1>Contact Us</h1>
+        <p>Have questions, feedback, or collaboration ideas? We'd love to hear from you! Fill out the form below, and our team will get back to you as soon as possible.</p>
+
+        <!-- Contact Form -->
+        <form action="/Submit-Form" method="post">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+        
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+        
+            <label for="message">Your Message</label>
+            <textarea id="message" name="message" placeholder="Write your message here..." required></textarea>
+        
+            <button type="submit">Send Message</button>
+        </form>        
+    </div>
+
+    <footer>
+        <p>📧 Email: Clartalk@gmail.com | 📞 Phone: +91 70231-87244</p>
+        <p>📍 Address: ClarTalk HQ, New Delhi, India</p>
+    </footer>
 </body>
 </html>
