@@ -10,355 +10,103 @@ let combinedStream = new MediaStream();
 const configuration = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 
 
-// let recognition;
-// let debateTranscript = "";
-// let lastSentTranscript = "";
-
-// function startSpeechRecognition() {
-//     if (!('webkitSpeechRecognition' in window)) {
-//         console.log("Speech recognition not supported in this browser.");
-//         return;
-//     }
-
-//     recognition = new webkitSpeechRecognition();
-//     recognition.continuous = true;
-//     recognition.interimResults = true;
-//     recognition.lang = 'en-US';
-
-//     recognition.onresult = (event) => {
-//         let lastResult = event.results[event.results.length - 1];
-//         if (lastResult.isFinal) {
-//             debateTranscript = lastResult[0].transcript;
-//             console.log("Debate Transcript:", debateTranscript);
-//         }
-//     };
-
-//     recognition.onerror = (event) => {
-//         console.error("Speech recognition error:", event.error);
-//         console.log("Restarting speech recognition...");
-//         recognition.stop();  
-//         setTimeout(() => recognition.start(), 1000);
-//     };
-
-//     recognition.start();
-// }
-
-// function startAIAutoComment() {
-//     setInterval(async () => {
-//         const latestTranscript = debateTranscript.trim();
-
-//         if (latestTranscript.length > 0 && latestTranscript !== lastSentTranscript) {
-//             lastSentTranscript = latestTranscript;
-//             await fetchAIComment(latestTranscript);
-//         }
-//     }, 10000);
-// }
-
-// document.addEventListener("DOMContentLoaded", () => {
-//     startSpeechRecognition();
-//     startAIAutoComment();
-// });
-
-// async function fetchAIComment(debateText) {
-//     try {
-//         const response = await fetch('/generate-ai-comment', {
-//             method: 'POST',
-//             headers: { 'Content-Type': 'application/json' },
-//             body: JSON.stringify({ 
-//                 text: debateText, 
-//                 videoId: liveId,  
-//                 videoType: "Live",  
-//                 userId: Viewers  
-//             })
-//         });
-
-//         const data = await response.json();
-
-//         if (response.ok && data.comment) {
-//             addCommentToUI('AI_DebateBot', data.comment, '/images/nav.avif');
-//         } else {
-//             console.error("No valid comment received from AI.", data);
-//         }
-//     } catch (error) {
-//         console.error("Error fetching AI comment:", error);
-//     }
-// }
-
-// function addCommentToUI(username, comment, image) {
-//     let commentSection = document.querySelector(".allsinglecomment");
-
-//     if (!commentSection) {
-//         commentSection = document.createElement("div");
-//         commentSection.classList.add("allsinglecomment");
-//         document.body.appendChild(commentSection); 
-//     }
-
-//     const commentElement = document.createElement("div");
-//     commentElement.classList.add("single-comment");
-//     commentElement.innerHTML = `
-//         <img src="${image}" alt="" class="comment-image">
-//         <p><strong class="strong">${username}:</strong> ${comment}</p>
-//     `;
-
-//     commentSection.prepend(commentElement);
-// }
-
-
 let recognition;
-let debateTranscripts = {
-    local: "",
-    remote: {}
-};
-let isRecognitionActive = false;
-let remoteMediaRecorders = {};
-let isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-// Add mobile-specific audio constraints
-const audioConstraints = {
-    audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
-        sampleRate: 44100
-    }
-};
-
-async function sendTranscriptToBackend() {
-    // Combine both transcripts with user identification
-    const remoteTranscripts = Object.entries(debateTranscripts.remote)
-        .map(([userId, transcript]) => `Remote User ${userId}: ${transcript}`)
-        .join('\n');
-    
-    const combinedTranscript = `Local User: ${debateTranscripts.local}\n${remoteTranscripts}`;
-    
-    if (!combinedTranscript.trim()) {
-        console.warn("No transcript to send");
-        return;
-    }
-
-    // Validate required fields
-    if (!liveId || !Creator) {
-        console.error("Missing required fields: liveId or Creator");
-        return;
-    }
-
-    console.log("Sending transcript to backend...");
-    
-    try {
-        const response = await fetch('/generate-ai-feedback', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                text: combinedTranscript,
-                videoId: liveId,
-                videoType: "Live",
-                userId: Creator,
-                timestamp: new Date().toISOString()
-            })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error("Backend error:", errorData);
-            throw new Error(`Server responded with ${response.status}: ${errorData.message || 'Unknown error'}`);
-        }
-
-        const data = await response.json();
-        console.log("Backend response:", data);
-        
-        if (data.success) {
-            window.location.href = "/";
-        } else {
-            console.error("Backend reported failure:", data.message);
-        }
-    } catch (error) {
-        console.error("Failed to send transcript:", error);
-        alert(`Failed to send transcript: ${error.message}`);
-    }
-}
+let debateTranscript = "";
+let lastSentTranscript = "";
 
 function startSpeechRecognition() {
     if (!('webkitSpeechRecognition' in window)) {
-        console.log("Speech recognition not supported");
+        console.log("Speech recognition not supported in this browser.");
         return;
     }
 
-    // Request microphone permission with mobile-optimized constraints
-    navigator.mediaDevices.getUserMedia(audioConstraints)
-        .then(stream => {
-            // Initialize recognition for local user
-            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.lang = 'en-US';
-            isRecognitionActive = true;
+    recognition = new webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
 
-            // Add mobile-specific error handling
-            recognition.onerror = (event) => {
-                console.error("Recognition error:", event.error);
-                if (event.error === 'not-allowed') {
-                    alert("Please allow microphone access in your browser settings.");
-                    isRecognitionActive = false;
-                    return;
-                }
-                if (event.error === 'no-speech') {
-                    console.log("No speech detected");
-                    return;
-                }
-                if (event.error === 'aborted') {
-                    console.log("Speech recognition aborted");
-                    return;
-                }
-                if (event.error !== 'no-speech') {
-                    setTimeout(() => recognition.start(), 1000);
-                }
-            };
-
-            recognition.onresult = (event) => {
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    if (event.results[i].isFinal) {
-                        debateTranscripts.local += event.results[i][0].transcript + " ";
-                        console.log("Local user transcript:", debateTranscripts.local);
-                        
-                        // Add mobile-specific feedback
-                        if (isMobile) {
-                            showMobileFeedback("Speech captured");
-                        }
-                    }
-                }
-            };
-
-            recognition.onend = () => {
-                if (isRecognitionActive) {
-                    // Add small delay for mobile devices
-                    setTimeout(() => recognition.start(), isMobile ? 2000 : 1000);
-                }
-            };
-
-            recognition.start();
-            console.log("Speech recognition started for local user");
-        })
-        .catch(err => {
-            console.error("Microphone access error:", err);
-            if (isMobile) {
-                alert("Please check your microphone permissions in your phone settings.");
-            } else {
-                alert("Could not access microphone. Please check permissions.");
-            }
-        });
-}
-
-function handleRemoteAudio(stream, userId) {
-    // Optimize MediaRecorder settings for mobile
-    const mediaRecorderOptions = {
-        mimeType: isMobile ? 'audio/webm' : 'audio/webm;codecs=opus',
-        audioBitsPerSecond: 128000
-    };
-
-    const mediaRecorder = new MediaRecorder(stream, mediaRecorderOptions);
-    remoteMediaRecorders[userId] = mediaRecorder;
-
-    // Handle audio chunks with mobile optimization
-    mediaRecorder.ondataavailable = async (event) => {
-        if (event.data.size > 0) {
-            const formData = new FormData();
-            formData.append('audio', event.data);
-            formData.append('userId', userId);
-            formData.append('roomId', liveId);
-            formData.append('isMobile', isMobile);
-
-            try {
-                const response = await fetch('/process-remote-audio', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.transcript) {
-                        debateTranscripts.remote[userId] = (debateTranscripts.remote[userId] || '') + data.transcript + ' ';
-                        console.log(`Remote user ${userId} transcript:`, debateTranscripts.remote[userId]);
-                        
-                        // Add mobile-specific feedback
-                        if (isMobile) {
-                            showMobileFeedback("Remote speech captured");
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error(`Error processing remote audio for user ${userId}:`, error);
-                if (isMobile) {
-                    showMobileFeedback("Error processing remote audio");
-                }
-            }
+    recognition.onresult = (event) => {
+        let lastResult = event.results[event.results.length - 1];
+        if (lastResult.isFinal) {
+            debateTranscript = lastResult[0].transcript;
+            console.log("Debate Transcript:", debateTranscript);
         }
     };
 
-    // Adjust chunk size for mobile
+    recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        console.log("Restarting speech recognition...");
+        recognition.stop();  
+        setTimeout(() => recognition.start(), 1000);
+    };
+
+    recognition.start();
+}
+
+function startAIAutoComment() {
+    setInterval(async () => {
+        const latestTranscript = debateTranscript.trim();
+
+        if (latestTranscript.length > 0 && latestTranscript !== lastSentTranscript) {
+            lastSentTranscript = latestTranscript;
+            await fetchAIComment(latestTranscript);
+        }
+    }, 10000);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    startSpeechRecognition();
+    startAIAutoComment();
+});
+
+async function fetchAIComment(debateText) {
     try {
-        mediaRecorder.start(isMobile ? 2000 : 1000);
-    } catch (error) {
-        // Try alternative chunk size if initial start fails
-        try {
-            mediaRecorder.start(1000);
-        } catch (retryError) {
-            console.error(`Failed to start MediaRecorder even with alternative chunk size for user ${userId}:`, retryError);
-        }
-    }
-}
+        const response = await fetch('/generate-ai-comment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                text: debateText, 
+                videoId: liveId,  
+                videoType: "Live",  
+                userId: Viewers  
+            })
+        });
 
-function addRemoteStream(stream, userId) {
-    if (!document.getElementById(`video-${userId}`)) {
-        const videoElement = document.createElement("video");
-        videoElement.id = `video-${userId}`;
-        videoElement.className = "remote-Videos";
-        videoElement.autoplay = true;
-        videoElement.playsInline = true;
-        videoElement.srcObject = stream;
-        
-        // Handle remote audio
-        handleRemoteAudio(stream, userId);
-        
-        // Append to remote videos container
-        document.getElementById("remoteVideos").appendChild(videoElement);
+        const data = await response.json();
 
-        // Set styles after adding the video
-        updateVideoStyles();
-    }
-}
-
-function updateVideoStyles() {
-    const remoteVideos = document.querySelectorAll("#remoteVideos video");
-    const videoCount = remoteVideos.length;
-
-    remoteVideos.forEach((video) => {
-        if (videoCount === 1) {
-            video.style.width = "100%"; // Single video takes full width
-        } else if (videoCount === 2) {
-            video.style.width = "50%"; // Two videos take 50% each
-            video.style.display = "block"; // Ensure both videos are visible
+        if (response.ok && data.comment) {
+            addCommentToUI('AI_DebateBot', data.comment, '/images/nav.avif');
         } else {
-            video.style.width = "33.33%"; // If more than two, adjust accordingly
-            video.style.display = "block";
+            console.error("No valid comment received from AI.", data);
         }
-    });
+    } catch (error) {
+        console.error("Error fetching AI comment:", error);
+    }
 }
 
-function removeRemoteStream(userId) {
-    const videoElement = document.getElementById(`video-${userId}`);
-    if (videoElement) videoElement.remove();
-    
-    // Stop and cleanup MediaRecorder
-    if (remoteMediaRecorders[userId]) {
-        remoteMediaRecorders[userId].stop();
-        delete remoteMediaRecorders[userId];
+function addCommentToUI(username, comment, image) {
+    let commentSection = document.querySelector(".allsinglecomment");
+
+    if (!commentSection) {
+        commentSection = document.createElement("div");
+        commentSection.classList.add("allsinglecomment");
+        document.body.appendChild(commentSection); 
     }
 
-    // Clean up transcript
-    delete debateTranscripts.remote[userId];
+    const commentElement = document.createElement("div");
+    commentElement.classList.add("single-comment");
+    commentElement.innerHTML = `
+        <img src="${image}" alt="" class="comment-image">
+        <p><strong class="strong">${username}:</strong> ${comment}</p>
+    `;
+
+    commentSection.prepend(commentElement);
 }
+
+
+
+
+
 
 function startRecording() {
     const canvas = document.createElement("canvas");
@@ -516,7 +264,6 @@ async function joinRoom(type) {
         if (userType === "debater") {
             localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             document.getElementById("localVideo").srcObject = localStream;
-            startSpeechRecognition();
         }
     }catch (error) {
         console.error("Error accessing media devices:", error);
@@ -610,59 +357,43 @@ socket.on("user-disconnected", (userId) => {
     }
 });
 
-// Add mobile-specific feedback function
-function showMobileFeedback(message) {
-    const feedback = document.createElement('div');
-    feedback.className = 'mobile-feedback';
-    feedback.textContent = message;
-    document.body.appendChild(feedback);
-    
-    setTimeout(() => {
-        feedback.remove();
-    }, 2000);
-}
+function addRemoteStream(stream, userId) {
+    if (!document.getElementById(`video-${userId}`)) {
+        const videoElement = document.createElement("video");
+        videoElement.id = `video-${userId}`;
+        videoElement.className = "remote-Videos";
+        videoElement.autoplay = true;
+        videoElement.playsInline = true;
+        videoElement.srcObject = stream;
+        
+        // Append to remote videos container
+        document.getElementById("remoteVideos").appendChild(videoElement);
 
-// Add mobile-specific cleanup
-function cleanupAudio() {
-    if (localAudioContext) {
-        localAudioContext.close();
-    }
-    Object.values(remoteAudioContexts).forEach(context => context.close());
-    remoteAudioContexts = {};
-    
-    Object.values(remoteMediaRecorders).forEach(recorder => recorder.stop());
-    remoteMediaRecorders = {};
-    
-    if (recognition) {
-        stopSpeechRecognition();
+        // Set styles after adding the video
+        updateVideoStyles();
     }
 }
 
-// Add mobile-specific event listeners
-if (isMobile) {
-    // Handle page visibility changes
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            // Pause recognition when app goes to background
-            if (recognition) {
-                recognition.stop();
-            }
+function updateVideoStyles() {
+    const remoteVideos = document.querySelectorAll("#remoteVideos video");
+    const videoCount = remoteVideos.length;
+
+    remoteVideos.forEach((video) => {
+        if (videoCount === 1) {
+            video.style.width = "100%"; // Single video takes full width
+        } else if (videoCount === 2) {
+            video.style.width = "50%"; // Two videos take 50% each
+            video.style.display = "block"; // Ensure both videos are visible
         } else {
-            // Resume recognition when app comes to foreground
-            if (isRecognitionActive) {
-                recognition.start();
-            }
+            video.style.width = "33.33%"; // If more than two, adjust accordingly
+            video.style.display = "block";
         }
     });
+}
 
-    // Handle orientation changes
-    window.addEventListener('orientationchange', () => {
-        // Reinitialize audio contexts after orientation change
-        setTimeout(() => {
-            if (isRecognitionActive) {
-                recognition.stop();
-                recognition.start();
-            }
-        }, 500);
-    });
+
+
+function removeRemoteStream(userId) {
+    const videoElement = document.getElementById(`video-${userId}`);
+    if (videoElement) videoElement.remove();
 }
