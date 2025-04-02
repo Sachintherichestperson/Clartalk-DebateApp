@@ -1191,7 +1191,7 @@ router.get("/start-debate", isloggedin, async function (req, res) {
   try {
     const content = await User.findOne({ email: req.user.email }).populate({
       path: "Live",
-      select: "title description Time opponent",
+      select: "title description Time opponent LiveStatus",
       populate: {
         path: "opponent",
         select: "username"
@@ -1199,21 +1199,43 @@ router.get("/start-debate", isloggedin, async function (req, res) {
     });
 
     // Filter and calculate hoursLeft for active debates only
+    // const updatedContent = content.Live.filter((liveContent) => {
+    //   const Time = new Date(liveContent.Time).getTime();
+    //   const TimeLeft = Time - Date.now();
+    //   return TimeLeft > 0; // Include only future debates
+    // }).map((liveContent) => {
+    //   const Time = new Date(liveContent.Time).getTime();
+    //   const TimeLeft = Time - Date.now();
+    //   const hours = TimeLeft / (1000 * 60 * 60);
+    //   const hoursLeft = hours.toFixed(1);
+
+    //   return {
+    //     ...liveContent.toObject(), // Convert Mongoose document to plain object
+    //     hoursLeft,
+    //     opponent: liveContent.opponent[0].username    //problem here should be solved only 0th index name getting
+    //   };
+    // });
+
     const updatedContent = content.Live.filter((liveContent) => {
-      const Time = new Date(liveContent.Time).getTime();
-      const TimeLeft = Time - Date.now();
-      return TimeLeft > 0; // Include only future debates
+      return liveContent.LiveStatus === "Live"  || liveContent.LiveStatus === "Processing";
     }).map((liveContent) => {
-      const Time = new Date(liveContent.Time).getTime();
-      const TimeLeft = Time - Date.now();
-      const hours = TimeLeft / (1000 * 60 * 60);
-      const hoursLeft = hours.toFixed(1);
+        const Time = new Date(liveContent.Time).getTime();
+        const TimeLeft = Time - Date.now();
+
+        let hoursLeft;
+        if (TimeLeft <= 0) {
+          hoursLeft = "Live already started";
+        } else {
+          const hours = TimeLeft / (1000 * 60 * 60);
+          hoursLeft = hours.toFixed(1) + " hours left";
+        }
+
 
       return {
         ...liveContent.toObject(), // Convert Mongoose document to plain object
         hoursLeft,
-        opponent: liveContent.opponent[0].username    //problem here should be solved only 0th index name getting
-      };
+        opponent: liveContent.opponent[0].username
+      } 
     });
     
 
