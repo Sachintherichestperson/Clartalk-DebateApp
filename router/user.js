@@ -1138,6 +1138,25 @@ router.post("/Booking-Done-for-community/:id",isloggedin, async function (req, r
 
 router.get("/Livedebate/:id", isloggedin, async function (req, res) { 
   try {
+
+    const LiveCheck = await liveMongo.findById(req.params.id);
+
+
+      if(LiveCheck.creator[0]._id.equals(req.user._id) || LiveCheck.opponent[0]._id.equals(req.user._id)){
+        const userAgent = req.headers["user-agent"];
+        const isMobile = /android|iphone|ipad|mobile/i.test(userAgent);
+    
+        if (isMobile) {
+          return res.render("mobile-block", {
+            message: "Please visit on a laptop or desktop browser to start or join the live debate.",
+          });
+        }
+      }
+
+
+
+
+
       const Live = await liveMongo.findById(req.params.id)
           .populate({ 
             path: "creator", 
@@ -1194,16 +1213,6 @@ router.get("/Livedebate/:id", isloggedin, async function (req, res) {
 });
 
 router.get("/start-debate", isloggedin, async function (req, res) {
-
-  const userAgent = req.headers["user-agent"];
-    const isMobile = /android|iphone|ipad|mobile/i.test(userAgent);
-
-    if (isMobile) {
-      return res.render("mobile-block", {
-        message: "Please visit on a laptop or desktop browser to start or join the live debate.",
-      });
-    }
-
   try {
     const content = await User.findOne({ email: req.user.email }).populate({
       path: "Live",

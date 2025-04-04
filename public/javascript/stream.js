@@ -53,13 +53,9 @@ function startAIAutoComment() {
             lastSentTranscript = latestTranscript;
             await fetchAIComment(latestTranscript);
         }
-    }, 10000);
+    }, 20000);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    startSpeechRecognition();
-    startAIAutoComment();
-});
 
 async function fetchAIComment(debateText) {
     try {
@@ -370,6 +366,7 @@ async function joinRoom(type) {
         if (userType === "debater") {
             localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             document.getElementById("localVideo").srcObject = localStream;
+            startSpeechRecognition();
         }
     }catch (error) {
         console.error("Error accessing media devices:", error);
@@ -390,11 +387,12 @@ socket.on("new-user", async (userId, type) => {
 
     if(Creator === "true"){
         startIndividualRecording();
+        startAIAutoComment();
     }
 });    
 
 function createPeerConnection(userId) {
-    if (peerConnections[userId]) return; // Prevent duplicate connections
+    if (peerConnections[userId]) return;
 
     const peerConnection = new RTCPeerConnection(configuration);
 
