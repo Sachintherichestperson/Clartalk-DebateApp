@@ -823,5 +823,26 @@ router.post("/remote/:id", videoUpload.single("video"), async (req, res) => {
 
 
 
+router.get("/search-users", isloggedin, async function (req, res) {
+  try {
+    const query = req.query.query;
+
+    const users = await User.find({
+      username: { $regex: "^" + query, $options: "i" },
+      _id: { $ne: req.user._id } // exclude current user
+    }).limit(10);
+
+    const usernames = users.map(u => u.username);
+    res.json(usernames);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+
+
+
+
 
 module.exports = router;

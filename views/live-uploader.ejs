@@ -18,20 +18,21 @@
                 <input type="datetime-local" name="Time" class="time">
                 <input type="text" name="title" id="title" placeholder="Give Title">
                 <input type="text" name="description" id="description" placeholder="Give description">
-                <div id="radio">
+                <!-- <div id="radio">
                     <% if (live.Rank < 2) { %>
                       <label for="trending-radio" class="radio-topic">Trending Topic</label>
                       <input type="radio" name="Type" id="trending-radio" value="trending" class="radio">
                     <% } %>
-                  </div>                  
-                <div class="opponent">
+                  </div>                   -->
+                  <div class="opponent" style="position: relative;">
                     <p>Opponent Debater</p>
-                    <input type="text" placeholder="username" id="username-input" name="opponent">
-                </div>
+                    <input type="text" placeholder="username" id="username-input" name="opponent" autocomplete="off">
+                    <div id="suggestions-box" style="display: none; position: absolute; background: white; z-index: 1000;"></div>
+                  </div>                  
                 <input type="submit" value="Send Request" id="button">
             </form>
         </div>
     </section>
-    <script src="/javascript/live-uploader.min.js"></script>
+    <script src="/javascript/live-uploader.min.js"></script>    
 </body>
 </html>
