@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Page</title>
     <link rel="stylesheet" href="/stylesheets/vedioplayer.min.css">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
@@ -17,7 +18,7 @@
             <div class="video-and-suggestions">
                 <div class="video-section">
                     <video controls autoplay class="video-player" id="videoPlayer">
-                        <source src="<%= Live.Stream %>" type="video/mp4">
+                        <source src="<%= Live.Stream %>" type="video/mp4" autoplay>
                         Your browser does not support the video tag.
                     </video>
                     <h1 class="video-title"><%= Live.title %></h1>
@@ -50,10 +51,10 @@
                         </div>
                     </div>
                     <div class="comments">
-                        <h2 class="comment-data">Comments 12980</h2>
+                        <h2 class="comment-data">Comments <%= comments.length %></h2>
                         <div class="msg-box">
                             <img src="/images/Default.avif" alt="" class="comment-image">
-                            <div class="txtmsg">Kis Kis ko Ye Best App Lagta he Like kare</div>
+                            <div class="txtmsg"><%= firstcomment %></div>
                         </div>
                         <div class="allcomments">
                             <div class="input-cmt">
@@ -108,4 +109,26 @@
 </script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/javascript/videoplayer.min.js"></script>
+<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+<script>
+    const player = new Plyr('#videoPlayer', {
+        controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'settings', 'fullscreen'],
+        settings: ['speed', 'quality'],
+        speed: { selected: 1, options: [0.5, 1, 1.5, 2] }
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const video = document.getElementById("videoPlayer");
+
+        // Log video duration when metadata is loaded
+        video.addEventListener("loadedmetadata", () => {
+            console.log("Video Duration:", video.duration);
+        });
+
+        // Prevent fullscreen from being triggered via double-click on the video
+        video.addEventListener('dblclick', (e) => {
+            e.preventDefault(); // Stop default fullscreen behavior
+        });
+    });
+</script>
 </html>

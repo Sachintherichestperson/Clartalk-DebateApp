@@ -17,8 +17,8 @@
             </nav>
             <div class="video-and-suggestions">
                 <div class="video-section">
-                    <video controls  class="video-player" id="videoPlayer" autoplay>
-                        <source src="<%= vedios.vedio %>" autoplay>
+                    <video controls autoplay class="video-player" id="videoPlayer">
+                        <source src="<%= vedios.vedio %>" type="video/mp4" autoplay>
                         Your browser does not support the video tag.
                     </video>
                     <h1 class="video-title"><%= vedios.title %></h1>
@@ -52,10 +52,10 @@
                         </div>
                     </div>
                     <div class="comments">
-                        <h2 class="comment-data">Comments 12980</h2>
+                        <h2 class="comment-data">Comments <%= comment.lenght %></h2>
                         <div class="msg-box">
                             <img src="/images/Default.avif" alt="" class="comment-image" loading="lazy">
-                            <div class="txtmsg">Kis Kis ko Ye Best App Lagta he Like kare</div>
+                            <div class="txtmsg"><%= firstcomment %></div>
                         </div>
                         <div class="allcomments">
                             <div class="input-cmt">
@@ -118,13 +118,35 @@
         });
 
         document.addEventListener("DOMContentLoaded", () => {
-    const video = document.getElementById("videoPlayer");
+        const video = document.getElementById("videoPlayer");
 
-    video.addEventListener("loadedmetadata", () => {
-        console.log("Video Duration:", video.duration);
+        video.addEventListener("loadedmetadata", () => {
+            console.log("Video Duration:", video.duration);
+        });
     });
-});
 
+const bigPlay = document.querySelector('.plyr__control--overlaid');
+    if (bigPlay) {
+        bigPlay.addEventListener('click', async () => {
+            try {
+                // Fullscreen request
+                if (video.requestFullscreen) {
+                    await video.requestFullscreen();
+                } else if (video.webkitRequestFullscreen) {
+                    await video.webkitRequestFullscreen();
+                } else if (video.msRequestFullscreen) {
+                    await video.msRequestFullscreen();
+                }
+
+                // Rotate screen to landscape (mobile only)
+                if (screen.orientation && screen.orientation.lock) {
+                    await screen.orientation.lock('landscape');
+                }
+            } catch (err) {
+                console.warn('Fullscreen or orientation lock failed:', err);
+            }
+        });
+    }
 </script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/javascript/videoplayer.min.js"></script>

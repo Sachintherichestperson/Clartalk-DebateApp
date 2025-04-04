@@ -229,6 +229,7 @@ router.get("/debate/:id", isloggedin, async function(req, res) {
     }).lean();
 
     const comments = vedios.comment;
+    const firstcomment = comments[0]?.text || "Be The First To Comment";
 
     res.render("vedioplayer", {
       vedios, 
@@ -238,7 +239,8 @@ router.get("/debate/:id", isloggedin, async function(req, res) {
       follower, 
       isFollowing, 
       user,
-      comments
+      comments,
+      firstcomment
     });
 
   } catch (err) {
@@ -332,6 +334,7 @@ router.get("/podcast/:id", isloggedin, async function(req, res) {
     });
 
     const comments = vedios.comment;
+    const firstcomment = comments[0]?.text || "Be The First To Comment";
     
     res.render("vedioplayer", {
       vedios, 
@@ -341,7 +344,8 @@ router.get("/podcast/:id", isloggedin, async function(req, res) {
       follower, 
       isFollowing, 
       user,
-      comments
+      comments,
+      firstcomment
     });
 
   } catch(err) {
@@ -961,16 +965,18 @@ router.get("/Live-Stream-Recorded/:id",isloggedin, async function(req, res){
   const suggestions = [...Livemongo, ...vediomongo, ...podcastmongo];
 
   const comments = Live.comment;
+  const firstcomment = comments[0]?.text || "Be The First To Comment";
 
   res.render("Live-streamer", {
      Live,
      videoFile: Live.Stream[0],
      suggestions, 
-     currentRoute: "Live-Stream-Recorded", 
+     currentRoute: "live", 
      follower, 
      isFollowing, 
      user,
-     comments
+     comments,
+     firstcomment
     });
 });
 

@@ -422,13 +422,14 @@ io.on("connection", (socket) => {
             // ⚡ Use bulk update instead of separate calls
             await Promise.all([
                 vediomongoose.findByIdAndUpdate(data.vedioId, { $push: { comment: newComment._id } }),
-                podcastmongoose.findByIdAndUpdate(data.vedioId, { $push: { comment: newComment._id } })
+                podcastmongoose.findByIdAndUpdate(data.vedioId, { $push: { comment: newComment._id } }),
+                liveMongo.findByIdAndUpdate(data.vedioId, { $push: { comment: newComment._id } })
             ]);
     
             // Send comment update instantly
             io.emit("addComment", {
                 text: newComment.text,
-                image: user.profile ? `data:image/png;base64,${user.profile.toString("base64")}` : "/images/default.png",
+                image: user.profile ? `${user.profile}` : "/images/Default.avif",
                 username: user.username,
             });
     
