@@ -1194,6 +1194,16 @@ router.get("/Livedebate/:id", isloggedin, async function (req, res) {
 });
 
 router.get("/start-debate", isloggedin, async function (req, res) {
+
+  const userAgent = req.headers["user-agent"];
+    const isMobile = /android|iphone|ipad|mobile/i.test(userAgent);
+
+    if (isMobile) {
+      return res.render("mobile-block", {
+        message: "Please visit on a laptop or desktop browser to start or join the live debate.",
+      });
+    }
+
   try {
     const content = await User.findOne({ email: req.user.email }).populate({
       path: "Live",
