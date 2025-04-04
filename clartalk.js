@@ -23,6 +23,13 @@ const server = createServer(app);
 const io = new Server(server);
 const axios = require("axios");
 require('dotenv').config();
+const SendEmail = require("./config/nodemailer");
+const fs = require("fs");
+
+const uploadDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
 
 
 app.use(express.json());
@@ -30,6 +37,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.set("view engine", "ejs");
+app.use("/uploads", express.static(uploadDir));
 
 
 app.use(
@@ -39,7 +47,6 @@ app.use(
     secret: process.env.EXPRESS_SESSION_SECRET,
   })
 );
-
 
 app.get("/firebase-config", (req, res) => {
     res.json({
@@ -52,7 +59,6 @@ app.get("/firebase-config", (req, res) => {
         measurementId: process.env.FIREBASE_MEASUREMENT_ID
     });
 });
-
 
 app.post("/generate-ai-comment", async (req, res) => {
     try {
@@ -100,6 +106,210 @@ app.post("/generate-ai-comment", async (req, res) => {
         return res.status(500).json({ error: "Failed to generate AI comment" });
     }
 });
+
+// app.post("/generate-ai-feedback", async (req, res) => {
+//     try {
+//         const { text, videoId, videoType, userId1, userId2 } = req.body;
+
+//         // Function to fetch AI feedback
+//         const getFeedback = async (debateText, userId, variation) => {
+//             const openRouterResponse = await axios.post(
+//                 "https://openrouter.ai/api/v1/chat/completions",
+//                 {
+//                     model: "openai/gpt-4o",
+//                     messages: [
+//                         { 
+//                             role: "system", 
+//                             content: "You are an AI that provides professional and constructive feedback on live debates. Each response should be unique while maintaining a focus on content, argument structure, and persuasion."
+//                         },
+//                         { 
+//                             role: "user", 
+//                             content: `Debate transcript: "${debateText}". Provide structured feedback for User ID: ${userId}.
+                            
+//                             Make sure this feedback is **unique** and slightly different from other responses.
+                            
+//                             1. Strengths: Highlight strong points in argument clarity, persuasion, or delivery.
+//                             2. Areas for Improvement: Identify specific weaknesses.
+//                             3. Suggestions: Provide actionable advice to enhance debating skills.
+
+//                             **Variation Factor:** ${variation} (Use this to slightly alter the feedback structure and focus on different aspects).`
+//                         }
+//                     ],
+//                     max_tokens: 500,
+//                     temperature: 0.8, // Higher temperature for more variety
+//                     top_p: 0.9
+//                 },
+//                 {
+//                     headers: {
+//                         "Authorization": `Bearer `,
+//                         "HTTP-Referer": "http://localhost:3000",
+//                         "Content-Type": "application/json"
+//                     }
+//                 }
+//             );
+//             return openRouterResponse.data.choices[0].message.content.trim();
+//         };
+
+//         // Generate different feedback by introducing slight variations
+//         const feedback1 = await getFeedback(text, userId1, "Focus more on delivery and tone.");
+//         const feedback2 = await getFeedback(text, userId2, "Focus more on argument structure and persuasiveness.");
+
+//         console.log("Feedback for User 1:", feedback1);
+//         console.log("Feedback for User 2:", feedback2);
+
+//         return res.json({ user1Feedback: feedback1, user2Feedback: feedback2 });
+
+//     } catch (error) {
+//         console.error("Error fetching AI feedback:", error.response?.data || error.message);
+//         return res.status(500).json({ error: "Failed to generate AI feedback" });
+//     }
+// });
+
+app.post("/generate-ai-feedback", async (req, res) => {
+    try {
+        const { text, videoId, videoType, userId } = req.body;
+
+        // AI feedback generation (using OpenRouter or similar service)
+        const openRouterResponse = await axios.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            {
+                model: "openai/gpt-4o",
+                messages: [
+                    { 
+                        "role": "system", 
+                        "content": "You are an AI that provides professional and constructive feedback on live debates. Your response should focus primarily on the content of the argument, its structure, and its persuasiveness. The tone should be professional, encouraging, and insightful. Focus less on grammatical issues unless they significantly impact the clarity of the message."
+                      },
+                    { 
+                        role: "user", 
+                        content: `Debate transcript: "${text}".Analyze the debate and provide structured feedback in a professional tone with the following format:
+                        
+                        1. Strengths: Highlight what the user did well in terms of argument clarity, persuasion, or delivery.
+                        2. Areas for Improvement: Identify specific weaknesses or points where the debate could have been stronger.
+                        3. Suggestions for Improvement: Provide practical, actionable advice to enhance debating skills.
+                        
+                        Keep the feedback concise, insightful, and professional.` 
+                    }
+                ],
+                max_tokens: 500,
+                temperature: 0.7,
+                top_p: 0.9
+            },
+            {
+                headers: {
+                    "Authorization": `Bearer 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`,
+                    "HTTP-Referer": "http://localhost:3000",
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+        // Extract AI feedback from the response
+        const aiFeedback = openRouterResponse.data.choices[0].message.content.trim();
+        return res.json({ feedback: aiFeedback });
+
+    } catch (error) {
+        console.error("Error fetching AI feedback:", error.response?.data || error.message);
+        return res.status(500).json({ error: "Failed to generate AI feedback" });
+    }
+});   
+
+
+// app.post("/generate-ai-feedback", async (req, res) => {
+//     try {
+//         const { text, userId1, userId2 } = req.body;
+
+//         const splitDebate = async (debateText) => {
+//             const aiResponse = await axios.post(
+//                 "https://openrouter.ai/api/v1/chat/completions",
+//                 {
+//                     model: "openai/gpt-4o",
+//                     messages: [
+//                         {
+//                             role: "system",
+//                             content: "You are an AI that extracts and separates debate arguments. Identify the arguments of each debater and split them accordingly."
+//                         },
+//                         {
+//                             role: "user",
+//                             content: `Debate transcript: "${debateText}"
+//                                       Identify and return two separate sections:
+//                                       - Speaker 1 Argument:
+//                                       - Speaker 2 Argument:`
+//                         }
+//                     ],
+//                     max_tokens: 500,
+//                     temperature: 0.5
+//                 },
+//                 {
+//                     headers: {
+//                         "Authorization": `Bearer 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`,
+//                         "Content-Type": "application/json"
+//                     }
+//                 }
+//             );
+
+//             // Extracting AI-processed separation
+//             const responseText = aiResponse.data.choices[0].message.content.trim();
+//             const match = responseText.match(/Speaker 1 Argument:\s*(.*)\s*Speaker 2 Argument:\s*(.*)/s);
+
+//             if (match) {
+//                 return { speaker1: match[1].trim(), speaker2: match[2].trim() };
+//             } else {
+//                 return { speaker1: debateText, speaker2: "" }; // Default if AI can't split properly
+//             }
+//         };
+
+//         // Extract arguments
+//         const { speaker1, speaker2 } = await splitDebate(text);
+
+//         // Function to fetch AI feedback
+//         const getFeedback = async (debateText) => {
+//             const openRouterResponse = await axios.post(
+//                 "https://openrouter.ai/api/v1/chat/completions",
+//                 {
+//                     model: "openai/gpt-4o",
+//                     messages: [
+//                         {
+//                             role: "system",
+//                             content: "You are an AI that provides professional and constructive feedback on live debates."
+//                         },
+//                         {
+//                             role: "user",
+//                             content: `Debate argument: "${debateText}".
+//                                       Provide structured feedback:
+//                                       1. Strengths
+//                                       2. Areas for Improvement
+//                                       3. Suggestions for Enhancement`
+//                         }
+//                     ],
+//                     max_tokens: 500,
+//                     temperature: 0.7
+//                 },
+//                 {
+//                     headers: {
+//                         "Authorization": `Bearer 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`,
+//                         "Content-Type": "application/json"
+//                     }
+//                 }
+//             );
+
+//             return openRouterResponse.data.choices[0].message.content.trim();
+//         };
+
+//         // Get AI feedback separately
+//         const feedback1 = await getFeedback(speaker1);
+//         const feedback2 = await getFeedback(speaker2);
+
+//         return res.json({ user1Feedback: feedback1, user2Feedback: feedback2 });
+
+//     } catch (error) {
+//         console.error("Error fetching AI feedback:", error.response?.data || error.message);
+//         return res.status(500).json({ error: "Failed to generate AI feedback" });
+//     }
+// });
+
+
+
+
 
 app.use(flash());
 

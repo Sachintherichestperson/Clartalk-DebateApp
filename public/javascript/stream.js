@@ -13,6 +13,7 @@ const configuration = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] }
 let recognition;
 let debateTranscript = "";
 let lastSentTranscript = "";
+let feedbackRequested = false;
 
 function startSpeechRecognition() {
     if (!('webkitSpeechRecognition' in window)) {
@@ -28,21 +29,22 @@ function startSpeechRecognition() {
     recognition.onresult = (event) => {
         let lastResult = event.results[event.results.length - 1];
         if (lastResult.isFinal) {
-            debateTranscript = lastResult[0].transcript;
-            console.log("Debate Transcript:", debateTranscript);
+            debateTranscript += " " + lastResult[0].transcript;
+            console.log("Updated Debate Transcript:", debateTranscript);
         }
     };
 
     recognition.onerror = (event) => {
         console.error("Speech recognition error:", event.error);
         console.log("Restarting speech recognition...");
-        recognition.stop();  
+        recognition.stop();
         setTimeout(() => recognition.start(), 1000);
     };
 
     recognition.start();
 }
 
+// Auto-send AI comments every 10 seconds
 function startAIAutoComment() {
     setInterval(async () => {
         const latestTranscript = debateTranscript.trim();
@@ -90,7 +92,7 @@ function addCommentToUI(username, comment, image) {
     if (!commentSection) {
         commentSection = document.createElement("div");
         commentSection.classList.add("allsinglecomment");
-        document.body.appendChild(commentSection); 
+        document.body.appendChild(commentSection);
     }
 
     const commentElement = document.createElement("div");
@@ -102,9 +104,6 @@ function addCommentToUI(username, comment, image) {
 
     commentSection.prepend(commentElement);
 }
-
-
-
 
 
 
@@ -189,42 +188,149 @@ socket.on("user-connected", () => {
 });
 
 
-function generateOTP() {
-return Math.floor(100000 + Math.random() * 900000).toString();
+
+
+
+let localRecorder, remoteRecorder;
+let localChunks = [];
+let remoteChunks = [];
+
+function startIndividualRecording() {
+    console.log("Starting individual recording...");
+
+    const localVideo = document.getElementById("localVideo");
+
+    if (localVideo && localVideo.srcObject) {
+        localRecorder = createRecorder(localVideo.srcObject, localChunks);
+    } else {
+        console.warn("Local video stream not found!");
+    }
+
+    waitForRemoteVideo((remoteVideo) => {
+        remoteRecorder = createRecorder(remoteVideo.srcObject, remoteChunks);
+    });
+}
+
+function waitForRemoteVideo(callback, retries = 100) {
+    let remoteVideo = document.querySelector("#remoteVideos video");
+
+    if (remoteVideo && remoteVideo.srcObject) {
+        console.log("✅ Remote video found:", remoteVideo);
+        callback(remoteVideo);
+    } else if (retries > 0) {
+        console.warn(`⏳ Remote video not found yet, retrying... (${retries})`);
+        setTimeout(() => waitForRemoteVideo(callback, retries - 1), 500);
+    } else {
+        console.error("❌ Remote video not found after multiple attempts.");
+    }
+}
+
+function createRecorder(stream, chunkArray) {
+    const recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+
+    recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+            chunkArray.push(event.data);
+            console.log("✅ Chunk added, total:", chunkArray.length);
+        } else {
+            console.warn("⚠️ Received an empty chunk!");
+        }
+    };
+
+    recorder.start();
+    console.log("🎥 Recording started...");
+
+    return recorder;
+}
+
+function stopIndividualRecording() {
+    if (localRecorder) {
+        if (localRecorder.state !== "inactive") {
+            localRecorder.stop();
+            console.log("✅ Local video recording stopped.");
+            setTimeout(() => uploadRecording(localChunks, `local`, "local_recording.webm"), 1000);
+        } else {
+            console.warn("⚠️ Local recorder was already inactive.");
+        }
+    } else {
+        console.warn("❌ Local recorder does not exist.");
+    }
+
+    if (remoteRecorder) {
+        if (remoteRecorder.state !== "inactive") {
+            remoteRecorder.stop();
+            console.log("✅ Remote video recording stopped.");
+            setTimeout(() => uploadRecording(remoteChunks, `remote`, "remote_recording.webm"), 1000);
+        } else {
+            console.warn("⚠️ Remote recorder was already inactive.");
+        }
+    } else {
+        console.warn("❌ Remote recorder does not exist.");
+    }
+}
+
+function uploadRecording(chunks, route, filename) {
+    if (chunks.length === 0) {
+        console.warn("⚠️ No recorded chunks available.");
+        return;
+    }
+
+    const blob = new Blob(chunks, { type: "video/webm" });
+    const formData = new FormData();
+    formData.append("video", blob, filename);
+    formData.append("liveId", liveId);
+
+    fetch(`/creator/${route}/${liveId}`, {  
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("✅ Upload success:", data);
+        chunks.length = 0;  // ✅ Clear recorded chunks after upload
+    })
+    .catch(error => console.error("❌ Upload error:", error));
 }
 
 
-function requestEndCallOTP() {
-const otp = generateOTP();
-console.log("OTP generated:", otp);
-
-// Emitting OTP to the other streamer in the room
-socket.emit("send_otp", { otp, roomId: liveId });
-
-// Asking the current streamer to enter OTP
-const enteredOTP = prompt("Enter the OTP received by the other streamer:");
-
-// Sending OTP verification request
-if (enteredOTP) {
-    socket.emit("verify_otp", { enteredOTP, roomId: liveId });
-}
-}
 
 
-socket.on("receive_otp", (data) => {
-alert("Your opponent wants to end the call. Share this OTP: " + data.otp);
-});
 
-socket.on("otp_success", () => {
-stopRecording();
 
-setTimeout(() => {
-    socket.emit("end_call_redirect", { roomId: liveId });
-    socket.emit("redirect_to_home", { roomId: liveId });
-}, 2000);
 
-});
 
+    function generateOTP() {
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+
+    function requestEndCallOTP() {
+        const otp = generateOTP();
+        console.log("OTP generated:", otp);
+
+        socket.emit("send_otp", { otp, roomId: liveId });
+
+        const enteredOTP = prompt("Enter the OTP received by the other streamer:");
+
+        if (enteredOTP) {
+            socket.emit("verify_otp", { enteredOTP, roomId: liveId });
+        }
+    }
+
+
+    socket.on("receive_otp", (data) => {
+        alert("Your opponent wants to end the call. Share this OTP: " + data.otp);
+    });
+
+    socket.on("otp_success", () => {
+        stopRecording();
+        stopIndividualRecording();
+
+    setTimeout(() => {
+            socket.emit("end_call_redirect", { roomId: liveId });
+            socket.emit("redirect_to_home", { roomId: liveId });
+    }, 2000);
+    });
 
 socket.on("redirect_to_home", async () => {
 try {
@@ -278,9 +384,12 @@ socket.on("new-user", async (userId, type) => {
     createPeerConnection(userId);
 
     if (userType === "debater") {
-        // First debater should also send an offer to new debater
-        await new Promise(resolve => setTimeout(resolve, 500)); // Small delay to ensure stable signaling
+        await new Promise(resolve => setTimeout(resolve, 500)); 
         sendOffer(userId);
+    }
+
+    if(Creator === "true"){
+        startIndividualRecording();
     }
 });    
 

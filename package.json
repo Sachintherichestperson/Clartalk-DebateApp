@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/speech": "^7.0.1",
     "@paypal/checkout-server-sdk": "^1.0.3",
     "agenda": "^5.0.0",
     "axios": "^1.8.4",
@@ -33,6 +34,7 @@
     "firebase": "^11.1.0",
     "firebase-admin": "^13.1.0",
     "flash": "^1.1.0",
+    "form-data": "^4.0.2",
     "google-auth-library": "^9.15.0",
     "gridfs-stream": "^1.1.1",
     "jsonwebtoken": "^9.0.2",

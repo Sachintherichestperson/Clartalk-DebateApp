@@ -360,8 +360,10 @@ router.post("/reject/:id",isloggedin,async function (req, res) {
 router.post("/end-call/:id",isloggedin, async(req, res) => {
   try {
         const { LiveStatus } = req.body;
+        const { id } = req.params;
   
-        await livemongo.findByIdAndUpdate(req.params.id, { LiveStatus });
+        await livemongo.findByIdAndUpdate(id, { LiveStatus });
+        
         res.status(200).json({ message: 'Status updated successfully', status: "success", redirect: "/" });
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
@@ -667,6 +669,157 @@ router.get("/delete-community/:id", isloggedin, async function (req, res) {
     res.status(500).send("Internal Server Error");
   }
 });
+
+
+const axios = require("axios");
+const SendEmail = require("../config/nodemailer");
+const cloudinary = require("cloudinary").v2;
+
+
+router.post("/local/:id", videoUpload.single("video"), async (req, res) => {
+  if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded." });
+  }
+
+  const videoUrl = req.file.path; 
+
+  try {
+      // Convert video to MP3 using Cloudinary
+      const audioResponse = await cloudinary.uploader.upload(videoUrl, {
+          resource_type: "video",
+          format: "mp3",
+      });
+
+      const mp3Url = audioResponse.secure_url;
+
+      // Send MP3 file to AssemblyAI for transcription
+      const assemblyResponse = await axios.post(
+          "https://api.assemblyai.com/v2/transcript",
+          { audio_url: mp3Url },
+          { headers: { Authorization: "d99e20af955b48c4b8a3a3837ed26405" } }
+      );
+
+      const transcriptId = assemblyResponse.data.id;
+
+      // Wait for the transcript to be processed (Polling)
+      let transcript;
+      while (true) {
+          await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5s
+
+          const checkResponse = await axios.get(
+              `https://api.assemblyai.com/v2/transcript/${transcriptId}`,
+              { headers: { Authorization: "d99e20af955b48c4b8a3a3837ed26405" } }
+          );
+
+          if (checkResponse.data.status === "completed") {
+              transcript = checkResponse.data.text;
+              break;
+          } else if (checkResponse.data.status === "failed") {
+              throw new Error("Transcription failed");
+          }
+      }
+
+      const feedbackResponse = await axios.post(
+        "http://localhost:3000/generate-ai-feedback",
+        {
+            text: transcript, 
+            videoId: req.params.id, // Pass the video ID
+            videoType: "debate",
+            userId: req.user ? req.user.id : "unknown", // If authentication exists
+        },
+        {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }
+    );
+
+    const aiFeedback = feedbackResponse.data.feedback;
+
+      res.json({
+          success: true,
+          videoUrl,
+          transcript,
+          aiFeedback
+      });
+  } catch (error) {
+      console.error("Transcription error:", error.response ? error.response.data : error.message);
+      res.status(500).json({ error: "Failed to transcribe video." });
+  }
+});
+
+router.post("/remote/:id", videoUpload.single("video"), async (req, res) => {
+  if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded." });
+  }
+
+  const videoUrl = req.file.path;
+
+  try {
+      // Convert video to MP3 using Cloudinary
+      const audioResponse = await cloudinary.uploader.upload(videoUrl, {
+          resource_type: "video",
+          format: "mp3",
+      });
+
+      const mp3Url = audioResponse.secure_url;
+
+      // Send MP3 file to AssemblyAI for transcription
+      const assemblyResponse = await axios.post(
+          "https://api.assemblyai.com/v2/transcript",
+          { audio_url: mp3Url },
+          { headers: { Authorization: "d99e20af955b48c4b8a3a3837ed26405" } }
+      );
+
+      const transcriptId = assemblyResponse.data.id;
+
+      let transcript;
+      while (true) {
+          await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5s
+
+          const checkResponse = await axios.get(
+              `https://api.assemblyai.com/v2/transcript/${transcriptId}`,
+              { headers: { Authorization: "d99e20af955b48c4b8a3a3837ed26405" } }
+          );
+
+          if (checkResponse.data.status === "completed") {
+              transcript = checkResponse.data.text;
+              break;
+          } else if (checkResponse.data.status === "failed") {
+              throw new Error("Transcription failed");
+          }
+      }
+
+
+      const feedbackResponse = await axios.post(
+        "http://localhost:3000/generate-ai-feedback",
+        {
+            text: transcript, 
+            videoId: req.params.id,
+            videoType: "debate",
+            userId: req.user ? req.user.id : "unknown",
+        },
+        {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }
+    );
+
+    const aiFeedback = feedbackResponse.data.feedback;
+
+      res.json({
+          success: true,
+          videoUrl,
+          transcript,
+          aiFeedback
+      });
+  } catch (error) {
+      console.error("Transcription error:", error.response ? error.response.data : error.message);
+      res.status(500).json({ error: "Failed to transcribe video." });
+  }
+});
+
 
 
 
