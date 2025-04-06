@@ -18,22 +18,27 @@
         }
         .section {
             height: 100%;
-            width: 100%;
+            width: 50%;
             display: flex;
             justify-content: center;
-            flex-direction: column;
+            flex-direction: row;
             gap: 20px;
             flex-wrap: wrap;
+            row-gap: 0px;
         }
         .section a {
             color: #707070;
+        }
+        .section a:hover {
+            color: #ff9800;
+            text-decoration: underline;
         }
         .footer {
             position: relative;
             font-size: 0.85rem;
             color: rgba(255, 255, 255, 0.6);
             width: fit-content;
-            top: 40px;
+            top: 20px;
             margin-bottom: 40px;
         }
         .footer a {
@@ -67,115 +72,13 @@
         .disable:hover {
             box-shadow: 0 8px 30px rgba(255, 0, 0, 0.61);
         }
+        #footer{
+            width: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
     </style>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getMessaging, getToken, deleteToken } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-messaging.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAt9ZJs2CBEKFOK_T72QIQjVlidoBgiY-Q",
-            authDomain: "clartalk-94a92.firebaseapp.com",
-            databaseURL: "https://clartalk-94a92-default-rtdb.firebaseio.com",
-            projectId: "clartalk-94a92",
-            storageBucket: "clartalk-94a92.firebasestorage.app",
-            messagingSenderId: "220220136589",
-            appId: "1:220220136589:web:80ce8c1c77fb718c4bd6c4",
-            measurementId: "G-SXR988HK5W"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const messaging = getMessaging(app);
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const notificationButton = document.getElementById("notificationButton");
-            const notificationStatus = document.getElementById("notificationStatus");
-
-            function updateUI(enabled) {
-                if (enabled) {
-                    notificationButton.textContent = "Disable Notifications";
-                    notificationButton.classList.remove("enable");
-                    notificationButton.classList.add("disable");
-                    notificationStatus.textContent = "Notifications Enabled ✅";
-                } else {
-                    notificationButton.textContent = "Enable Notifications";
-                    notificationButton.classList.remove("disable");
-                    notificationButton.classList.add("enable");
-                    notificationStatus.textContent = "Notifications Disabled ❌";
-                }
-            }
-
-                async function enableNotifications() {
-                    updateUI(true);
-
-                    try {
-                        console.log("API HITTED");
-                        const permission = await Notification.requestPermission();
-                        if (permission === "granted") {
-                            const fcmToken = await getToken(messaging, { 
-                                vapidKey: "BDhQxlMBmyq4wfmcEu3QXV3k_b7rhPdyoE9C0q3ftnNe_bC9tRnBZpmwBAzj72-9UJcevR9GuYjCXfpd3Y13uiU" 
-                            });
-                            if (fcmToken) {
-                                localStorage.setItem("fcmToken", fcmToken);
-
-                                await fetch("/save-token", {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                    },
-                                    body: JSON.stringify({ fcmToken }),
-                                });
-                            } else {
-                                notificationStatus.textContent = "Error retrieving fcmToken ❌";
-                                updateUI(false); // Revert UI if failed
-                            }
-                        } else {
-                            notificationStatus.textContent = "Notifications Denied ❌";
-                            updateUI(false); // Revert UI if permission denied
-                        }
-                    } catch (error) {
-                        console.error("Error enabling notifications:", error);
-                        notificationStatus.textContent = "Error enabling notifications ❌";
-                        updateUI(false); // Revert UI if there's an error
-                    }
-                }
-
-                async function disableNotifications() {
-                updateUI(false); // Instantly update UI
-
-                try {
-                    const fcmToken = localStorage.getItem("fcmToken");
-                    if (fcmToken) {
-                        await deleteToken(messaging);
-                        localStorage.removeItem("fcmToken");
-
-                        // Notify backend to remove token
-                        await fetch("/delete-token", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ fcmToken }),
-                        });
-
-                        console.log("Token deleted from backend:", fcmToken);
-                    }
-                } catch (error) {
-                    console.error("Error disabling notifications:", error);
-                    notificationStatus.textContent = "Error disabling notifications ❌";
-                    updateUI(true); // Revert UI if failed
-                }
-            }
-
-            notificationButton.addEventListener("click", () => {
-                if (localStorage.getItem("fcmToken")) {
-                    disableNotifications();
-                } else {
-                    enableNotifications();
-                }
-            });
-
-            updateUI(!!localStorage.getItem("fcmToken"));
-        });
-    </script>
 </head>
 <body>
     <section>
@@ -201,17 +104,11 @@
             <div class="content">
                 <a href="/creator/Delete-content"><p>Delete Content</p></a>
             </div>
-            <!-- <div class="content">
-                <a href="/Delete-Account" onclick="openModal(event)">
-                    <p>Delete Account</p>
+            <div class="content">
+                <a href="/logout">
+                    <p>Logout</p>
                 </a>
-            </div> -->
-        </div>
-
-        <!-- Notification Section -->
-        <div class="notification-container">
-            <button id="notificationButton" class="enable">Enable Notifications</button>
-            <p id="notificationStatus">Notifications Disabled ❌</p>
+            </div>
         </div>
 
         <div class="company-values">
@@ -222,8 +119,10 @@
                 <a href="/About-Us">About Us</a>
             </div>
         </div>
-        <div class="footer">
-            &copy; 2025 ClarTalk. Need help? <a href="/contact-us">Contact us</a>
+        <div id="footer">
+            <div class="footer">
+                &copy; 2025 ClarTalk. Need help? <a href="/contact-us">Contact us</a>
+            </div>
         </div>
     </section>
 </body>

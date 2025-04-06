@@ -1463,7 +1463,7 @@ router.get("/Privacy-Policy", async function (req, res) {
   res.render("Privacy-Policy");
 });
 
-router.get("/Contact-Us",isloggedin, async function (req, res) {
+router.get("/Contact-Us", async function (req, res) {
   res.render("Contact-Us");
 });
 

@@ -25,10 +25,24 @@
             <button type="submit">Send Message</button>
         </form>        
     </div>
-
     <footer>
         <p>📧 Email: Clartalk@gmail.com | 📞 Phone: +91 70231-87244</p>
-        <p>📍 Address: ClarTalk HQ, New Delhi, India</p>
+        <p>📍 Address: ClarTalk HQ, Jaipur, India</p>
     </footer>
+    <script>
+        const form = document.querySelector("form");
+        const button = document.querySelector("button");
+    
+        button.addEventListener("click", function(event) {
+            event.preventDefault(); // Stop normal submission
+    
+            alert("Thank you for reaching out! Your message has been received. We will get back to you shortly.");
+    
+            // Optionally add a small delay before submitting
+            setTimeout(() => {
+                form.submit(); // Now submit the form after alert
+            }, 500);
+        });
+    </script>    
 </body>
 </html>
