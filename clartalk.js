@@ -82,7 +82,7 @@ app.post("/generate-ai-comment", async (req, res) => {
             },
             {
                 headers: {
-                    "Authorization": `Bearer ${process.env.AI_API_KEY}`,
+                    "Authorization": `Bearer ${process.env.COMMENT_API_KEY}`,
                     "HTTP-Referer": "http://localhost:3000",
                     "Content-Type": "application/json"
                 }
@@ -91,11 +91,16 @@ app.post("/generate-ai-comment", async (req, res) => {
 
         const aiComment = openRouterResponse.data.choices[0].message.content.trim();
 
+        const users = ["Akshay Singh", "Shivam Rathore", "Delisha Agarwal", "Saurabh", "Amit Trivedi", "Sudiksha Agarwal", "Nitin", "Shraddha Jain", "Rohit Sharma"];
+        const user = users[Math.floor(Math.random() * users.length)];
+        console.log(user);
+
+
         const aiUserId = "65a9f9d7e4b0e4c3f4b67891";
 
         const newAIComment = new comments({
             text: text,
-            userId: aiUserId,
+            userId: user,
             videoType: videoType || "live",
             liveId: videoId
         });
@@ -106,64 +111,6 @@ app.post("/generate-ai-comment", async (req, res) => {
         return res.status(500).json({ error: "Failed to generate AI comment" });
     }
 });
-
-// app.post("/generate-ai-feedback", async (req, res) => {
-//     try {
-//         const { text, videoId, videoType, userId1, userId2 } = req.body;
-
-//         // Function to fetch AI feedback
-//         const getFeedback = async (debateText, userId, variation) => {
-//             const openRouterResponse = await axios.post(
-//                 "https://openrouter.ai/api/v1/chat/completions",
-//                 {
-//                     model: "openai/gpt-4o",
-//                     messages: [
-//                         { 
-//                             role: "system", 
-//                             content: "You are an AI that provides professional and constructive feedback on live debates. Each response should be unique while maintaining a focus on content, argument structure, and persuasion."
-//                         },
-//                         { 
-//                             role: "user", 
-//                             content: `Debate transcript: "${debateText}". Provide structured feedback for User ID: ${userId}.
-                            
-//                             Make sure this feedback is **unique** and slightly different from other responses.
-                            
-//                             1. Strengths: Highlight strong points in argument clarity, persuasion, or delivery.
-//                             2. Areas for Improvement: Identify specific weaknesses.
-//                             3. Suggestions: Provide actionable advice to enhance debating skills.
-
-//                             **Variation Factor:** ${variation} (Use this to slightly alter the feedback structure and focus on different aspects).`
-//                         }
-//                     ],
-//                     max_tokens: 500,
-//                     temperature: 0.8, // Higher temperature for more variety
-//                     top_p: 0.9
-//                 },
-//                 {
-//                     headers: {
-//                         "Authorization": `Bearer `,
-//                         "HTTP-Referer": "http://localhost:3000",
-//                         "Content-Type": "application/json"
-//                     }
-//                 }
-//             );
-//             return openRouterResponse.data.choices[0].message.content.trim();
-//         };
-
-//         // Generate different feedback by introducing slight variations
-//         const feedback1 = await getFeedback(text, userId1, "Focus more on delivery and tone.");
-//         const feedback2 = await getFeedback(text, userId2, "Focus more on argument structure and persuasiveness.");
-
-//         console.log("Feedback for User 1:", feedback1);
-//         console.log("Feedback for User 2:", feedback2);
-
-//         return res.json({ user1Feedback: feedback1, user2Feedback: feedback2 });
-
-//     } catch (error) {
-//         console.error("Error fetching AI feedback:", error.response?.data || error.message);
-//         return res.status(500).json({ error: "Failed to generate AI feedback" });
-//     }
-// });
 
 app.post("/generate-ai-feedback", async (req, res) => {
     try {
@@ -196,7 +143,7 @@ app.post("/generate-ai-feedback", async (req, res) => {
             },
             {
                 headers: {
-                    "Authorization": `Bearer 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`,
+                    "Authorization": `Bearer ${process.env.FEEDBACK_API_KEY}`,
                     "HTTP-Referer": "http://localhost:3000",
                     "Content-Type": "application/json"
                 }
@@ -212,101 +159,6 @@ app.post("/generate-ai-feedback", async (req, res) => {
         return res.status(500).json({ error: "Failed to generate AI feedback" });
     }
 });   
-
-
-// app.post("/generate-ai-feedback", async (req, res) => {
-//     try {
-//         const { text, userId1, userId2 } = req.body;
-
-//         const splitDebate = async (debateText) => {
-//             const aiResponse = await axios.post(
-//                 "https://openrouter.ai/api/v1/chat/completions",
-//                 {
-//                     model: "openai/gpt-4o",
-//                     messages: [
-//                         {
-//                             role: "system",
-//                             content: "You are an AI that extracts and separates debate arguments. Identify the arguments of each debater and split them accordingly."
-//                         },
-//                         {
-//                             role: "user",
-//                             content: `Debate transcript: "${debateText}"
-//                                       Identify and return two separate sections:
-//                                       - Speaker 1 Argument:
-//                                       - Speaker 2 Argument:`
-//                         }
-//                     ],
-//                     max_tokens: 500,
-//                     temperature: 0.5
-//                 },
-//                 {
-//                     headers: {
-//                         "Authorization": `Bearer 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`,
-//                         "Content-Type": "application/json"
-//                     }
-//                 }
-//             );
-
-//             // Extracting AI-processed separation
-//             const responseText = aiResponse.data.choices[0].message.content.trim();
-//             const match = responseText.match(/Speaker 1 Argument:\s*(.*)\s*Speaker 2 Argument:\s*(.*)/s);
-
-//             if (match) {
-//                 return { speaker1: match[1].trim(), speaker2: match[2].trim() };
-//             } else {
-//                 return { speaker1: debateText, speaker2: "" }; // Default if AI can't split properly
-//             }
-//         };
-
-//         // Extract arguments
-//         const { speaker1, speaker2 } = await splitDebate(text);
-
-//         // Function to fetch AI feedback
-//         const getFeedback = async (debateText) => {
-//             const openRouterResponse = await axios.post(
-//                 "https://openrouter.ai/api/v1/chat/completions",
-//                 {
-//                     model: "openai/gpt-4o",
-//                     messages: [
-//                         {
-//                             role: "system",
-//                             content: "You are an AI that provides professional and constructive feedback on live debates."
-//                         },
-//                         {
-//                             role: "user",
-//                             content: `Debate argument: "${debateText}".
-//                                       Provide structured feedback:
-//                                       1. Strengths
-//                                       2. Areas for Improvement
-//                                       3. Suggestions for Enhancement`
-//                         }
-//                     ],
-//                     max_tokens: 500,
-//                     temperature: 0.7
-//                 },
-//                 {
-//                     headers: {
-//                         "Authorization": `Bearer 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`,
-//                         "Content-Type": "application/json"
-//                     }
-//                 }
-//             );
-
-//             return openRouterResponse.data.choices[0].message.content.trim();
-//         };
-
-//         // Get AI feedback separately
-//         const feedback1 = await getFeedback(speaker1);
-//         const feedback2 = await getFeedback(speaker2);
-
-//         return res.json({ user1Feedback: feedback1, user2Feedback: feedback2 });
-
-//     } catch (error) {
-//         console.error("Error fetching AI feedback:", error.response?.data || error.message);
-//         return res.status(500).json({ error: "Failed to generate AI feedback" });
-//     }
-// });
-
 
 
 
@@ -506,64 +358,58 @@ io.on("connection", (socket) => {
         }
     });
     
-
-        socket.on("join-room", (roomId, userType) => {
+    socket.on("join-room", (roomId, userType) => {
             socket.join(roomId);
             if (!rooms[roomId]) rooms[roomId] = [];
             rooms[roomId].push({ id: socket.id, type: userType });
     
             socket.to(roomId).emit("new-user", socket.id, userType);
             socket.to(roomId).emit("user-connected"); 
-        });
+    });
 
-        socket.on("leave-room", (roomId) => {
-            socket.leave(roomId);
-            io.to(roomId).emit("user-disconnected", socket.id);
-        });
+    socket.on("leave-room", (roomId) => {
+        socket.leave(roomId);
+       io.to(roomId).emit("user-disconnected", socket.id);
+    });
         
-        socket.on("offer", (offer, receiverId) => {
-            io.to(receiverId).emit("offer", offer, socket.id);
-        });
+    socket.on("offer", (offer, receiverId) => {
+        io.to(receiverId).emit("offer", offer, socket.id);
+    });
     
-        socket.on("answer", (answer, senderId) => {
-            io.to(senderId).emit("answer", answer, socket.id);
-        });
+    socket.on("answer", (answer, senderId) => {
+        io.to(senderId).emit("answer", answer, socket.id);
+    });
     
-        socket.on("ice-candidate", (candidate, receiverId) => {
-            io.to(receiverId).emit("ice-candidate", candidate, socket.id);
-        });      
+    socket.on("ice-candidate", (candidate, receiverId) => {
+        io.to(receiverId).emit("ice-candidate", candidate, socket.id);
+    });      
 
-        socket.on("join_room", (roomId) => {
-            socket.join(roomId);
-            console.log(`User ${socket.id} joined room ${roomId}`);
-        });
+    socket.on("join_room", (roomId) => {
+        socket.join(roomId);
+    });
     
-        // Sending OTP to the other streamer
-        socket.on("send_otp", (data) => {
-            const { otp, roomId } = data;
+    socket.on("send_otp", (data) => {
+        const { otp, roomId } = data;
     
-            // Broadcast OTP to the other streamer in the room (excluding sender)
-            socket.to(roomId).emit("receive_otp", { otp });
-        });
-    
-        // Verifying OTP and notifying both streamers
-        socket.on("verify_otp", (data) => {
-            const { enteredOTP, roomId } = data;
-    
-            io.to(roomId).emit("otp_success");
-        });
-    
-        // Redirecting both streamers
-        socket.on("end_call_redirect", ({ roomId }) => {
-            io.to(roomId).emit("redirect_to_home");
-        });        
+        socket.to(roomId).emit("receive_otp", { otp });
+    });
 
-        socket.on("disconnect", () => {
-            for (const roomId in rooms) {
-                rooms[roomId] = rooms[roomId].filter(user => user.id !== socket.id);
-                io.to(roomId).emit("user-disconnected", socket.id);
-            }
-        });
+    socket.on("verify_otp", (data) => {
+        const { enteredOTP, roomId } = data;
+    
+        io.to(roomId).emit("otp_success");
+    });
+    
+    socket.on("end_call_redirect", ({ roomId }) => {
+        io.to(roomId).emit("redirect_to_home");
+    });        
+
+    socket.on("disconnect", () => {
+        for (const roomId in rooms) {
+            rooms[roomId] = rooms[roomId].filter(user => user.id !== socket.id);
+            io.to(roomId).emit("user-disconnected", socket.id);
+        }
+    });
 });
 
 server.listen(3000);
