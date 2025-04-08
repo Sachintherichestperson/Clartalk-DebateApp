@@ -1492,8 +1492,79 @@ router.post("/Submit-Form", isloggedin, async function (req, res) {
   }
 });
 
+router.get("/forgot-password", async function (req, res) {
+  const err = req.flash("key");  
+  res.render("forgot-password", { err }); 
+});
 
+router.post("/login-otp", async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
 
+  if (!user) {
+      req.flash("key", "Email not registered");
+      return res.redirect("/forgot-password");
+  }
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  req.session.otp = otp;
+  req.session.otpEmail = email;
+  req.session.otpExpires = Date.now() + 5 * 60 * 1000;
+
+  console.log("OTP:", otp);
+  await SendEmail(email, "Login OTP", `Your OTP is: ${otp} (valid for 5 minutes)`);
+
+  res.redirect("/verify-otp");
+});
+
+router.get("/verify-otp", (req, res) => {
+  res.render("OTP-input");
+});
+
+router.post("/resend-forgot-otp", async (req, res) => {
+  const email = req.session.otpEmail;
+  if (!email) return res.status(400).json({ success: false, error: "Session expired. Please login again." });
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  req.session.otp = otp;
+  req.session.otpExpires = Date.now() + 5 * 60 * 1000;
+
+  console.log("Resent OTP:", otp);
+  await SendEmail(email, "New OTP", `Your new OTP is: ${otp} (valid for 5 minutes)`);
+
+  res.json({ success: true, message: "OTP resent successfully!" });
+});
+
+router.post("/verify-Forgot-OTP", async (req, res) => {
+  const { otp } = req.body;
+
+  if (Date.now() > req.session.otpExpires) {
+      return res.send("OTP expired.");
+  }
+
+  if (otp !== req.session.otp) {
+      return res.send("Invalid OTP.");
+  }
+
+  const user = await User.findOne({ email: req.session.otpEmail });
+
+  // Generate JWT
+  const token = jwt.sign({ email: user.email, id: user._id }, process.env.JWT_KEY, {
+      expiresIn: "7d"
+  });
+
+  res.cookie("user", token, {
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  // Clear session OTP
+  req.session.otp = null;
+  req.session.otpEmail = null;
+  req.session.otpExpires = null;
+
+  res.json({ success: true, redirectUrl: "/" });
+});
 
 
 

@@ -5,18 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="./stylesheets/Signup.min.css">
-    <style>
-        .terms label{
-            display: flex;
-        }
-    </style>
 </head>
 <body>
     <div id="container">
-        <% if(err.length>0){ %>
-            <div class="err flash-message"> <%= err %> </div> 
-            <%}else {%>
-                <% } %>
+        <% if (err && err.length > 0) { %>
+            <div class="err flash-message"><%= err %></div>
+        <% } %>        
         <h1>Register</h1>
         <form action="/register" method="post" id="Sign-up">
             <div class="username">
@@ -32,9 +26,10 @@
             <div class="password">
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" placeholder="Enter Password" required>
+                <a href="/forgot-password" class="Link">Forgot Password?</a>
             </div>
             <br>
-            <input type="hidden" id="fcmToken" name="fcmToken"> <!-- Hidden field for FCM Token -->
+            <input type="hidden" id="fcmToken" name="fcmToken">
             
             <div class="terms">
                 <input type="radio" name="Terms" id="terms" required>
