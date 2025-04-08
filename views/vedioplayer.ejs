@@ -11,10 +11,6 @@
 <body>
     <section class="main-page">
         <div class="vediopage">
-            <nav>
-                <link rel="preload" as="image" href="/images/nav.avif">
-                <input type="text" placeholder="Search for debates, podcasts, or live streams..." class="search-bar">
-            </nav>
             <div class="video-and-suggestions">
                 <div class="video-section">
                     <video controls autoplay class="video-player" id="videoPlayer">
@@ -52,7 +48,7 @@
                         </div>
                     </div>
                     <div class="comments">
-                        <h2 class="comment-data">Comments <%= comment.length %></h2>
+                        <h2 class="comment-data">Comments <%= comments.length %></h2>
                         <div class="msg-box">
                             <img src="/images/Default.avif" alt="" class="comment-image" loading="lazy">
                             <div class="txtmsg"><%= firstcomment %></div>
@@ -125,28 +121,26 @@
         });
     });
 
-const bigPlay = document.querySelector('.plyr__control--overlaid');
-    if (bigPlay) {
-        bigPlay.addEventListener('click', async () => {
-            try {
-                // Fullscreen request
-                if (video.requestFullscreen) {
-                    await video.requestFullscreen();
-                } else if (video.webkitRequestFullscreen) {
-                    await video.webkitRequestFullscreen();
-                } else if (video.msRequestFullscreen) {
-                    await video.msRequestFullscreen();
-                }
 
-                // Rotate screen to landscape (mobile only)
-                if (screen.orientation && screen.orientation.lock) {
-                    await screen.orientation.lock('landscape');
-                }
-            } catch (err) {
-                console.warn('Fullscreen or orientation lock failed:', err);
+    player.on('enterfullscreen', async () => {
+        try {
+            if (screen.orientation && screen.orientation.lock) {
+                await screen.orientation.lock('landscape');
             }
-        });
-    }
+        } catch (err) {
+            console.warn('Orientation lock failed:', err);
+        }
+    });
+
+    player.on('exitfullscreen', async () => {
+        try {
+            if (screen.orientation && screen.orientation.unlock) {
+                await screen.orientation.unlock();
+            }
+        } catch (err) {
+            console.warn('Orientation unlock failed:', err);
+        }
+    });
 </script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/javascript/videoplayer.min.js"></script>
