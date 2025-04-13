@@ -35,7 +35,8 @@ const userSchema = new mongoose.Schema({
             creatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
             title: String,
             description: String,
-            status: { type: String, default: 'pending' }
+            status: { type: String, default: 'pending' },
+            DebateSupport: { type: String, enum: ['Support', 'Against']}
         }
     ],
     Sender:  [
@@ -45,7 +46,8 @@ const userSchema = new mongoose.Schema({
             creatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
             title: String,
             description: String,
-            status: { type: String, default: 'pending' }
+            status: { type: String, default: 'pending' },
+            DebateSupport: { type: String, enum: ['Support', 'Against']}
         }
     ],
     LiveBooked: [{

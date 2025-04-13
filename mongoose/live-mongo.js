@@ -34,7 +34,7 @@ const vedioSchema = new mongoose.Schema({
     }],
     Type: {
         type: String,
-        enum: ['trending', 'regular'], // 'trending' if radio selected, 'regular' otherwise
+        enum: ['trending', 'regular'],
         default: 'regular',
     },
     viewedBy: [{ 
@@ -50,7 +50,11 @@ const vedioSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "comments"
     }],
-    Questions: { type: [String]}
+    Questions: { type: [String]},
+    DebateSupport: {
+        type: String,
+        enum: ['Support', 'Against']
+    }
 });
 
 module.exports = mongoose.model('live', vedioSchema);

@@ -1566,6 +1566,8 @@ router.post("/verify-Forgot-OTP", async (req, res) => {
   res.json({ success: true, redirectUrl: "/" });
 });
 
-
+router.get("/Offer-Terms&Conditions", async function (req, res) {
+  res.render("Banner-T&C");
+});
 
 module.exports = router;

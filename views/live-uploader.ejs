@@ -6,6 +6,24 @@
     <title>Creator page</title>
     <link rel="stylesheet" href="/stylesheets/live.min.css">
     <script type="module" src="/firebase-notification.min.js"></script>
+    <style>
+      .instruction {
+        font-size: 18px;
+        margin-bottom: 10px;
+        text-align: center;
+        color: #ff9800;
+      }
+      .radio-container {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 20px;
+      }
+      input[type="radio"] {
+        accent-color: #ff4500;
+        transform: scale(2);
+      }
+    </style>
 </head>
 <body>
     <section>
@@ -18,12 +36,17 @@
                 <input type="datetime-local" name="Time" class="time">
                 <input type="text" name="title" id="title" placeholder="Give Title">
                 <input type="text" name="description" id="description" placeholder="Give description">
-                <!-- <div id="radio">
-                    <% if (live.Rank < 2) { %>
-                      <label for="trending-radio" class="radio-topic">Trending Topic</label>
-                      <input type="radio" name="Type" id="trending-radio" value="trending" class="radio">
-                    <% } %>
-                  </div>                   -->
+                <p class="instruction">Select Content Type:</p>
+                <div class="radio-container">
+                    <label>
+                        <input type="radio" id="Support" name="Support" value="Support" required>
+                        <span>Support Of The Topic</span>
+                    </label>
+                    <label>
+                        <input type="radio" id="Against" name="Support" value="Against" required>
+                        <span>Against The Topic</span>
+                    </label>
+                </div>
                   <div class="opponent" style="position: relative;">
                     <p>Opponent Debater</p>
                     <input type="text" placeholder="username" id="username-input" name="opponent" autocomplete="off">

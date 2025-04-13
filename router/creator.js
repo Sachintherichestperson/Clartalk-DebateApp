@@ -147,7 +147,7 @@ router.get("/content/:id", isloggedin, async function(req, res) {
 
 router.post("/stream/live", upload.single("Thumbnail"), isloggedin, async function (req, res) {
   try {
-    let { title, description, creator, Time, opponent, Type } = req.body;
+    let { title, description, creator, Time, opponent, Type, Support } = req.body;
 
     let Thumbnail = req.file ? req.file.path : null;
     let uploadDate = new Date();
@@ -169,6 +169,7 @@ router.post("/stream/live", upload.single("Thumbnail"), isloggedin, async functi
       Time: streamingDate,
       opponent: opponentUser._id,
       Type,
+      DebateSupport: Support,
     });
 
     const user = await User.findOne({ email: req.user.email });
@@ -188,9 +189,11 @@ router.post("/stream/live", upload.single("Thumbnail"), isloggedin, async functi
       creatorId: req.user._id,
       title,
       description,
-      Type
+      Type,
+      DebateSupport: Support === "Support" ? "Against" : "Support",
     });
     await opponentUser.save();
+    console.log("Opponent User Requests: ", opponentUser.requests);
 
     user.Sender.push({
       OpponentName: opponentUser._id,
@@ -198,6 +201,7 @@ router.post("/stream/live", upload.single("Thumbnail"), isloggedin, async functi
       creatorId: req.user._id,
       title,
       description,
+      DebateSupport: Support
     });
     await user.save();
 
@@ -224,7 +228,7 @@ router.get("/opponent-requests/:Id", isloggedin, async (req, res) => {
     // Fetch the user by email and populate the requests
     const user = await User.findOne({ email: req.user.email }).populate({
       path: "requests",
-      select: "OpponentName requestId title description",
+      select: "OpponentName requestId title description DebateSupport",
     });
 
     // Check if the user or their requests do not exist or are empty
@@ -233,18 +237,23 @@ router.get("/opponent-requests/:Id", isloggedin, async (req, res) => {
     }
 
     // Get the first request's opponentId
-    const opponentId = user.requests[0]?.OpponentName; // Using optional chaining
+    const opponentId = user.requests[0]?.OpponentName;
 
-    // If opponentId doesn't exist in the request, return empty data
     if (!opponentId) {
       return res.render("requests", { requests: [], contents: [], opponentId: null, user });
     }
 
     // Fetch the contents with status 'pending'
-    const contents = await livemongo.find({ status: "pending" });
+    const contents = await livemongo.find({ status: "pending" }).populate({
+      path: "opponent",
+      select: "username requests"
+    }).populate({
+      path: "creator",
+      select: "username requests"
+    });
     const Time = contents.Time;
+    console.log("Contents: ", contents[0].opponent[0].requests[0].DebateSupport);
 
-    // Render the page with requests and contents
     res.render("requests", { requests: user.requests, contents, opponentId, user });
   } catch (err) {
     console.log("Error fetching opponent requests: ", err);
