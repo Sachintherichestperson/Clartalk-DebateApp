@@ -193,7 +193,6 @@ router.post("/stream/live", upload.single("Thumbnail"), isloggedin, async functi
       DebateSupport: Support === "Support" ? "Against" : "Support",
     });
     await opponentUser.save();
-    console.log("Opponent User Requests: ", opponentUser.requests);
 
     user.Sender.push({
       OpponentName: opponentUser._id,
@@ -252,7 +251,6 @@ router.get("/opponent-requests/:Id", isloggedin, async (req, res) => {
       select: "username requests"
     });
     const Time = contents.Time;
-    console.log("Contents: ", contents[0].opponent[0].requests[0].DebateSupport);
 
     res.render("requests", { requests: user.requests, contents, opponentId, user });
   } catch (err) {
