@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings</title>
+    <meta property="og:title" content="Join Clartalk!">
+    <meta property="og:description" content="🔥 Let’s debate & earn! Join Clartalk and become a featured debater!">
+    <meta property="og:image" content="https://clartalk.online/images/nav.avif">
+    <meta property="og:url" content="https://clartalk.online">
+
     <link rel="stylesheet" href="./stylesheets/settings.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         .company-values {
             border-top: 1px solid #333333;
@@ -59,6 +65,10 @@
             border: none;
             cursor: pointer;
             color: white;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
         }
         .enable {
             background-color: #00a600;
@@ -78,6 +88,24 @@
             display: flex;
             justify-content: center;
         }
+        /* Share Button Style */
+        #shareBtn {
+            border: none;
+            cursor: pointer;
+            color: white;
+            font-size: 28px;
+            background-color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        .share:hover{
+            color: orange;
+        }
+        #shareBtn i {
+            font-size: 25px;
+        }
     </style>
 </head>
 <body>
@@ -86,6 +114,11 @@
             <h1>Settings</h1>
         </div>
         <div class="page">
+            <div class="content">
+                <button id="shareBtn">
+                    <p class="share">Refer to a Creator</p> <i class="fas fa-share"></i>
+                </button>
+            </div>     
             <div class="content">
                 <a href="/creator/creator/upload"><p>Upload Content</p></a>
             </div>
@@ -97,7 +130,7 @@
             </div>
             <div class="content">
                 <a href="/creator/Create-The-Competition"><p>Introduce the Competition</p></a>
-            </div>        
+            </div>             
             <div class="content">
                 <a href="/creator/Delete-community"><p>Delete Community</p></a>
             </div>
@@ -125,5 +158,30 @@
             </div>
         </div>
     </section>
+    <script>
+        const shareBtn = document.getElementById('shareBtn');
+      
+        shareBtn.addEventListener('click', async () => {
+          const shareData = {
+            title: 'Join Clartalk!',
+            text: '🔥 Let’s debate & earn! Join Clartalk and become a featured debater!',
+            url: `https://clartalk.online`,
+            image: 'https://clartalk.online/images/nav.avif'
+          };
+      
+          if (navigator.share) {
+            try {
+              await navigator.share(shareData);
+              console.log('App shared successfully!');
+            } catch (err) {
+              console.error('Sharing failed:', err);
+            }
+          } else {
+            // Fallback: Copy link to clipboard
+            navigator.clipboard.writeText(shareData.url);
+            alert("Link copied to clipboard! Share it with your friends.");
+          }
+        });
+      </script>      
 </body>
 </html>

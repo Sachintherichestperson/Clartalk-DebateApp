@@ -615,10 +615,6 @@ router.get("/Send-merge-request",isloggedin,async function(req, res){
   res.render("Send-merge-request")
 });
 
-router.get("/settings",isloggedin,async function (req, res) {                                                  //settings   Page
-  res.render("settings");
-});
-
 router.get("/logout", logout);                                                                             //Logout route
 
 router.get("/community-chat/:id",isloggedin ,async function(req, res){                                    //community-chat/:id Page
@@ -844,7 +840,7 @@ router.get("/Send-merge-request",isloggedin,async function(req, res){
   res.render("Send-merge-request")
 });
 
-router.get("/settings",isloggedin,async function (req, res) {                                                  //settings   Page
+router.get("/settings", async function (req, res) {                                                  //settings   Page
   res.render("settings");
 });
 
@@ -1568,6 +1564,10 @@ router.post("/verify-Forgot-OTP", async (req, res) => {
 
 router.get("/Offer-Terms&Conditions", async function (req, res) {
   res.render("Banner-T&C");
+});
+
+router.get("/Clartalk-Debators-Reward", async function (req, res) {
+  res.render("Clartalk-Debators-Reward");
 });
 
 module.exports = router;
